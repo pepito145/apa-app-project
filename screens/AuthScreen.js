@@ -6,8 +6,18 @@ const AuthScreen = ({ onLogin }) => {
   const [showLoginForm, setShowLoginForm] = useState(false); // État pour afficher le formulaire de connexion
   const [showSignupForm, setShowSignupForm] = useState(false); // État pour afficher le formulaire d'inscription
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [firstname, setFirstname] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState(''); // Champ supplémentaire pour l'inscription
+
+  const resetForm = () => {
+    setEmail('');
+    setName('');
+    setFirstname('');
+    setPassword('');
+    setConfirmPassword('');
+  };
 
   const handleLogin = () => {
     if (email && password) {
@@ -80,7 +90,7 @@ const AuthScreen = ({ onLogin }) => {
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Se Connecter</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.secondaryButton} onPress={() => setShowLoginForm(false)}>
+          <TouchableOpacity style={styles.secondaryButton} onPress={() => { setShowLoginForm(false); resetForm(); }}>
             <Text style={styles.secondaryButtonText}>Retour</Text>
           </TouchableOpacity>
         </>
@@ -95,6 +105,21 @@ const AuthScreen = ({ onLogin }) => {
             autoCapitalize="none"
             value={email}
             onChangeText={setEmail}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Nom"
+            autoCapitalize="words"
+            value={name}
+            onChangeText={setName}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Prénom"
+            keyboardType="email-address"
+            autoCapitalize="words"
+            value={firstname}
+            onChangeText={setFirstname}
           />
           <TextInput
             style={styles.input}
@@ -113,7 +138,7 @@ const AuthScreen = ({ onLogin }) => {
           <TouchableOpacity style={styles.button} onPress={handleSignup}>
             <Text style={styles.buttonText}>S'inscrire</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.secondaryButton} onPress={() => setShowSignupForm(false)}>
+          <TouchableOpacity style={styles.secondaryButton} onPress={() => { setShowSignupForm(false); resetForm(); }}>
             <Text style={styles.secondaryButtonText}>Retour</Text>
           </TouchableOpacity>
         </>
