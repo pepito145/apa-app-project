@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import HomeScreen from './screens/HomeScreen';
+//import CustomButton from './components/CustomButton';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
