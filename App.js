@@ -1,9 +1,8 @@
-// App.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthScreen from './screens/AuthScreen';
-import AppNavigator from './navigation/AppNavigator'; // Navigation pour les utilisateurs connectés
+import AppNavigator from './navigation/AppNavigator'; // Votre système de navigation
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -12,13 +11,10 @@ export default function App() {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        // TEMPORAIRE : Pour tester, retirez ceci après
-        await AsyncStorage.clear();
-
         const userToken = await AsyncStorage.getItem('userToken');
-        console.log('User Token:', userToken); // Pour vérifier la valeur du token
+        console.log('User Token:', userToken); // Vérifiez la valeur du token
         if (userToken) {
-          setIsLoggedIn(true); // L'utilisateur est connecté
+          setIsLoggedIn(true); // Définit l'utilisateur comme connecté
         }
       } catch (e) {
         console.error('Erreur lors de la vérification du statut de connexion', e);
@@ -33,9 +29,10 @@ export default function App() {
   const handleLogin = async (token) => {
     try {
       await AsyncStorage.setItem('userToken', token);
-      setIsLoggedIn(true); // Définir l'utilisateur comme connecté
+      setIsLoggedIn(true); // Définit l'utilisateur comme connecté
+      console.log('Connexion réussie avec token :', token);
     } catch (e) {
-      console.error('Erreur lors de la connexion', e);
+      console.error('Erreur lors de la sauvegarde du token', e);
     }
   };
 
@@ -57,9 +54,9 @@ export default function App() {
   }
 
   return isLoggedIn ? (
-    <AppNavigator onLogout={handleLogout} /> // Affiche la navigation principale si connecté
+    <AppNavigator onLogout={handleLogout} /> // Navigation principale si connecté
   ) : (
-    <AuthScreen onLogin={handleLogin} /> // Affiche l'écran d'authentification si non connecté
+    <AuthScreen onLogin={handleLogin} /> // Écran d'authentification si non connecté
   );
 }
 
