@@ -1,9 +1,34 @@
 // screens/SettingsScreen.js
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
 
-const SettingsScreen = () => {
+const SettingsScreen = ({ navigation }) => {
+  // Gestion des actions des boutons
+  const handleProfileEdit = () => {
+    // Naviguer vers une page "Modifier le profil"
+    navigation.navigate('EditProfile');
+  };
+
+  const handlePreferences = () => {
+    // Exemple d'alerte pour Préférences (ajouter une navigation si nécessaire)
+    Alert.alert('Préférences', 'Options de préférences à venir.');
+  };
+
+  const handleNotifications = () => {
+    // Naviguer vers une page Notifications
+    navigation.navigate('Notifications');
+  };
+
+  const handleAbout = () => {
+    // Exemple d'alerte pour "À propos de l'application"
+    Alert.alert(
+      'À propos de l’application',
+      'Version : 1.0.0\nCréée par votre équipe.',
+      [{ text: 'OK', style: 'default' }]
+    );
+  };
+
   return (
     <LinearGradient
       colors={['#6dd5ed', '#2193b0']} // Dégradé similaire aux autres écrans
@@ -11,18 +36,24 @@ const SettingsScreen = () => {
     >
       <Text style={styles.title}>Paramètres</Text>
 
-      {/* Placeholder pour les futurs paramètres */}
       <View style={styles.optionContainer}>
-        <TouchableOpacity style={styles.optionButton}>
+        {/* Bouton Modifier le profil */}
+        <TouchableOpacity style={styles.optionButton} onPress={handleProfileEdit}>
           <Text style={styles.optionText}>Modifier le profil</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.optionButton}>
+
+        {/* Bouton Préférences */}
+        <TouchableOpacity style={styles.optionButton} onPress={handlePreferences}>
           <Text style={styles.optionText}>Préférences</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.optionButton}>
+
+        {/* Bouton Notifications */}
+        <TouchableOpacity style={styles.optionButton} onPress={handleNotifications}>
           <Text style={styles.optionText}>Notifications</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.optionButton}>
+
+        {/* Bouton À propos */}
+        <TouchableOpacity style={styles.optionButton} onPress={handleAbout}>
           <Text style={styles.optionText}>À propos de l'application</Text>
         </TouchableOpacity>
       </View>
