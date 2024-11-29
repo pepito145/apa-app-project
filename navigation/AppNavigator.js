@@ -10,6 +10,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import IPAQForm from '../screens/IPAQForm';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -76,15 +77,18 @@ const TabNavigator = ({ onLogout }) => {
             iconName = focused ? 'fitness' : 'fitness-outline';
           } else if (route.name === 'Paramètres') {
             iconName = focused ? 'settings' : 'settings-outline';
+          } else if (route.name === 'Profil') {
+            iconName = focused ? 'person' : 'person-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
       })}
     >
-      <Tab.Screen name="Accueil">{() => <HomeStack onLogout={onLogout} />}</Tab.Screen>
       <Tab.Screen name="Statistiques" component={StatsScreen} />
       <Tab.Screen name="Activités" component={ActivitiesScreen} />
+      <Tab.Screen name="Accueil">{() => <HomeStack onLogout={onLogout} />}</Tab.Screen>
+      <Tab.Screen name="Profil" component={ProfileScreen} />
       <Tab.Screen name="Paramètres" component={SettingsStack} />
     </Tab.Navigator>
   );
