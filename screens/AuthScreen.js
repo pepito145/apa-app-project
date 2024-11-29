@@ -52,7 +52,8 @@ const AuthScreen = ({ onLogin }) => {
       }
     } catch (error) {
       console.error('Erreur backend :', error.response?.data || error.message);
-      Alert.alert('Erreur', 'Connexion échouée. Vérifiez vos identifiants.');
+      const errorMessage = error.response?.data?.error || 'Connexion échouée. Veuillez réessayer.';
+      Alert.alert('Erreur', errorMessage); // Affiche le message d'erreur précis
     }
   };
 
@@ -61,23 +62,23 @@ const AuthScreen = ({ onLogin }) => {
       Alert.alert('Erreur', 'Les mots de passe ne correspondent pas.');
       return;
     }
-
+  
     if (!email || !password || !name || !firstname || !confirmPassword) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
       return;
     }
-
+  
     if (!isValidEmail(email)) {
       Alert.alert('Erreur', 'Veuillez saisir un email valide.');
       return;
     }
-
+  
     try {
       const response = await api.post('/register/', {
         email,
         password,
-        name,
-        firstname,
+        last_name: name,
+        first_name: firstname,
       });
       if (response.status === 201) {
         Alert.alert('Inscription réussie !', 'Vous pouvez maintenant vous connecter.');
@@ -86,7 +87,8 @@ const AuthScreen = ({ onLogin }) => {
       }
     } catch (error) {
       console.error('Erreur backend (inscription) :', error.response?.data || error.message);
-      Alert.alert('Inscription échouée', 'Vérifiez vos informations.');
+      const errorMessage = error.response?.data?.error || 'Inscription échouée. Veuillez réessayer.';
+      Alert.alert('Erreur', errorMessage); // Affiche le message d'erreur précis
     }
   };
 

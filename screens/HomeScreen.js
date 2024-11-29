@@ -50,8 +50,8 @@ const HomeScreen = ({ navigation, onLogout }) => {
           <Text style={styles.statValue}>350 kcal</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statTitle}>BPM</Text>
-          <Text style={styles.statValue}>75 ❤️</Text>
+          <Text style={styles.statTitle}>BPM ❤️</Text>
+          <Text style={styles.statValue}>75</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statTitle}>Streak 🔥</Text>

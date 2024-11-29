@@ -1,86 +1,131 @@
-// screens/ProfileScreen.js
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
 const ProfileScreen = () => {
-  return (
-    <LinearGradient
-      colors={['#6dd5ed', '#2193b0']} // Dégradé similaire aux autres écrans
-      style={styles.container}
-    >
-      <Text style={styles.title}>Profil</Text>
+  // Données fictives
+  const userData = {
+    first_name: 'Elliot',
+    last_name: 'Cabanau',
+    birth_date: '15 juin 2002 (22 ans)',
+    gender: 'Homme',
+    weight: '75 kg',
+    ipaq_score: 'Moyen',
+  };
 
-      <ScrollView contentContainerStyle={styles.statsContainer}>
-        {/* Placeholder pour les statistiques */}
-        <View style={styles.statCard}>
-          <Text style={styles.statTitle}>Nom</Text>
-          <Text style={styles.statValue}>7,500</Text>
+  return (
+    <View style={styles.container}>
+      <ScrollView>
+        <View style={styles.header}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {userData.first_name[0]}{userData.last_name[0]}
+            </Text>
+          </View>
+          <Text style={styles.headerName}>
+            {userData.first_name} {userData.last_name}
+          </Text>
+        </View>
+
+        {/* Section des informations */}
+        <View style={styles.section}>
+          <View style={styles.row}>
+            <Text style={styles.label}>Nom</Text>
+            <Text style={styles.value}>{userData.last_name}</Text>
+          </View>
+          <View style={styles.separator} />
+          <View style={styles.row}>
+            <Text style={styles.label}>Prénom</Text>
+            <Text style={styles.value}>{userData.first_name}</Text>
+          </View>
+          <View style={styles.separator} />
+          <View style={styles.row}>
+            <Text style={styles.label}>Genre</Text>
+            <Text style={styles.value}>{userData.gender}</Text>
+          </View>
+          <View style={styles.separator} />
+          <View style={styles.row}>
+            <Text style={styles.label}>Date de naissance</Text>
+            <Text style={styles.value}>{userData.birth_date}</Text>
+          </View>
+          <View style={styles.separator} />
+          <View style={styles.row}>
+            <Text style={styles.label}>Poids</Text>
+            <Text style={styles.value}>{userData.weight}</Text>
+          </View>
+          <View style={styles.separator} />
+          <View style={styles.row}>
+            <Text style={styles.label}>Score IPAQ</Text>
+            <Text style={styles.value}>{userData.ipaq_score}</Text>
+          </View>
         </View>
       </ScrollView>
-      
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    justifyContent: 'center',
+    backgroundColor: '#6dd5ed', // Couleur bleu clair dégradée d'avant
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  statsContainer: {
+  header: {
     alignItems: 'center',
-    paddingBottom: 20,
+    paddingVertical: 20,
+    backgroundColor: '#2193b0', // Couleur bleu foncé d'avant
+    marginBottom: 10,
   },
-  statCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Fond blanc semi-transparent
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFFFFF', // Fond blanc pour l'avatar
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  avatarText: {
+    fontSize: 32,
+    color: '#2193b0', // Texte bleu foncé pour l'avatar
+    fontWeight: 'bold',
+  },
+  headerName: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#FFFFFF', // Nom en blanc dans l'en-tête
+  },
+  section: {
+    backgroundColor: '#FFFFFF', // Fond blanc pour les sections
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     borderRadius: 12,
-    padding: 16,
-    width: '100%',
-    marginBottom: 16,
-    alignItems: 'flex-start',
+    marginHorizontal: 15,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3, // Légère ombre
   },
-  statTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2193b0',
-    marginBottom: 4,
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10, // Espacement vertical pour chaque ligne
   },
-  statValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333333',
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#2193b0', // Bleu foncé pour les labels
   },
-  detailsButton: {
-    position: 'absolute', // Fixé en bas de l'écran
-    bottom: 20,
-    alignSelf: 'center',
-    backgroundColor: '#ffffff',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  detailsButtonText: {
+  value: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2193b0',
+    color: '#333333', // Texte noir pour les valeurs
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#E5E5E5', // Ligne de séparation grise
+    marginVertical: 5,
   },
 });
 
