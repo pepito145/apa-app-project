@@ -1,54 +1,126 @@
-// screens/EditProfileScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Picker } from '@react-native-picker/picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const EditProfileScreen = () => {
-  // États pour chaque champ de profil
-  const [firstName, setFirstName] = useState('Elliot');
-  const [lastName, setLastName] = useState('FamilyName');
-  const [email, setEmail] = useState('elliot@example.com');
-  const [phone, setPhone] = useState('0123456789');
-  const [isEditing, setIsEditing] = useState(null); // Champ actuellement édité
+  // États pour les données principales
+  const [profile, setProfile] = useState({
+    firstName: 'Elliot',
+    lastName: 'FamilyName',
+    gender: 'Homme',
+    age: '22',
+    weight: '70',
+    ipaqScore: '5000',
+  });
 
-  const handleSave = (field, value) => {
-    if (field === 'firstName') setFirstName(value);
-    if (field === 'lastName') setLastName(value);
-    if (field === 'email') setEmail(value);
-    if (field === 'phone') setPhone(value);
+  const [editingField, setEditingField] = useState(null); // Champ actuellement édité
+  const [tempValue, setTempValue] = useState(''); // Valeur temporaire pour la saisie
+  const [showDatePicker, setShowDatePicker] = useState(false); // Contrôle du DateTimePicker
 
-    setIsEditing(null); // Arrête l'édition après sauvegarde
-    alert('Modifications sauvegardées.');
+  // Charger les données sauvegardées à partir d'AsyncStorage
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const savedProfile = await AsyncStorage.getItem('userProfile');
+        if (savedProfile) {
+          setProfile(JSON.parse(savedProfile));
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement du profil :', error);
+      }
+    };
+    loadProfile();
+  }, []);
+
+  // Sauvegarder les données dans AsyncStorage
+  const saveProfile = async (updatedProfile) => {
+    try {
+      await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      console.log('Profil sauvegardé !');
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde du profil :', error);
+    }
+  };
+
+  // Gestion de la modification
+  const startEditing = (field) => {
+    setEditingField(field);
+    setTempValue(profile[field]?.toString() || ''); // Charger la valeur actuelle
+    if (field === 'birthDate') {
+      setShowDatePicker(true); // Afficher le calendrier pour la date
+    }
+  };
+
+  // Gestion de la sauvegarde
+  const saveField = (field) => {
+    const updatedProfile = {
+      ...profile,
+      [field]: field === 'birthDate' ? tempValue : tempValue.toString(),
+    };
+    setProfile(updatedProfile);
+    saveProfile(updatedProfile); // Sauvegarde dans AsyncStorage
+    setEditingField(null);
+    if (field === 'birthDate') setShowDatePicker(false); // Cacher le calendrier après sauvegarde
+  };
+
+  // Gestion de la validation automatique pour le genre
+  const handleGenderChange = (value) => {
+    const updatedProfile = {
+      ...profile,
+      gender: value,
+    };
+    setProfile(updatedProfile);
+    saveProfile(updatedProfile); // Sauvegarde dans AsyncStorage
+    setEditingField(null);
   };
 
   return (
     <LinearGradient colors={['#6dd5ed', '#2193b0']} style={styles.container}>
-      <Text style={styles.title}>Modifier le profil</Text>
-
       <View style={styles.form}>
-        {/* Champ : Prénom */}
+        {/* Prénom */}
+        <EditableField
+          label="Prénom"
+          value={profile.firstName}
+          isEditing={editingField === 'firstName'}
+          tempValue={tempValue}
+          setTempValue={setTempValue}
+          onEdit={() => startEditing('firstName')}
+          onSave={() => saveField('firstName')}
+        />
+
+        {/* Nom */}
+        <EditableField
+          label="Nom"
+          value={profile.lastName}
+          isEditing={editingField === 'lastName'}
+          tempValue={tempValue}
+          setTempValue={setTempValue}
+          onEdit={() => startEditing('lastName')}
+          onSave={() => saveField('lastName')}
+        />
+
+        {/* Genre */}
         <View style={styles.field}>
-          <Text style={styles.label}>Prénom</Text>
-          {isEditing === 'firstName' ? (
-            <View style={styles.inputRow}>
-              <TextInput
-                style={styles.input}
-                value={firstName}
-                onChangeText={(value) => setFirstName(value)}
-              />
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={() => handleSave('firstName', firstName)}
-              >
-                <Text style={styles.saveButtonText}>✔</Text>
-              </TouchableOpacity>
-            </View>
+          <Text style={styles.label}>Genre</Text>
+          {editingField === 'gender' ? (
+            <Picker
+              selectedValue={profile.gender}
+              style={styles.picker}
+              onValueChange={(itemValue) => handleGenderChange(itemValue)}
+            >
+              <Picker.Item label="Homme" value="Homme" />
+              <Picker.Item label="Femme" value="Femme" />
+              <Picker.Item label="Autre" value="Autre" />
+            </Picker>
           ) : (
             <View style={styles.valueRow}>
-              <Text style={styles.value}>{firstName}</Text>
+              <Text style={styles.value}>{profile.gender}</Text>
               <TouchableOpacity
                 style={styles.editButton}
-                onPress={() => setIsEditing('firstName')}
+                onPress={() => startEditing('gender')}
               >
                 <Text style={styles.editButtonText}>Modifier</Text>
               </TouchableOpacity>
@@ -56,116 +128,77 @@ const EditProfileScreen = () => {
           )}
         </View>
 
-        {/* Champ : Nom */}
-        <View style={styles.field}>
-          <Text style={styles.label}>Nom</Text>
-          {isEditing === 'lastName' ? (
-            <View style={styles.inputRow}>
-              <TextInput
-                style={styles.input}
-                value={lastName}
-                onChangeText={(value) => setLastName(value)}
-              />
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={() => handleSave('lastName', lastName)}
-              >
-                <Text style={styles.saveButtonText}>✔</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.valueRow}>
-              <Text style={styles.value}>{lastName}</Text>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => setIsEditing('lastName')}
-              >
-                <Text style={styles.editButtonText}>Modifier</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
+        {/* Age */}
+        <EditableField
+          label="Age"
+          value={profile.age + ' ans'}
+          isEditing={editingField === 'age'}
+          tempValue={tempValue}
+          setTempValue={setTempValue}
+          onEdit={() => startEditing('age')}
+          onSave={() => saveField('age')}
+        />
 
-        {/* Champ : Email */}
-        <View style={styles.field}>
-          <Text style={styles.label}>Email</Text>
-          {isEditing === 'email' ? (
-            <View style={styles.inputRow}>
-              <TextInput
-                style={styles.input}
-                value={email}
-                onChangeText={(value) => setEmail(value)}
-                keyboardType="email-address"
-              />
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={() => handleSave('email', email)}
-              >
-                <Text style={styles.saveButtonText}>✔</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.valueRow}>
-              <Text style={styles.value}>{email}</Text>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => setIsEditing('email')}
-              >
-                <Text style={styles.editButtonText}>Modifier</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
+        {/* Poids */}
+        <EditableField
+          label="Poids (kg)"
+          value={profile.weight}
+          isEditing={editingField === 'weight'}
+          tempValue={tempValue}
+          setTempValue={setTempValue}
+          onEdit={() => startEditing('weight')}
+          onSave={() => saveField('weight')}
+        />
 
-        {/* Champ : Téléphone */}
-        <View style={styles.field}>
-          <Text style={styles.label}>Téléphone</Text>
-          {isEditing === 'phone' ? (
-            <View style={styles.inputRow}>
-              <TextInput
-                style={styles.input}
-                value={phone}
-                onChangeText={(value) => setPhone(value)}
-                keyboardType="phone-pad"
-              />
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={() => handleSave('phone', phone)}
-              >
-                <Text style={styles.saveButtonText}>✔</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.valueRow}>
-              <Text style={styles.value}>{phone}</Text>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => setIsEditing('phone')}
-              >
-                <Text style={styles.editButtonText}>Modifier</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
+        {/* Score IPAQ */}
+        <EditableField
+          label="Score IPAQ"
+          value={profile.ipaqScore}
+          isEditing={editingField === 'ipaqScore'}
+          tempValue={tempValue}
+          setTempValue={setTempValue}
+          onEdit={() => startEditing('ipaqScore')}
+          onSave={() => saveField('ipaqScore')}
+        />
       </View>
     </LinearGradient>
   );
 };
+
+// Composant réutilisable pour les champs modifiables
+const EditableField = ({ label, value, isEditing, tempValue, setTempValue, onEdit, onSave }) => (
+  <View style={styles.field}>
+    <Text style={styles.label}>{label}</Text>
+    {isEditing ? (
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          value={tempValue}
+          onChangeText={(text) => setTempValue(text)}
+          keyboardType={label === 'Poids (kg)' || label === 'Score IPAQ' ? 'numeric' : 'default'}
+        />
+        <TouchableOpacity style={styles.saveButton} onPress={onSave}>
+          <Text style={styles.saveButtonText}>✔</Text>
+        </TouchableOpacity>
+      </View>
+    ) : (
+      <View style={styles.valueRow}>
+        <Text style={styles.value}>{value}</Text>
+        <TouchableOpacity style={styles.editButton} onPress={onEdit}>
+          <Text style={styles.editButtonText}>Modifier</Text>
+        </TouchableOpacity>
+      </View>
+    )}
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
   form: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Fond blanc semi-transparent
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 12,
     padding: 16,
     shadowColor: '#000',
@@ -227,6 +260,11 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#ffffff',
     fontWeight: 'bold',
+  },
+  picker: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    color: '#333',
   },
 });
 

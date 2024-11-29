@@ -3,29 +3,37 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
 
-const SettingsScreen = ({ navigation }) => {
+const SettingsScreen = ({ navigation, onLogout }) => {
   // Gestion des actions des boutons
   const handleProfileEdit = () => {
-    // Naviguer vers une page "Modifier le profil"
     navigation.navigate('EditProfile');
   };
 
   const handlePreferences = () => {
-    // Exemple d'alerte pour Préférences (ajouter une navigation si nécessaire)
     Alert.alert('Préférences', 'Options de préférences à venir.');
   };
 
   const handleNotifications = () => {
-    // Naviguer vers une page Notifications
     navigation.navigate('Notifications');
   };
 
   const handleAbout = () => {
-    // Exemple d'alerte pour "À propos de l'application"
     Alert.alert(
       'À propos de l’application',
       'Version : 1.0.0\nCréée par votre équipe.',
       [{ text: 'OK', style: 'default' }]
+    );
+  };
+
+  const handleLogout = () => {
+    // Affiche une pop-up de confirmation
+    Alert.alert(
+      'Déconnexion',
+      'Êtes-vous sûr de vouloir vous déconnecter ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Déconnecter', style: 'destructive', onPress: onLogout }, // Appelle la fonction `onLogout`
+      ]
     );
   };
 
@@ -57,6 +65,11 @@ const SettingsScreen = ({ navigation }) => {
           <Text style={styles.optionText}>À propos de l'application</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Bouton Déconnexion */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Se déconnecter</Text>
+      </TouchableOpacity>
     </LinearGradient>
   );
 };
@@ -77,7 +90,7 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   optionButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Blanc semi-transparent pour correspondre au design
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Blanc semi-transparent
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -90,6 +103,26 @@ const styles = StyleSheet.create({
   },
   optionText: {
     color: '#2193b0',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  logoutButton: {
+    marginTop: 20,
+    backgroundColor: '#ff5047', // Rouge pour attirer l'attention
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    width: '80%',
+    borderWidth: 2,
+    borderColor: '#ffffff', // Bordure blanche
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  logoutText: {
+    color: '#ffffff', // Texte en blanc
     fontSize: 16,
     fontWeight: 'bold',
   },

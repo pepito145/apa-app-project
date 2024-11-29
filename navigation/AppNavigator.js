@@ -11,6 +11,8 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import IPAQForm from '../screens/IPAQForm';
 import ProfileScreen from '../screens/ProfileScreen';
+import DailyActivityScreen from '../screens/DailyActivityScreen';
+import ActivitiesHistory from '../screens/ActivitiesHistory';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -30,12 +32,12 @@ const HomeStack = ({ onLogout }) => {
 };
 
 // Stack pour Paramètres et ses écrans secondaires
-const SettingsStack = () => {
+const SettingsStack = ({ onLogout }) => {
   return (
     <Stack.Navigator>
       <Stack.Screen
         name="Settings"
-        component={SettingsScreen}
+        children={(props) => <SettingsScreen {...props} onLogout={onLogout} />}
         options={{ headerShown: false }}
       />
       <Stack.Screen
@@ -48,6 +50,7 @@ const SettingsStack = () => {
         component={NotificationsScreen}
         options={{ title: 'Notifications' }}
       />
+      <Stack.Screen name="ActivitiesHistory" component={ActivitiesHistory} />
     </Stack.Navigator>
   );
 };
@@ -56,6 +59,7 @@ const SettingsStack = () => {
 const TabNavigator = ({ onLogout }) => {
   return (
     <Tab.Navigator
+      initialRouteName="Accueil" // Définit "Accueil" comme l'onglet par défaut
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
@@ -89,7 +93,9 @@ const TabNavigator = ({ onLogout }) => {
       <Tab.Screen name="Activités" component={ActivitiesScreen} />
       <Tab.Screen name="Accueil">{() => <HomeStack onLogout={onLogout} />}</Tab.Screen>
       <Tab.Screen name="Profil" component={ProfileScreen} />
-      <Tab.Screen name="Paramètres" component={SettingsStack} />
+      <Tab.Screen name="Paramètres">
+        {() => <SettingsStack onLogout={onLogout} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 };
@@ -113,6 +119,16 @@ const AppNavigator = ({ onLogout }) => {
             headerShown: false, // Pas d'en-tête
             presentation: 'modal', // Style modal (affichage séparé)
           }}
+        />
+        <Stack.Screen
+          name="DailyActivity"
+          component={DailyActivityScreen}
+          options={{ title: 'Activité du jour', headerShown: false, }}
+        />        
+        <Stack.Screen
+          name="ActivitiesHistory"
+          component={ActivitiesHistory}
+          options={{ title: 'Historique des Activités', headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

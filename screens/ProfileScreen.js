@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ navigation }) => {
   // Données fictives
   const userData = {
     first_name: 'Elliot',
     last_name: 'Cabanau',
-    birth_date: '15 juin 2002 (22 ans)',
+    age: '22 ans',
     gender: 'Homme',
     weight: '75 kg',
     ipaq_score: 'Moyen',
@@ -44,8 +44,8 @@ const ProfileScreen = () => {
           </View>
           <View style={styles.separator} />
           <View style={styles.row}>
-            <Text style={styles.label}>Date de naissance</Text>
-            <Text style={styles.value}>{userData.birth_date}</Text>
+            <Text style={styles.label}>Âge</Text>
+            <Text style={styles.value}>{userData.age}</Text>
           </View>
           <View style={styles.separator} />
           <View style={styles.row}>
@@ -58,6 +58,14 @@ const ProfileScreen = () => {
             <Text style={styles.value}>{userData.ipaq_score}</Text>
           </View>
         </View>
+
+        {/* Bouton Historique des activités */}
+        <TouchableOpacity
+          style={styles.historyButton}
+          onPress={() => navigation.navigate('ActivitiesHistory')} // Assurez-vous que le nom correspond
+        >
+          <Text style={styles.historyButtonText}>Historique des activités</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -126,6 +134,23 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#E5E5E5', // Ligne de séparation grise
     marginVertical: 5,
+  },
+  historyButton: {
+    backgroundColor: '#2193b0', // Couleur bleue
+    paddingVertical: 12,
+    borderRadius: 30,
+    marginHorizontal: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  historyButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF', // Texte en blanc
   },
 });
 

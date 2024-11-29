@@ -1,101 +1,101 @@
-// screens/ActivitiesScreen.js
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
+import { View, Text, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 
-const ActivitiesScreen = ({ onHistoryPress }) => {
+const ActivitiesScreen = ({ navigation }) => {
+  const handleAccept = () => {
+    navigation.navigate('DailyActivity'); // Navigue vers la page des activités quotidiennes
+  };
+
+  const handleReject = () => {
+    alert('D\'accord, nous choisirons une autre activité.');
+    navigation.navigate('Accueil'); // Retourne à l'écran précédent
+  };
+
   return (
-    <LinearGradient
-      colors={['#2193b0', '#6dd5ed']} // Dégradé ajusté pour correspondre à l'esthétique globale
-      style={styles.container}
-    >
-      <Text style={styles.title}>Activités</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Excellent !</Text>
+      <Text style={styles.subtitle}>Voici l'APA que nous t'avons choisi.</Text>
 
-      <ScrollView contentContainerStyle={styles.activitiesContainer}>
-        {/* Placeholder pour les activités */}
-        <TouchableOpacity style={styles.activityCard}>
-          <Text style={styles.activityTitle}>Yoga</Text>
-          <Text style={styles.activityDescription}>Relaxation et flexibilité</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.activityCard}>
-          <Text style={styles.activityTitle}>Course</Text>
-          <Text style={styles.activityDescription}>Améliorez votre endurance</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.activityCard}>
-          <Text style={styles.activityTitle}>Renforcement musculaire</Text>
-          <Text style={styles.activityDescription}>Développez votre force</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.activityCard}>
-          <Text style={styles.activityTitle}>Étirements</Text>
-          <Text style={styles.activityDescription}>Améliorez votre souplesse</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      <Image
+        source={require('../assets/activities/test/seance-test.png')}
+        style={styles.activityImage}
+        resizeMode="contain"
+      />
 
-      {/* Bouton Historique */}
-      <TouchableOpacity style={styles.historyButton} onPress={onHistoryPress}>
-        <Text style={styles.historyButtonText}>Voir l'historique des activités</Text>
-      </TouchableOpacity>
-    </LinearGradient>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
+          <Text style={styles.buttonText}>C'est parfait !</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
+          <Text style={styles.buttonText}>Non</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
+    backgroundColor: '#FAF3E0', // Couleur beige claire pour correspondre au design
     justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  homeButton: {
+    position: 'absolute',
+    top: 30,
+    left: 20,
+  },
+  homeButtonText: {
+    fontSize: 24,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#333333',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#666666',
     textAlign: 'center',
-    marginTop: 20,
     marginBottom: 20,
   },
-  activitiesContainer: {
-    alignItems: 'center',
-    paddingBottom: 20,
-  },
-  activityCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Blanc semi-transparent pour l'esthétique
-    borderRadius: 12,
-    padding: 16,
+  activityImage: {
     width: '100%',
-    marginBottom: 16,
-    alignItems: 'flex-start',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    height: 300, // Hauteur de l'image pour l'exemple
+    marginBottom: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#CCC',
   },
-  activityTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2193b0',
-    marginBottom: 4,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 20,
   },
-  activityDescription: {
-    fontSize: 14,
-    color: '#666666',
-  },
-  historyButton: {
-    position: 'absolute', // Fixé en bas de l'écran
-    bottom: 20,
-    alignSelf: 'center',
-    backgroundColor: '#ffffff',
+  acceptButton: {
+    flex: 1,
+    backgroundColor: '#FFC107', // Couleur dorée pour "C'est parfait"
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    marginHorizontal: 10,
+    borderRadius: 8,
+    alignItems: 'center',
   },
-  historyButtonText: {
+  rejectButton: {
+    flex: 1,
+    backgroundColor: '#FF5722', // Couleur rouge pour "Non"
+    paddingVertical: 12,
+    marginHorizontal: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2193b0',
+    color: '#FFFFFF',
   },
 });
 

@@ -1,7 +1,6 @@
-// screens/StatsScreen.js
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
+import { LinearGradient } from 'expo-linear-gradient';
 
 const StatsScreen = () => {
   return (
@@ -12,33 +11,63 @@ const StatsScreen = () => {
       <Text style={styles.title}>Statistiques</Text>
 
       <ScrollView contentContainerStyle={styles.statsContainer}>
-        {/* Placeholder pour les statistiques */}
-        <View style={styles.statCard}>
-          <Text style={styles.statTitle}>Nombre de pas</Text>
-          <Text style={styles.statValue}>7,500</Text>
+        {/* Section : Activité physique */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Activité physique</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Nombre de pas</Text>
+            <Text style={styles.statValue}>7,500</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Calories brûlées</Text>
+            <Text style={styles.statValue}>350 kcal</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Activités complétées</Text>
+            <Text style={styles.statValue}>12</Text>
+          </View>
         </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statTitle}>Calories brûlées</Text>
-          <Text style={styles.statValue}>350 kcal</Text>
+
+        {/* Section : Santé */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Santé</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>BPM moyen</Text>
+            <Text style={styles.statValue}>72</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Sommeil (heures)</Text>
+            <Text style={styles.statValue}>7h 45m</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Niveau de stress</Text>
+            <Text style={styles.statValue}>Modéré</Text>
+          </View>
         </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statTitle}>BPM moyen</Text>
-          <Text style={styles.statValue}>72</Text>
+
+        {/* Section : Historique */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Historique</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Streak actuel</Text>
+            <Text style={styles.statValue}>5 jours</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Meilleur streak</Text>
+            <Text style={styles.statValue}>10 jours</Text>
+          </View>
         </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statTitle}>Activités complétées</Text>
-          <Text style={styles.statValue}>12</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statTitle}>Streak actuel</Text>
-          <Text style={styles.statValue}>5 jours</Text>
+
+        {/* Section : Respiration */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Respiration</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Respirations par minute</Text>
+            <Text style={styles.statValue}>16 rpm</Text>
+          </View>
         </View>
       </ScrollView>
 
-      {/* Bouton pour plus de détails */}
-      <TouchableOpacity style={styles.detailsButton}>
-        <Text style={styles.detailsButtonText}>Voir les détails complets</Text>
-      </TouchableOpacity>
     </LinearGradient>
   );
 };
@@ -60,6 +89,16 @@ const styles = StyleSheet.create({
   statsContainer: {
     alignItems: 'center',
     paddingBottom: 20,
+  },
+  section: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 10,
   },
   statCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)', // Fond blanc semi-transparent

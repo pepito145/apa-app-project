@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-na
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
 import mascot from '../assets/logo-test.png'; // Assurez-vous que l'image existe dans assets
 
-const HomeScreen = ({ navigation, onLogout }) => {
+const HomeScreen = ({ navigation }) => {
 
   const [isQuestionnaireDone, setIsQuestionnaireDone] = useState(false); 
 
@@ -46,23 +46,11 @@ const HomeScreen = ({ navigation, onLogout }) => {
           <Text style={styles.statValue}>7,500</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statTitle}>Calories dépensées</Text>
-          <Text style={styles.statValue}>350 kcal</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statTitle}>BPM ❤️</Text>
-          <Text style={styles.statValue}>75</Text>
-        </View>
-        <View style={styles.statCard}>
           <Text style={styles.statTitle}>Streak 🔥</Text>
           <Text style={styles.statValue}>5</Text>
         </View>
       </View>
 
-      {/* Bouton de déconnexion */}
-      <TouchableOpacity style={styles.button} onPress={onLogout}>
-        <Text style={styles.buttonText}>Se Déconnecter</Text>
-      </TouchableOpacity>
     </LinearGradient>
   );
 };
