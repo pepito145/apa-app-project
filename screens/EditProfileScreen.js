@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Picker } from '@react-native-picker/picker';
 import { ProfileContext } from './ProfileContext'; // Import du contexte
@@ -19,6 +19,26 @@ const EditProfileScreen = () => {
     setProfile(updatedProfile);
     saveProfile(updatedProfile);
     setEditingField(null);
+  };
+
+  // Réinitialiser le score IPAQ
+  const resetIPAQScore = () => {
+    Alert.alert(
+      'Réinitialiser le Score IPAQ',
+      'Êtes-vous sûr de vouloir réinitialiser le Score IPAQ ? Cette action est irréversible.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Réinitialiser',
+          style: 'destructive',
+          onPress: () => {
+            const updatedProfile = { ...profile, ipaqScore: null }; // Réinitialiser à null
+            setProfile(updatedProfile);
+            saveProfile(updatedProfile);
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -94,16 +114,19 @@ const EditProfileScreen = () => {
           onSave={() => saveField('weight')}
         />
 
-        {/* Score IPAQ */}
-        <EditableField
-          label="Score IPAQ"
-          value={profile.ipaqScore}
-          isEditing={editingField === 'ipaqScore'}
-          tempValue={tempValue}
-          setTempValue={setTempValue}
-          onEdit={() => startEditing('ipaqScore')}
-          onSave={() => saveField('ipaqScore')}
-        />
+        {/* Score IPAQ - Non éditable, seulement réinitialisable */}
+        <View style={styles.field}>
+          <Text style={styles.label}>Score IPAQ</Text>
+          <View style={styles.valueRow}>
+            <Text style={styles.value}>{profile.ipaqScore ?? 'Non défini'}</Text>
+            <TouchableOpacity
+              style={styles.resetButton}
+              onPress={resetIPAQScore}
+            >
+              <Text style={styles.resetButtonText}>Réinitialiser</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </LinearGradient>
   );
@@ -119,7 +142,7 @@ const EditableField = ({ label, value, isEditing, tempValue, setTempValue, onEdi
           style={styles.input}
           value={tempValue}
           onChangeText={(text) => setTempValue(text)}
-          keyboardType={label === 'Poids (kg)' || label === 'Score IPAQ' ? 'numeric' : 'default'}
+          keyboardType={label === 'Poids (kg)' ? 'numeric' : 'default'}
         />
         <TouchableOpacity style={styles.saveButton} onPress={onSave}>
           <Text style={styles.saveButtonText}>✔</Text>
@@ -159,10 +182,6 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 8,
   },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   valueRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -194,14 +213,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
-  saveButton: {
-    marginLeft: 10,
+  resetButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: '#28a745',
+    backgroundColor: '#ff5047',
     borderRadius: 8,
   },
-  saveButtonText: {
+  resetButtonText: {
     color: '#ffffff',
     fontWeight: 'bold',
   },

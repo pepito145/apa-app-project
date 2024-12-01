@@ -84,7 +84,7 @@ const IPAQForm = ({ navigation }) => {
     },
   ];
 
-  // Gestion de l'affichage des blocs et de l'écran final
+  // Gestion de l'affichage
   if (currentBlock === 0) {
     return (
       <View style={styles.container}>
@@ -99,7 +99,7 @@ const IPAQForm = ({ navigation }) => {
     );
   }
 
-  if (currentBlock < blocks.length) {
+  if (currentBlock > 0 && currentBlock <= blocks.length) {
     const block = blocks[currentBlock - 1];
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -118,27 +118,31 @@ const IPAQForm = ({ navigation }) => {
         ))}
         <TouchableOpacity
           style={styles.button}
-          onPress={currentBlock < blocks.length ? nextBlock : submitForm}
+          onPress={currentBlock <= blocks.length ? nextBlock : submitForm}
         >
           <Text style={styles.buttonText}>
-            {currentBlock < blocks.length ? 'Continuer' : 'Terminer'}
+            {currentBlock <= blocks.length ? 'Continuer' : 'Terminer'}
           </Text>
         </TouchableOpacity>
       </ScrollView>
     );
   }
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Félicitations !</Text>
-      <Text style={styles.subtitle}>
-        Vous avez terminé le questionnaire IPAQ. Votre nouveau score a été mis à jour dans votre profil.
-      </Text>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
-        <Text style={styles.buttonText}>Retour</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  if (currentBlock > blocks.length) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Félicitations !</Text>
+        <Text style={styles.subtitle}>
+          Vous avez terminé le questionnaire IPAQ. Votre nouveau score sera sauvegardé.
+        </Text>
+        <TouchableOpacity style={styles.button} onPress={submitForm}>
+          <Text style={styles.buttonText}>Terminer</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return null;
 };
 
 const styles = StyleSheet.create({

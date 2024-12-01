@@ -7,12 +7,12 @@ export const ProfileContext = createContext();
 // Fournisseur de contexte
 export const ProfileProvider = ({ children }) => {
   const [profile, setProfile] = useState({
-    firstName: 'Elliot',
-    lastName: 'FamilyName',
-    gender: 'Homme',
-    age: '22',
-    weight: '70',
-    ipaqScore: '5000',
+    firstName: '',
+    lastName: '',
+    gender: '',
+    age: '',
+    weight: '',
+    ipaqScore: '',
   });
 
   // Charger les données depuis AsyncStorage

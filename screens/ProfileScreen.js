@@ -48,7 +48,7 @@ const ProfileScreen = ({ navigation }) => {
           <View style={styles.separator} />
           <View style={styles.row}>
             <Text style={styles.label}>Score IPAQ</Text>
-            <Text style={styles.value}>{profile.ipaqScore}</Text>
+            <Text style={styles.value}>{profile.ipaqScore ?? 'Non défini'}</Text>
           </View>
         </View>
 

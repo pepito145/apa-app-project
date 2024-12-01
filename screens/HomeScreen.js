@@ -1,24 +1,11 @@
-// screens/HomeScreen.js
-import { React, useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
+import { ProfileContext } from './ProfileContext'; // Import du contexte
 import mascot from '../assets/logo-test.png'; // Assurez-vous que l'image existe dans assets
 
 const HomeScreen = ({ navigation }) => {
-
-  const [isQuestionnaireDone, setIsQuestionnaireDone] = useState(false); 
-
-  // Simuler un chargement initial (pourrait être remplacé plus tard par un appel à une base de données)
-  useEffect(() => {
-    // Si le statut est sauvegardé localement (dans AsyncStorage ou autre), on pourrait le charger ici.
-    // Exemple futur : charger depuis AsyncStorage
-    setIsQuestionnaireDone(false); // Par défaut : pas encore rempli
-  }, []);
-
-  const handleCompleteQuestionnaire = () => {
-    // Action pour marquer le questionnaire comme terminé
-    setIsQuestionnaireDone(true); // Mettre à jour l'état local
-  };
+  const { profile } = useContext(ProfileContext); // Accéder au profil partagé
 
   return (
     <LinearGradient
@@ -28,12 +15,11 @@ const HomeScreen = ({ navigation }) => {
       <Text style={styles.welcomeText}>Bon retour sur APA App !</Text>
       <Image source={mascot} style={styles.mascotte} />
 
-      {/* Bouton pour remplir le questionnaire */}
-      {!isQuestionnaireDone && (
+      {/* Vérification de la présence du score IPAQ */}
+      {(profile.ipaqScore == null || profile.ipaqScore === '') && ( // Vérifie si le score est null ou non défini
         <TouchableOpacity
           style={styles.questionnaireButton}
           onPress={() => navigation.navigate('QuestionnaireIPAQ')} // Naviguer vers la page du questionnaire
-          //onPress={() => Alert.alert('IPAQ', 'BOUTON cliqué')}
         >
           <Text style={styles.questionnaireText}>Remplir le questionnaire IPAQ</Text>
         </TouchableOpacity>
@@ -50,7 +36,6 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.statValue}>5</Text>
         </View>
       </View>
-
     </LinearGradient>
   );
 };
