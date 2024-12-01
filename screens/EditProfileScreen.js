@@ -1,79 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Picker } from '@react-native-picker/picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ProfileContext } from './ProfileContext'; // Import du contexte
 
 const EditProfileScreen = () => {
-  // États pour les données principales
-  const [profile, setProfile] = useState({
-    firstName: 'Elliot',
-    lastName: 'FamilyName',
-    gender: 'Homme',
-    age: '22',
-    weight: '70',
-    ipaqScore: '5000',
-  });
+  const { profile, setProfile, saveProfile } = useContext(ProfileContext); // Récupération des données partagées
+  const [editingField, setEditingField] = useState(null);
+  const [tempValue, setTempValue] = useState('');
 
-  const [editingField, setEditingField] = useState(null); // Champ actuellement édité
-  const [tempValue, setTempValue] = useState(''); // Valeur temporaire pour la saisie
-  const [showDatePicker, setShowDatePicker] = useState(false); // Contrôle du DateTimePicker
-
-  // Charger les données sauvegardées à partir d'AsyncStorage
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const savedProfile = await AsyncStorage.getItem('userProfile');
-        if (savedProfile) {
-          setProfile(JSON.parse(savedProfile));
-        }
-      } catch (error) {
-        console.error('Erreur lors du chargement du profil :', error);
-      }
-    };
-    loadProfile();
-  }, []);
-
-  // Sauvegarder les données dans AsyncStorage
-  const saveProfile = async (updatedProfile) => {
-    try {
-      await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-      console.log('Profil sauvegardé !');
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde du profil :', error);
-    }
-  };
-
-  // Gestion de la modification
   const startEditing = (field) => {
     setEditingField(field);
-    setTempValue(profile[field]?.toString() || ''); // Charger la valeur actuelle
-    if (field === 'birthDate') {
-      setShowDatePicker(true); // Afficher le calendrier pour la date
-    }
+    setTempValue(profile[field]?.toString() || '');
   };
 
-  // Gestion de la sauvegarde
-  const saveField = (field) => {
-    const updatedProfile = {
-      ...profile,
-      [field]: field === 'birthDate' ? tempValue : tempValue.toString(),
-    };
+  const saveField = (field, value = tempValue) => {
+    const updatedProfile = { ...profile, [field]: value };
     setProfile(updatedProfile);
-    saveProfile(updatedProfile); // Sauvegarde dans AsyncStorage
-    setEditingField(null);
-    if (field === 'birthDate') setShowDatePicker(false); // Cacher le calendrier après sauvegarde
-  };
-
-  // Gestion de la validation automatique pour le genre
-  const handleGenderChange = (value) => {
-    const updatedProfile = {
-      ...profile,
-      gender: value,
-    };
-    setProfile(updatedProfile);
-    saveProfile(updatedProfile); // Sauvegarde dans AsyncStorage
+    saveProfile(updatedProfile);
     setEditingField(null);
   };
 
@@ -109,7 +53,7 @@ const EditProfileScreen = () => {
             <Picker
               selectedValue={profile.gender}
               style={styles.picker}
-              onValueChange={(itemValue) => handleGenderChange(itemValue)}
+              onValueChange={(itemValue) => saveField('gender', itemValue)}
             >
               <Picker.Item label="Homme" value="Homme" />
               <Picker.Item label="Femme" value="Femme" />

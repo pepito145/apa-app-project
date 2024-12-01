@@ -1,16 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { ProfileContext } from './ProfileContext'; // Import du contexte
 
 const ProfileScreen = ({ navigation }) => {
-  // Données fictives
-  const userData = {
-    first_name: 'Elliot',
-    last_name: 'Cabanau',
-    age: '22 ans',
-    gender: 'Homme',
-    weight: '75 kg',
-    ipaq_score: 'Moyen',
-  };
+  const { profile } = useContext(ProfileContext); // Récupération des données partagées
 
   return (
     <View style={styles.container}>
@@ -18,11 +11,11 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.header}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              {userData.first_name[0]}{userData.last_name[0]}
+              {profile.firstName[0]}{profile.lastName[0]}
             </Text>
           </View>
           <Text style={styles.headerName}>
-            {userData.first_name} {userData.last_name}
+            {profile.firstName} {profile.lastName}
           </Text>
         </View>
 
@@ -30,39 +23,39 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.section}>
           <View style={styles.row}>
             <Text style={styles.label}>Nom</Text>
-            <Text style={styles.value}>{userData.last_name}</Text>
+            <Text style={styles.value}>{profile.lastName}</Text>
           </View>
           <View style={styles.separator} />
           <View style={styles.row}>
             <Text style={styles.label}>Prénom</Text>
-            <Text style={styles.value}>{userData.first_name}</Text>
+            <Text style={styles.value}>{profile.firstName}</Text>
           </View>
           <View style={styles.separator} />
           <View style={styles.row}>
             <Text style={styles.label}>Genre</Text>
-            <Text style={styles.value}>{userData.gender}</Text>
+            <Text style={styles.value}>{profile.gender}</Text>
           </View>
           <View style={styles.separator} />
           <View style={styles.row}>
             <Text style={styles.label}>Âge</Text>
-            <Text style={styles.value}>{userData.age}</Text>
+            <Text style={styles.value}>{profile.age + ' ans'}</Text>
           </View>
           <View style={styles.separator} />
           <View style={styles.row}>
             <Text style={styles.label}>Poids</Text>
-            <Text style={styles.value}>{userData.weight}</Text>
+            <Text style={styles.value}>{profile.weight + ' kg'}</Text>
           </View>
           <View style={styles.separator} />
           <View style={styles.row}>
             <Text style={styles.label}>Score IPAQ</Text>
-            <Text style={styles.value}>{userData.ipaq_score}</Text>
+            <Text style={styles.value}>{profile.ipaqScore}</Text>
           </View>
         </View>
 
         {/* Bouton Historique des activités */}
         <TouchableOpacity
           style={styles.historyButton}
-          onPress={() => navigation.navigate('ActivitiesHistory')} // Assurez-vous que le nom correspond
+          onPress={() => navigation.navigate('ActivitiesHistory')}
         >
           <Text style={styles.historyButtonText}>Historique des activités</Text>
         </TouchableOpacity>
