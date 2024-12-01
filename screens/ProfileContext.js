@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Crée un contexte
 export const ProfileContext = createContext();
 
-// Fournisseur de contexte
+// Context:
 export const ProfileProvider = ({ children }) => {
   const [profile, setProfile] = useState({
     firstName: '',
@@ -15,7 +15,7 @@ export const ProfileProvider = ({ children }) => {
     ipaqScore: '',
   });
 
-  // Charger les données depuis AsyncStorage
+  // Charge les données depuis AsyncStorage
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -30,7 +30,7 @@ export const ProfileProvider = ({ children }) => {
     loadProfile();
   }, []);
 
-  // Sauvegarder les données dans AsyncStorage
+  // Sauvegarde les données dans AsyncStorage
   const saveProfile = async (updatedProfile) => {
     try {
       await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));

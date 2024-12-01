@@ -38,7 +38,7 @@ const NotificationsScreen = () => {
     loadPreferences();
   }, []);
 
-  // Sauvegarder une préférence
+  // Sauvegarde une préférence
   const savePreference = async (key, value) => {
     try {
       await AsyncStorage.setItem(key, JSON.stringify(value));

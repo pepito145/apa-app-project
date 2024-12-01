@@ -2,14 +2,17 @@ import React, { useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
 import { ProfileContext } from './ProfileContext'; // Import du contexte
-import mascot from '../assets/logo-test.png'; // Assurez-vous que l'image existe dans assets
+import mascot from '../assets/logo-test.png'; // Logo
 
 const HomeScreen = ({ navigation }) => {
   const { profile } = useContext(ProfileContext); // Accéder au profil partagé
 
+  // Vérification des données personnelles
+  const isProfileIncomplete = !profile.firstName || !profile.lastName || !profile.gender || !profile.age || !profile.weight;
+
   return (
     <LinearGradient
-      colors={['#2193b0', '#6dd5ed']} // Dégradé ajusté pour être similaire mais différent
+      colors={['#2193b0', '#6dd5ed']} 
       style={styles.container}
     >
       <Text style={styles.welcomeText}>Bon retour sur APA App !</Text>
@@ -24,6 +27,16 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.questionnaireText}>Remplir le questionnaire IPAQ</Text>
         </TouchableOpacity>
       )}
+
+      {/* Vérification des données personnelles */}
+      {isProfileIncomplete && (
+        <TouchableOpacity
+          style={styles.incompleteProfileButton}
+          onPress={() => navigation.navigate('Paramètres', { screen: 'EditProfile' })} 
+        >
+          <Text style={styles.incompleteProfileText}>Complétez vos informations personnelles</Text>
+        </TouchableOpacity>
+      )}
       
       {/* Affichage des statistiques */}
       <View style={styles.statsContainer}>
@@ -36,6 +49,18 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.statValue}>5</Text>
         </View>
       </View>
+
+      {/* Phrase motivante */}
+      <Text style={styles.motivationalText}>
+        Êtes-vous prêt à bouger et faire du sport aujourd’hui ?
+      </Text>
+
+      <TouchableOpacity
+        style={styles.activityButton}
+        onPress={() => navigation.navigate('Activités')}
+      >
+        <Text style={styles.activityText}>C'est parti !</Text>
+      </TouchableOpacity>
     </LinearGradient>
   );
 };
@@ -83,21 +108,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     color: '#333',
   },
-  button: {
-    padding: 12,
-    backgroundColor: '#ff5047',
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 16,
-    width: '80%',
-    borderWidth: 2,
-    borderColor: '#6dd5ed', // Contour bleu clair
-  },
-  buttonText: {
-    color: '#2193b0',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   questionnaireButton: {
     padding: 16,
     backgroundColor: '#4caf50', // Vert
@@ -112,6 +122,44 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  motivationalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  activityButton: {
+    padding: 16,
+    backgroundColor: '#FFC107', // Jaune
+    borderRadius: 100,
+    alignItems: 'center',
+    marginBottom: 16,
+    width: '45%',
+    borderWidth: 2,
+    borderColor: '#6dd5ed',
+  },
+  activityText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  incompleteProfileButton: {
+    padding: 16,
+    backgroundColor: '#FF6347', // Rouge
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 16,
+    width: '80%',
+    borderWidth: 2,
+    borderColor: '#6dd5ed',
+  },
+  incompleteProfileText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

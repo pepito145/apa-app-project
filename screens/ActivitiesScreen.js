@@ -24,7 +24,7 @@ const ActivitiesScreen = ({ navigation }) => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
-          <Text style={styles.buttonText}>C'est parfait !</Text>
+          <Text style={styles.buttonText}>Commencer !</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
           <Text style={styles.buttonText}>Non</Text>

@@ -32,8 +32,12 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('userToken');
-    setIsLoggedIn(false);
+    try {
+      await AsyncStorage.removeItem('userToken');
+      setIsLoggedIn(false);
+    } catch (e) {
+      console.error('Erreur lors de la déconnexion', e);
+    }
   };
 
   if (loading) {

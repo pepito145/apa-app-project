@@ -4,11 +4,56 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 const ActivitiesHistory = ({ navigation }) => {
   // Données fictives pour les activités
   const activities = [
-    { date: '28 Nov 2024', name: 'Yoga Matinal', duration: '30 min', calories: '150 kcal' },
-    { date: '27 Nov 2024', name: 'Course à pied', duration: '45 min', calories: '300 kcal' },
-    { date: '26 Nov 2024', name: 'HIIT', duration: '20 min', calories: '250 kcal' },
-    { date: '25 Nov 2024', name: 'Cyclisme', duration: '60 min', calories: '400 kcal' },
-    { date: '24 Nov 2024', name: 'Étirements', duration: '15 min', calories: '50 kcal' },
+    {
+      date: '28 Nov 2024',
+      name: 'Séance 2 étoiles numéro 3',
+      duration: '30 min',
+      calories: '150 kcal',
+      exercisesCompleted: 8,
+      totalExercises: 10,
+      painLevel: 3,
+      difficulty: 2,
+    },
+    {
+      date: '27 Nov 2024',
+      name: 'Séance 3 étoiles numéro 5',
+      duration: '45 min',
+      calories: '300 kcal',
+      exercisesCompleted: 12,
+      totalExercises: 12,
+      painLevel: 4,
+      difficulty: 3,
+    },
+    {
+      date: '26 Nov 2024',
+      name: 'Séance 1 étoile numéro 1',
+      duration: '20 min',
+      calories: '250 kcal',
+      exercisesCompleted: 5,
+      totalExercises: 8,
+      painLevel: 1,
+      difficulty: 1,
+    },
+    {
+      date: '25 Nov 2024',
+      name: 'Séance 3 étoiles numéro 8',
+      duration: '60 min',
+      calories: '400 kcal',
+      exercisesCompleted: 15,
+      totalExercises: 15,
+      painLevel: 5,
+      difficulty: 4,
+    },
+    {
+      date: '24 Nov 2024',
+      name: 'Séance 2 étoiles numéro 6',
+      duration: '15 min',
+      calories: '50 kcal',
+      exercisesCompleted: 3,
+      totalExercises: 5,
+      painLevel: 2,
+      difficulty: 2,
+    },
   ];
 
   return (
@@ -23,6 +68,17 @@ const ActivitiesHistory = ({ navigation }) => {
             <View style={styles.detailsRow}>
               <Text style={styles.details}>{activity.duration}</Text>
               <Text style={styles.details}>{activity.calories}</Text>
+            </View>
+            <Text style={styles.exercises}>
+              {activity.exercisesCompleted} exercices sur {activity.totalExercises} réalisés
+            </Text>
+            <View style={styles.additionalDetailsRow}>
+              <Text style={styles.additionalDetails}>
+                Douleur ressentie : {activity.painLevel}/5
+              </Text>
+              <Text style={styles.additionalDetails}>
+                Difficulté : {activity.difficulty}/5
+              </Text>
             </View>
           </View>
         ))}
@@ -84,6 +140,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   details: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  exercises: {
+    fontSize: 14,
+    color: '#333333',
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  additionalDetailsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 5,
+  },
+  additionalDetails: {
     fontSize: 14,
     color: '#666666',
   },

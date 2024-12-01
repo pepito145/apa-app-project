@@ -21,18 +21,17 @@ const EditProfileScreen = () => {
     setEditingField(null);
   };
 
-  // Réinitialiser le score IPAQ
   const resetIPAQScore = () => {
     Alert.alert(
-      'Réinitialiser le Score IPAQ',
-      'Êtes-vous sûr de vouloir réinitialiser le Score IPAQ ? Cette action est irréversible.',
+      'Réinitialisation',
+      'Êtes-vous sûr de vouloir réinitialiser le score IPAQ ?',
       [
         { text: 'Annuler', style: 'cancel' },
         {
           text: 'Réinitialiser',
           style: 'destructive',
           onPress: () => {
-            const updatedProfile = { ...profile, ipaqScore: null }; // Réinitialiser à null
+            const updatedProfile = { ...profile, ipaqScore: null };
             setProfile(updatedProfile);
             saveProfile(updatedProfile);
           },
@@ -114,11 +113,13 @@ const EditProfileScreen = () => {
           onSave={() => saveField('weight')}
         />
 
-        {/* Score IPAQ - Non éditable, seulement réinitialisable */}
+        {/* Score IPAQ */}
         <View style={styles.field}>
           <Text style={styles.label}>Score IPAQ</Text>
           <View style={styles.valueRow}>
-            <Text style={styles.value}>{profile.ipaqScore ?? 'Non défini'}</Text>
+            <Text style={styles.value}>
+              {profile.ipaqScore != null ? profile.ipaqScore : 'Non défini'}
+            </Text>
             <TouchableOpacity
               style={styles.resetButton}
               onPress={resetIPAQScore}
@@ -142,7 +143,7 @@ const EditableField = ({ label, value, isEditing, tempValue, setTempValue, onEdi
           style={styles.input}
           value={tempValue}
           onChangeText={(text) => setTempValue(text)}
-          keyboardType={label === 'Poids (kg)' ? 'numeric' : 'default'}
+          keyboardType={label === 'Poids (kg)' || label === 'Score IPAQ' ? 'numeric' : 'default'}
         />
         <TouchableOpacity style={styles.saveButton} onPress={onSave}>
           <Text style={styles.saveButtonText}>✔</Text>
@@ -191,6 +192,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
+  resetButton: {
+    backgroundColor: '#ff5047',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  resetButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   input: {
     flex: 1,
     backgroundColor: '#ffffff',
@@ -213,13 +228,14 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
-  resetButton: {
+  saveButton: {
+    marginLeft: 10,
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: '#ff5047',
+    backgroundColor: '#28a745',
     borderRadius: 8,
   },
-  resetButtonText: {
+  saveButtonText: {
     color: '#ffffff',
     fontWeight: 'bold',
   },

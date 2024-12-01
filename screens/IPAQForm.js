@@ -41,10 +41,10 @@ const IPAQForm = ({ navigation }) => {
     return intenseMET + moderateMET + walkingMET;
   };
 
-  // Soumettre le formulaire et mettre à jour le profil
+  // Soumet le formulaire et met à jour le profil
   const submitForm = () => {
     const ipaqScore = calculateScore();
-    const updatedProfile = { ...profile, ipaqScore }; // Mettre à jour le score IPAQ dans le profil
+    const updatedProfile = { ...profile, ipaqScore }; // Metà jour le score IPAQ dans le profil
     setProfile(updatedProfile); // Met à jour le contexte local
     saveProfile(updatedProfile); // Sauvegarde dans AsyncStorage
     navigation.goBack(); // Retour à l'écran précédent

@@ -1,10 +1,11 @@
-// screens/SettingsScreen.js
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
+import { ProfileContext } from './ProfileContext'; // Import du contexte
 
 const SettingsScreen = ({ navigation, onLogout }) => {
-  // Gestion des actions des boutons
+  const { setProfile } = useContext(ProfileContext); // Accéde à setProfile pour réinitialiser le profil
+
   const handleProfileEdit = () => {
     navigation.navigate('EditProfile');
   };
@@ -20,19 +21,33 @@ const SettingsScreen = ({ navigation, onLogout }) => {
   const handleAbout = () => {
     Alert.alert(
       'À propos de l’application',
-      'Version : 1.0.0\nCréée par votre équipe.',
+      'Version : 1.0.0\nCréée par l\'équipe projet APA CentraleSupélec.',
       [{ text: 'OK', style: 'default' }]
     );
   };
 
   const handleLogout = () => {
-    // Affiche une pop-up de confirmation
     Alert.alert(
       'Déconnexion',
       'Êtes-vous sûr de vouloir vous déconnecter ?',
       [
         { text: 'Annuler', style: 'cancel' },
-        { text: 'Déconnecter', style: 'destructive', onPress: onLogout }, // Appelle la fonction `onLogout`
+        {
+          text: 'Déconnecter',
+          style: 'destructive',
+          onPress: () => {
+            // Réinitialise les valeurs du profil
+            setProfile({
+              firstName: '',
+              lastName: '',
+              gender: '',
+              age: '',
+              weight: '',
+              ipaqScore: null,
+            });
+            onLogout(); // Appelle la fonction `onLogout` pour gérer la déconnexion
+          },
+        },
       ]
     );
   };
