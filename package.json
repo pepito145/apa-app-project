@@ -1,6 +1,6 @@
 {
   "name": "apa-app-project",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
@@ -18,9 +18,9 @@
     "axios": "^1.7.7",
     "expo": "~52.0.7",
     "expo-linear-gradient": "~14.0.1",
-    "expo-status-bar": "~2.0.0",
     "react": "18.3.1",
     "react-native": "0.76.2",
+    "react-native-linear-gradient": "^2.8.3",
     "react-native-pdf": "^6.7.5",
     "react-native-push-notification": "^8.1.1",
     "react-native-safe-area-context": "^4.14.0",
@@ -28,7 +28,8 @@
     "stack": "^0.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@react-native-community/cli": "^15.1.2"
   },
   "private": true
 }
