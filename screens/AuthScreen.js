@@ -31,6 +31,11 @@ const AuthScreen = ({ onLogin }) => {
     return emailRegex.test(email);
   };
 
+  const handleSkip = () => {
+    console.log('Authentification ignorée');
+    onLogin('guest'); // Passe un token factice ou une valeur indiquant le mode invité
+  };
+
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
@@ -94,8 +99,15 @@ const AuthScreen = ({ onLogin }) => {
 
   return (
     <LinearGradient colors={['#6dd5ed', '#2193b0']} style={styles.container}>
+
+    
       {currentScreen === 'welcome' && (
         <>
+          {/* Bouton Skip */}
+          <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+            <Text style={styles.skipButtonText}>Skip</Text>
+          </TouchableOpacity>
+
           <Text style={styles.appTitle}>Bienvenue dans l'application APA !</Text>
           <Text style={styles.subtitle}>Chaque pas vous rapproche de vos objectifs !</Text>
           <Image source={logo} style={styles.logo} />
@@ -302,6 +314,21 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     alignSelf: 'center',
     marginTop: height * 0.02, // Espacement pour éviter l’encombrement
+  },
+  // Autres styles existants
+  skipButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    padding: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderRadius: 20,
+    zIndex: 10, // S'assure que le bouton est au-dessus des autres composants
+  },
+  skipButtonText: {
+    color: '#2193b0',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });
 
