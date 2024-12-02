@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.pepito145.apaappproject"
+      "package": "com.pepito145.apaappproject",
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/favicon.png"
