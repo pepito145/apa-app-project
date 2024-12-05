@@ -7,18 +7,18 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <ScrollView>
-        <View style={styles.header}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {profile.firstName[0]}{profile.lastName[0]}
-            </Text>
-          </View>
-          <Text style={styles.headerName}>
-            {profile.firstName} {profile.lastName}
+      <View style={styles.header}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>
+            {profile.firstName[0]}{profile.lastName[0]}
           </Text>
         </View>
+        <Text style={styles.headerName}>
+          {profile.firstName} {profile.lastName}
+        </Text>
+      </View>
 
+      <ScrollView>
         {/* Section des informations */}
         <View style={styles.section}>
           <View style={styles.row}>
@@ -67,13 +67,18 @@ const ProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
-    backgroundColor: '#6dd5ed', // Couleur bleu clair dégradée d'avant
+    backgroundColor: '#2193b0', // Même couleur que l'en-tête
   },
   header: {
     alignItems: 'center',
     paddingVertical: 20,
-    backgroundColor: '#2193b0', // Couleur bleu foncé d'avant
+    backgroundColor: '#2193b0', // Couleur harmonisée
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5, // Ajoute une ombre subtile
   },
   avatar: {
     width: 80,
@@ -144,4 +149,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF', // Texte en blanc
- 
+  },
+});
+
+export default ProfileScreen;

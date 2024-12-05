@@ -52,4 +52,95 @@ const StreakDetailsScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Affichage actuel du stre
+        {/* Affichage actuel du streak */}
+        <View style={styles.streakDisplay}>
+          <Text style={styles.streakTitle}>Streak actuel :</Text>
+          <Text style={styles.streakValue}>{profile.streak}</Text>
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f4f6f8',
+  },
+  content: {
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 16,
+  },
+  text: {
+    fontSize: 16,
+    color: '#555',
+    lineHeight: 24,
+    marginBottom: 16,
+  },
+  tipContainer: {
+    backgroundColor: '#e3f2fd',
+    padding: 16,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  tipTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#007bff',
+    marginBottom: 8,
+  },
+  tipText: {
+    fontSize: 16,
+    color: '#007bff',
+    lineHeight: 24,
+  },
+  buttonContainer: {
+    marginTop: 20,
+    flexDirection: 'row', // Positionne les boutons côte à côte
+    justifyContent: 'space-between', // Ajoute un espace égal entre les boutons
+    width: '100%', // Prend toute la largeur de l'écran
+    paddingHorizontal: 20, // Ajoute des marges sur les côtés
+  },
+  incrementButton: {
+    backgroundColor: '#4caf50',
+    paddingVertical: 12,
+    borderRadius: 8,
+    flex: 1, // Permet de répartir également les boutons
+    alignItems: 'center',
+    marginRight: 10, // Ajoute un espace entre les boutons
+  },
+  resetButton: {
+    backgroundColor: '#FF6347',
+    paddingVertical: 12,
+    borderRadius: 8,
+    flex: 1, // Permet de répartir également les boutons
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  streakDisplay: {
+    marginTop: 30,
+    alignItems: 'center',
+  },
+  streakTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 10,
+  },
+  streakValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#007bff',
+  },
+});
+
+export default StreakDetailsScreen;

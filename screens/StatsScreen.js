@@ -140,3 +140,12 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  detailsButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2193b0',
+  },
+});
+export default StatsScreen;
