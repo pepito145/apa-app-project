@@ -13,6 +13,7 @@ import IPAQForm from '../screens/IPAQForm';
 import ProfileScreen from '../screens/ProfileScreen';
 import DailyActivityScreen from '../screens/DailyActivityScreen';
 import ActivitiesHistory from '../screens/ActivitiesHistory';
+import StreakDetailsScreen from '../screens/StreakDetailsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -129,6 +130,11 @@ const AppNavigator = ({ onLogout }) => {
           name="ActivitiesHistory"
           component={ActivitiesHistory}
           options={{ title: 'Historique des Activités', headerShown: false }}
+        />
+        <Stack.Screen
+          name="StreakDetails"
+          component={StreakDetailsScreen}
+          options={{ title: 'Fonctionnement des streaks', headerShown: true }}
         />
       </Stack.Navigator>
     </NavigationContainer>
