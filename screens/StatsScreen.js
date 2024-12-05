@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const StatsScreen = () => {
   return (
+    <SafeAreaView style={styles.safeContainer}>
     <LinearGradient
       colors={['#6dd5ed', '#2193b0']} // Dégradé similaire aux autres écrans
       style={styles.container}
@@ -69,10 +70,15 @@ const StatsScreen = () => {
       </ScrollView>
 
     </LinearGradient>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: '#6dd5ed',
+  },
   container: {
     flex: 1,
     paddingHorizontal: 20,
@@ -134,13 +140,3 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  detailsButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2193b0',
-  },
-});
-
-export default StatsScreen;

@@ -44,13 +44,4 @@ export const ProfileProvider = ({ children }) => {
 
   // Méthode pour mettre à jour le streak
   const updateStreak = async (newStreak) => {
-    const updatedProfile = { ...profile, streak: newStreak };
-    await saveProfile(updatedProfile);
-  };
-
-  return (
-    <ProfileContext.Provider value={{ profile, setProfile, saveProfile, updateStreak }}>
-      {children}
-    </ProfileContext.Provider>
-  );
-};
+    const updatedProfile = { ...profile, streak: ne

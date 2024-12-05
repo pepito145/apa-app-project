@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { ProfileContext } from './ProfileContext'; // Import du contexte
 
 const ProfileScreen = ({ navigation }) => {
   const { profile } = useContext(ProfileContext); // Récupération des données partagées
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeContainer}>
       <ScrollView>
         <View style={styles.header}>
           <View style={styles.avatar}>
@@ -60,12 +60,12 @@ const ProfileScreen = ({ navigation }) => {
           <Text style={styles.historyButtonText}>Historique des activités</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeContainer: {
     flex: 1,
     backgroundColor: '#6dd5ed', // Couleur bleu clair dégradée d'avant
   },
@@ -144,7 +144,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#FFFFFF', // Texte en blanc
-  },
-});
-
-export default ProfileScreen;
+ 

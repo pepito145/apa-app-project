@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 
 const ActivitiesHistory = ({ navigation }) => {
   // Données fictives pour les activités
@@ -57,6 +57,7 @@ const ActivitiesHistory = ({ navigation }) => {
   ];
 
   return (
+    <SafeAreaView style={styles.safeContainer}>
     <View style={styles.container}>
       <Text style={styles.title}>Historique des activités</Text>
 
@@ -92,10 +93,15 @@ const ActivitiesHistory = ({ navigation }) => {
         <Text style={styles.backButtonText}>Retour</Text>
       </TouchableOpacity>
     </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: '#6dd5ed', // Même couleur que l'en-tête
+  },
   container: {
     flex: 1,
     backgroundColor: '#6dd5ed',
@@ -167,15 +173,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-});
-
-export default ActivitiesHistory;
+    shadowOp
