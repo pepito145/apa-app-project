@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "my-first-app",
-    "slug": "my-first-app",
-    "version": "1.0.0",
+    "name": "apa-app-project",
+    "slug": "apa-app-project",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,10 +19,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.pepito145.apaappproject",
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "68a7b094-04c5-4d74-959f-ad0421a6a3f3"
+      }
     }
   }
 }

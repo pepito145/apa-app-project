@@ -1,5 +1,7 @@
 # apa-app-project
 
+/!\ Ne fonctionnera pas sans backend /!\
+
 Exemple d'arborescense : 
 
 project-root/
