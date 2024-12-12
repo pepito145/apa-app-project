@@ -4,8 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Picker } from '@react-native-picker/picker';
 import { ProfileContext } from './ProfileContext'; // Import du contexte
 
-const EditProfileScreen = () => {
-  const { profile, setProfile, saveProfile } = useContext(ProfileContext); // Récupération des données partagées
+const EditProfileScreen = ({ navigation }) => {
+  const { profile, setProfile, saveProfile } = useContext(ProfileContext);
   const [editingField, setEditingField] = useState(null);
   const [tempValue, setTempValue] = useState('');
 
@@ -129,6 +129,11 @@ const EditProfileScreen = () => {
           </View>
         </View>
       </View>
+
+      {/* Bouton Retour en bas */}
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Accueil")}>
+        <Text style={styles.backButtonText}>Sauvegarder et quitter</Text>
+      </TouchableOpacity>
     </LinearGradient>
   );
 };
@@ -164,6 +169,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    justifyContent: 'space-between',
   },
   form: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -202,6 +208,18 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
+  backButton: {
+    backgroundColor: '#6dd5ed',
+    paddingVertical: 12,
+    borderRadius: 100,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  backButtonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -238,11 +256,6 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#ffffff',
     fontWeight: 'bold',
-  },
-  picker: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    color: '#333',
   },
 });
 

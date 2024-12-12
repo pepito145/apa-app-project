@@ -34,7 +34,9 @@ const HomeScreen = ({ navigation }) => {
               style={styles.incompleteProfileButton}
               onPress={() => navigation.navigate('Paramètres', { screen: 'EditProfile' })}
             >
-              <Text style={styles.incompleteProfileText}>Complétez vos informations personnelles</Text>
+              <Text style={styles.incompleteProfileText}>
+                Complétez vos informations personnelles
+              </Text>
             </TouchableOpacity>
           )}
 

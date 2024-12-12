@@ -44,7 +44,10 @@ const SettingsStack = ({ onLogout }) => {
       <Stack.Screen
         name="EditProfile"
         component={EditProfileScreen}
-        options={{ title: 'Modifier le profil' }}
+        options={{ 
+          title: 'Modifier le profil',
+          headerShown: true
+        }}
       />
       <Stack.Screen
         name="Notifications"
