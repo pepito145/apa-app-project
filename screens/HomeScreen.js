@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, Pressable, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
 import { ProfileContext } from './ProfileContext'; // Import du contexte
 import mascot from '../assets/logo-test.png'; // Logo
@@ -12,93 +12,95 @@ const HomeScreen = ({ navigation }) => {
   const isProfileIncomplete = !profile.firstName || !profile.lastName || !profile.gender || !profile.age || !profile.weight;
 
   return (
-    <LinearGradient colors={['#2193b0', '#6dd5ed']} style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.welcomeText}>Bon retour sur APA App !</Text>
-        <Image source={mascot} style={styles.mascotte} />
+    <SafeAreaView style={styles.safeContainer}>
+      <LinearGradient colors={['#2193b0', '#6dd5ed']} style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Text style={styles.welcomeText}>Bon retour sur APA App !</Text>
+          <Image source={mascot} style={styles.mascotte} />
 
-        {/* Vérification de la présence du score IPAQ */}
-        {(profile.ipaqScore == null || profile.ipaqScore === '') && (
-          <TouchableOpacity
-            style={styles.questionnaireButton}
-            onPress={() => navigation.navigate('QuestionnaireIPAQ')} // Naviguer vers la page du questionnaire
-          >
-            <Text style={styles.questionnaireText}>Remplir le questionnaire IPAQ</Text>
-          </TouchableOpacity>
-        )}
-
-        {/* Vérification des données personnelles */}
-        {isProfileIncomplete && (
-          <TouchableOpacity
-            style={styles.incompleteProfileButton}
-            onPress={() => navigation.navigate('Paramètres', { screen: 'EditProfile' })}
-          >
-            <Text style={styles.incompleteProfileText}>Complétez vos informations personnelles</Text>
-          </TouchableOpacity>
-        )}
-
-        {/* Affichage des statistiques */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statTitle}>Nombre de pas</Text>
-            <Text style={styles.statValue}>7,500</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statTitle}>Fréquence Cardiaque moyenne</Text>
-            <Text style={styles.statValue}>65</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statTitle}>Calories brulées</Text>
-            <Text style={styles.statValue}>350</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.statCard}
-            onPress={() => navigation.navigate('StreakDetails')}
-          >
-            <Text style={styles.statTitle}>Streak 🔥</Text>
-            <Text style={styles.statValue}>{profile.streak}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Phrase motivante */}
-        <Text style={styles.motivationalText}>
-          Êtes-vous prêt à bouger et faire du sport aujourd’hui ?
-        </Text>
-
-        <TouchableOpacity
-          style={styles.activityButton}
-          onPress={() => navigation.navigate('Activités')}
-        >
-          <Text style={styles.activityText}>C'est parti !</Text>
-        </TouchableOpacity>
-      </ScrollView>
-      
-
-      {/* Modal pour afficher les détails du streak */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Comment est calculé le streak ?</Text>
-            <Text style={styles.modalText}>
-              Le streak est le nombre de jours consécutifs pendant lesquels vous avez atteint votre objectif quotidien d'activité physique.
-              Continuez à bouger tous les jours pour maintenir votre streak !
-            </Text>
-            <Pressable
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)} // Ferme le modal
+          {/* Vérification de la présence du score IPAQ */}
+          {(profile.ipaqScore == null || profile.ipaqScore === '') && (
+            <TouchableOpacity
+              style={styles.questionnaireButton}
+              onPress={() => navigation.navigate('QuestionnaireIPAQ')} // Naviguer vers la page du questionnaire
             >
-              <Text style={styles.closeButtonText}>Fermer</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+              <Text style={styles.questionnaireText}>Remplir le questionnaire IPAQ</Text>
+            </TouchableOpacity>
+          )}
 
-    </LinearGradient>
+          {/* Vérification des données personnelles */}
+          {isProfileIncomplete && (
+            <TouchableOpacity
+              style={styles.incompleteProfileButton}
+              onPress={() => navigation.navigate('Paramètres', { screen: 'EditProfile' })}
+            >
+              <Text style={styles.incompleteProfileText}>Complétez vos informations personnelles</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Affichage des statistiques */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statCard}>
+              <Text style={styles.statTitle}>Nombre de pas</Text>
+              <Text style={styles.statValue}>7,500</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statTitle}>Fréquence Cardiaque moyenne</Text>
+              <Text style={styles.statValue}>65</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statTitle}>Calories brulées</Text>
+              <Text style={styles.statValue}>350</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.statCard}
+              onPress={() => navigation.navigate('StreakDetails')}
+            >
+              <Text style={styles.statTitle}>Streak 🔥</Text>
+              <Text style={styles.statValue}>{profile.streak}</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Phrase motivante */}
+          <Text style={styles.motivationalText}>
+            Êtes-vous prêt à bouger et faire du sport aujourd’hui ?
+          </Text>
+
+          <TouchableOpacity
+            style={styles.activityButton}
+            onPress={() => navigation.navigate('Activités')}
+          >
+            <Text style={styles.activityText}>C'est parti !</Text>
+          </TouchableOpacity>
+        </ScrollView>
+        
+
+        {/* Modal pour afficher les détails du streak */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Comment est calculé le streak ?</Text>
+              <Text style={styles.modalText}>
+                Le streak est le nombre de jours consécutifs pendant lesquels vous avez atteint votre objectif quotidien d'activité physique.
+                Continuez à bouger tous les jours pour maintenir votre streak !
+              </Text>
+              <Pressable
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)} // Ferme le modal
+              >
+                <Text style={styles.closeButtonText}>Fermer</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
+      </LinearGradient>
+    </SafeAreaView>
   );
 };
 
@@ -201,6 +203,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  safeContainer: {
+    flex: 1,
+    backgroundColor: '#2193b0', // Même couleur que l'en-tête
   },
 });
 
