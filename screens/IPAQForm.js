@@ -1,10 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { ProfileContext } from './ProfileContext'; // Import du contexte
+import { ProfileContext } from './ProfileContext';
+
 
 const IPAQForm = ({ navigation }) => {
-  const { profile, setProfile, saveProfile } = useContext(ProfileContext); // Accès au contexte
+  const { profile, setProfile, saveProfile } = useContext(ProfileContext);
   const [currentBlock, setCurrentBlock] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
   const [answers, setAnswers] = useState({
     intenseDays: '',
     intenseHours: '',
@@ -18,12 +20,25 @@ const IPAQForm = ({ navigation }) => {
     sittingMinutes: '',
   });
 
-  // Passer au bloc suivant
   const nextBlock = () => {
-    setCurrentBlock(currentBlock + 1);
+    const block = blocks[currentBlock - 1];
+    const hasEmptyFields = block.questions.some((question) => !answers[question.stateKey]?.trim());
+
+    if (hasEmptyFields) {
+      setErrorMessage('Veuillez remplir tous les champs avant de continuer.');
+    } else {
+      setErrorMessage('');
+      setCurrentBlock(currentBlock + 1);
+    }
   };
 
-  // Calcul du score IPAQ en MET-minutes/semaine
+  const previousBlock = () => {
+    if (currentBlock > 1) {
+      setCurrentBlock(currentBlock - 1);
+      setErrorMessage('');
+    }
+  };
+
   const calculateScore = () => {
     const intenseMET =
       (parseInt(answers.intenseDays) || 0) *
@@ -41,16 +56,23 @@ const IPAQForm = ({ navigation }) => {
     return intenseMET + moderateMET + walkingMET;
   };
 
-  // Soumet le formulaire et met à jour le profil
   const submitForm = () => {
     const ipaqScore = calculateScore();
-    const updatedProfile = { ...profile, ipaqScore }; // Metà jour le score IPAQ dans le profil
-    setProfile(updatedProfile); // Met à jour le contexte local
-    saveProfile(updatedProfile); // Sauvegarde dans AsyncStorage
-    navigation.goBack(); // Retour à l'écran précédent
+    const updatedProfile = { ...profile, ipaqScore };
+
+    const block = blocks[currentBlock - 1];
+    const hasEmptyFields = block.questions.some((question) => !answers[question.stateKey]?.trim());
+
+
+    if (hasEmptyFields) {
+      setErrorMessage('Veuillez remplir tous les champs avant de continuer.');
+    } else {
+      setProfile(updatedProfile);
+      saveProfile(updatedProfile);
+      navigation.goBack();
+    }
   };
 
-  // Contenu des blocs basé sur le vrai questionnaire IPAQ
   const blocks = [
     {
       title: 'Bloc 1 : Activités intenses des 7 derniers jours',
@@ -84,7 +106,6 @@ const IPAQForm = ({ navigation }) => {
     },
   ];
 
-  // Gestion de l'affichage
   if (currentBlock === 0) {
     return (
       <View style={styles.container}>
@@ -92,8 +113,11 @@ const IPAQForm = ({ navigation }) => {
         <Text style={styles.subtitle}>
           Ce questionnaire mesure votre niveau d’activité physique au cours des 7 derniers jours. Veuillez répondre honnêtement.
         </Text>
-        <TouchableOpacity style={styles.button} onPress={nextBlock}>
-          <Text style={styles.buttonText}>Commencer</Text>
+        <TouchableOpacity style={styles.buttonThin} onPress={() => setCurrentBlock(1)}>
+          <Text style={styles.buttonThinText}>Commencer</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.buttonThinText}>Remplir le questionnaire plus tard</Text>
         </TouchableOpacity>
       </View>
     );
@@ -116,29 +140,23 @@ const IPAQForm = ({ navigation }) => {
             />
           </View>
         ))}
+        {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+
         <TouchableOpacity
-          style={styles.button}
-          onPress={currentBlock <= blocks.length ? nextBlock : submitForm}
+          style={styles.buttonThin}
+          onPress={currentBlock < blocks.length ? nextBlock : submitForm}
         >
-          <Text style={styles.buttonText}>
-            {currentBlock <= blocks.length ? 'Continuer' : 'Terminer'}
+          <Text style={styles.buttonThinText}>
+            {currentBlock < blocks.length ? 'Continuer' : 'Terminer'}
           </Text>
         </TouchableOpacity>
-      </ScrollView>
-    );
-  }
 
-  if (currentBlock > blocks.length) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Félicitations !</Text>
-        <Text style={styles.subtitle}>
-          Vous avez terminé le questionnaire IPAQ. Votre nouveau score sera sauvegardé.
-        </Text>
-        <TouchableOpacity style={styles.button} onPress={submitForm}>
-          <Text style={styles.buttonText}>Terminer</Text>
-        </TouchableOpacity>
-      </View>
+        {currentBlock > 1 && (
+          <TouchableOpacity style={styles.backButton} onPress={previousBlock}>
+            <Text style={styles.backButtonText}>Retour</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
     );
   }
 
@@ -182,18 +200,37 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: '#fff',
   },
-  button: {
+  buttonThin: {
     backgroundColor: '#007bff',
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     borderRadius: 8,
-    marginTop: 24,
+    marginTop: 12,
     alignItems: 'center',
     width: '80%',
   },
-  buttonText: {
+  buttonThinText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  backButton: {
+    backgroundColor: '#ccc',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    width: '80%',
+    marginTop: 12,
+  },
+  backButtonText: {
+    color: '#333',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
+    marginTop: 10,
+    textAlign: 'center',
   },
 });
 
