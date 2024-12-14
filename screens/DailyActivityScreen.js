@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import de FontAwesome depuis react-native-vector-icons
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ProfileContext } from './ProfileContext';
 
 const DailyActivityScreen = ({ navigation }) => {
   const exercises = [
@@ -85,6 +86,13 @@ useEffect(() => {
     }
   };
 
+  const { profile, updateStreak } = useContext(ProfileContext); // Accéder au streak depuis le contexte
+  // Fonction pour incrémenter le streak
+  const incrementStreak = async () => {
+    const newStreak = profile.streak + 1;
+    await updateStreak(newStreak);
+  };
+
   const handleSubmitFeedback = async () => {
     try {
       const minutesElapsed = Math.round(elapsedTime / 60);
@@ -93,6 +101,9 @@ useEffect(() => {
         month: 'short',
         year: 'numeric'
       });
+
+      // Appel de la fonction pour incrémenter le streak
+      const newStreak = await incrementStreak();
 
       const newActivity = {
         date: currentDate,
