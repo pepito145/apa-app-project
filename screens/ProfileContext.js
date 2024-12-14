@@ -13,7 +13,7 @@ export const ProfileProvider = ({ children }) => {
     age: '',
     weight: '',
     ipaqScore: '',
-    streak: '0',
+    streak: 0,
   });
 
   // Charge les données depuis AsyncStorage
