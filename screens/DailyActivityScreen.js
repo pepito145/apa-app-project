@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import de FontAwesome depuis react-native-vector-icons
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DailyActivityScreen = ({ navigation }) => {
   const exercises = [
@@ -84,16 +85,47 @@ useEffect(() => {
     }
   };
 
-  const handleSubmitFeedback = () => {
-    const minutesElapsed = Math.round(elapsedTime / 60);
+  const handleSubmitFeedback = async () => {
+    try {
+      const minutesElapsed = Math.round(elapsedTime / 60);
+      const currentDate = new Date().toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
 
-    setDifficultyRatingSaved(difficultyRating);
-    setPainRatingSaved(painRating);
-    Alert.alert(
-      'Merci pour votre retour !', 
-      `Exercices terminés : ${completedExercises}/${exercises.length}\nTemps total : ${minutesElapsed} minutes\nDifficulté : ${difficultyRating} étoiles\nDouleur : ${painRating} étoiles`
-    );
-    navigation.navigate('MainTabs', { screen: 'Accueil' }); // Retourne à l'accueil
+      const newActivity = {
+        date: currentDate,
+        name: `Séance ${difficultyRating} étoiles`,
+        duration: `${minutesElapsed} min`,
+        calories: `${Math.round(minutesElapsed * 5)} kcal`, // Calcul simple des calories
+        exercisesCompleted: completedExercises,
+        totalExercises: exercises.length,
+        painLevel: painRating,
+        difficulty: difficultyRating
+      };
+
+      // Récupérer l'historique existant
+      const existingHistory = await AsyncStorage.getItem('activitiesHistory');
+      const activities = existingHistory ? JSON.parse(existingHistory) : [];
+
+      // Ajouter la nouvelle activité
+      activities.unshift(newActivity); // Ajoute au début du tableau
+
+      // Sauvegarder l'historique mis à jour
+      await AsyncStorage.setItem('activitiesHistory', JSON.stringify(activities));
+
+      setDifficultyRatingSaved(difficultyRating);
+      setPainRatingSaved(painRating);
+      Alert.alert(
+        'Merci pour votre retour !', 
+        `Exercices terminés : ${completedExercises}/${exercises.length}\nTemps total : ${minutesElapsed} minutes\nDifficulté : ${difficultyRating} étoiles\nDouleur : ${painRating} étoiles`
+      );
+      navigation.navigate('MainTabs', { screen: 'Accueil' }); // Retourne à l'accueil
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde des données :', error);
+      Alert.alert('Erreur', 'Une erreur est survenue lors de la sauvegarde des données.');
+    }
   };
 
   const renderStars = (rating, setRating) => {

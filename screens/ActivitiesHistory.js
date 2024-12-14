@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ActivitiesHistory = ({ navigation }) => {
+
   // Données fictives pour les activités
-  const activities = [
+  const defaultActivities = [
     {
       date: '28 Nov 2024',
       name: 'Séance 2 étoiles numéro 3',
@@ -55,6 +57,32 @@ const ActivitiesHistory = ({ navigation }) => {
       difficulty: 2,
     },
   ];
+
+  const [activities, setActivities] = useState(defaultActivities);
+
+  useEffect(() => {
+    const loadActivities = async () => {
+      try {
+        const savedActivities = await AsyncStorage.getItem('activitiesHistory');
+        if (savedActivities) {
+          // Fusionner les activités sauvegardées avec les activités par défaut
+          const parsedActivities = JSON.parse(savedActivities);
+          setActivities([...parsedActivities, ...defaultActivities]);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement de l\'historique:', error);
+      }
+    };
+
+    loadActivities();
+
+    const unsubscribe = navigation.addListener('focus', () => {
+      loadActivities();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
 
   return (
     <SafeAreaView style={styles.safeContainer}>
