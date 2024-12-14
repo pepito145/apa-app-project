@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import de FontAwesome depuis react-native-vector-icons
 
@@ -36,14 +36,34 @@ const DailyActivityScreen = ({ navigation }) => {
     },
   ];
 
+  // Nouveaux états
+const [completedExercises, setCompletedExercises] = useState(0);
+const [elapsedTime, setElapsedTime] = useState(0);
+const [timer, setTimer] = useState(null);
+
+
+// Démarrage du timer au début
+useEffect(() => {
+  const startTime = Date.now();
+  const interval = setInterval(() => {
+    setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+  }, 1000);
+  setTimer(interval);
+
+  return () => clearInterval(interval);
+}, []);
+
   const [currentExercise, setCurrentExercise] = useState(0);
   const [showCongrats, setShowCongrats] = useState(false);
   const [isFeedbackPhase, setIsFeedbackPhase] = useState(false); // Phase de feedback
   const [difficultyRating, setDifficultyRating] = useState(0);
   const [painRating, setPainRating] = useState(0);
+  const [difficultyRatingSaved, setDifficultyRatingSaved] = useState(0);
+  const [painRatingSaved, setPainRatingSaved] = useState(0);
 
   const handleExerciseFinished = () => {
     setShowCongrats(true);
+    setCompletedExercises((prev) => prev + 1);
   };
 
   const handleNextExercise = () => {
@@ -52,6 +72,7 @@ const DailyActivityScreen = ({ navigation }) => {
       setCurrentExercise(currentExercise + 1);
     } else {
       setIsFeedbackPhase(true); // Passe à la phase de feedback après le dernier exercice
+      setIsFeedbackPhase(true);
     }
   };
 
@@ -64,7 +85,14 @@ const DailyActivityScreen = ({ navigation }) => {
   };
 
   const handleSubmitFeedback = () => {
-    Alert.alert('Merci pour votre retour !', 'Nous avons enregistré vos évaluations.');
+    const minutesElapsed = Math.round(elapsedTime / 60);
+
+    setDifficultyRatingSaved(difficultyRating);
+    setPainRatingSaved(painRating);
+    Alert.alert(
+      'Merci pour votre retour !', 
+      `Exercices terminés : ${completedExercises}/${exercises.length}\nTemps total : ${minutesElapsed} minutes\nDifficulté : ${difficultyRating} étoiles\nDouleur : ${painRating} étoiles`
+    );
     navigation.navigate('MainTabs', { screen: 'Accueil' }); // Retourne à l'accueil
   };
 
@@ -133,8 +161,15 @@ const DailyActivityScreen = ({ navigation }) => {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmitFeedback}>
-            <Text style={styles.submitButtonText}>Envoyer</Text>
+          <TouchableOpacity
+            style={[
+              styles.submitButton,
+              (difficultyRating === 0 || painRating === 0) && styles.submitButtonDisabled, // Applique un style désactivé
+            ]}
+            onPress={handleSubmitFeedback}
+            disabled={difficultyRating === 0 || painRating === 0} // Désactive le bouton si aucune étoile sélectionnée
+          >
+              <Text style={styles.submitButtonText}>Envoyer</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -245,6 +280,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  submitButtonDisabled: {
+    backgroundColor: '#CCCCCC', // Gris pour montrer que le bouton est désactivé
   },
   submitButtonText: {
     fontSize: 16,
