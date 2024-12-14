@@ -21,7 +21,8 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pepito145.apaappproject",
-      "permissions": []
+      "permissions": [],
+      "screenOrientation": "portrait"
     },
     "web": {
       "favicon": "./assets/favicon.png"

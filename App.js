@@ -4,10 +4,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthScreen from './screens/AuthScreen';
 import AppNavigator from './navigation/AppNavigator';
 import { ProfileProvider } from './screens/ProfileContext'; // Import du contexte
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function lockOrientation() {
+      await ScreenOrientation.lockAsync(
+        ScreenOrientation.OrientationLock.PORTRAIT_UP
+      );
+    }
+    lockOrientation();
+  }, []);
 
   useEffect(() => {
     const checkLoginStatus = async () => {

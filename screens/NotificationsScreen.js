@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, Switch, Alert, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Notifications from 'expo-notifications';
+
+// Configuration des notifications
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 const NotificationsScreen = () => {
   // États pour chaque notification
@@ -33,19 +43,106 @@ const NotificationsScreen = () => {
       } catch (error) {
         console.error('Erreur lors du chargement des préférences :', error);
       }
+
+      const requestPermissions = async () => {
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert(
+            'Permission requise',
+            'Les notifications sont nécessaires pour vous rappeler vos activités.'
+          );
+        }
+      };
+  
+      requestPermissions();
+      loadPreferences();
     };
 
     loadPreferences();
   }, []);
 
-  // Sauvegarde une préférence
+
+  // Programmer les notifications
+  const scheduleDailyReminder = async (enabled) => {
+    if (enabled) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "C'est l'heure de votre activité !",
+          body: "N'oubliez pas votre séance d'exercices quotidienne 💪",
+        },
+        trigger: {
+          hour: 13, // Notification à 10h
+          minute: 30,
+          repeats: true,
+        },
+      });
+    } else {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+    }
+  };
+
+  const scheduleWeeklyProgress = async (enabled) => {
+    if (enabled) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Récapitulatif hebdomadaire',
+          body: 'Consultez vos progrès de la semaine ! 📊',
+        },
+        trigger: {
+          weekday: 7, // Dimanche
+          hour: 18,
+          minute: 0,
+          repeats: true,
+        },
+      });
+    }
+  };
+
+  // Modifier la fonction savePreference existante
   const savePreference = async (key, value) => {
     try {
       await AsyncStorage.setItem(key, JSON.stringify(value));
-      //Alert.alert('Préférence mise à jour', `Vos réglages pour "${key}" ont été sauvegardés.`);
+      
+      // Gérer les différents types de notifications
+      switch (key) {
+        case 'dailyReminder':
+          await scheduleDailyReminder(value);
+          break;
+        case 'weeklyProgress':
+          await scheduleWeeklyProgress(value);
+          break;
+        case 'activityCompleted':
+          // Ces notifications seront déclenchées après chaque activité
+          break;
+        case 'goalAchieved':
+          // Ces notifications seront déclenchées lors de l'atteinte d'objectifs
+          break;
+        case 'encouragementMessages':
+          // Ces notifications peuvent être programmées aléatoirement
+          break;
+      }
     } catch (error) {
       console.error('Erreur lors de la sauvegarde :', error);
     }
+  };
+  
+  // Fonction pour envoyer une notification immédiate (pour les tests)
+  const sendImmediateNotification = async () => {
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Notifications désactivées', 'Activez les notifications dans les paramètres.');
+      return;
+    }
+  
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Test de notification',
+        body: 'Cette notification apparaît immédiatement !',
+      },
+      trigger: null, // null signifie notification immédiate
+    });
+  
+    Alert.alert('Notification envoyée !', 'La notification devrait apparaître.');
   };
 
   return (
@@ -135,6 +232,15 @@ const NotificationsScreen = () => {
           />
         </View>
       </View>
+
+      {/* Bouton de test */}
+      <TouchableOpacity
+        style={styles.testButton}
+        onPress={sendImmediateNotification}
+      >
+        <Text style={styles.testButtonText}>Tester les notifications</Text>
+      </TouchableOpacity>
+
     </LinearGradient>
   );
 };
@@ -179,6 +285,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+  },
+  testButton: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    alignSelf: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  testButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2193b0',
+    textAlign: 'center',
   },
 });
 
