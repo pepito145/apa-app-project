@@ -107,7 +107,7 @@ useEffect(() => {
 
       const newActivity = {
         date: currentDate,
-        name: `Séance ${difficultyRating} étoiles`,
+        name: `Séance 1 étoile`,
         duration: `${minutesElapsed} min`,
         calories: `${Math.round(minutesElapsed * 5)} kcal`, // Calcul simple des calories
         exercisesCompleted: completedExercises,
