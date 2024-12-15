@@ -45,6 +45,7 @@ const SettingsScreen = ({ navigation, onLogout }) => {
               weight: '',
               ipaqScore: 0,
               isWithingsLinked: false,
+              streak: 0,
               access_token: '',
               refresh_token: '',
             });
