@@ -136,7 +136,12 @@ const IPAQForm = ({ navigation }) => {
               keyboardType="numeric"
               placeholder="Votre réponse"
               value={answers[question.stateKey]}
-              onChangeText={(text) => setAnswers({ ...answers, [question.stateKey]: text })}
+              onChangeText={(text) => {
+                // Vérifie si le texte ne contient que des chiffres
+                if (/^\d*$/.test(text)) {
+                  setAnswers({ ...answers, [question.stateKey]: text });
+                }
+              }}
             />
           </View>
         ))}
