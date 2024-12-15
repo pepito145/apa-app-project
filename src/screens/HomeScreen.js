@@ -16,6 +16,91 @@ const HomeScreen = ({ navigation }) => {
   // Vérification des données personnelles
   const isProfileIncomplete = !profile.firstName || !profile.lastName || !profile.gender || !profile.age || !profile.weight;
 
+  const [steps, setSteps] = useState(0); // État pour les pas
+  const [loading, setLoading] = useState(true); // État de chargement
+  const [heartRateAverage, setHeartRateAverage] = useState(0); // État pour la moyenne BPM
+  const [heartRateLoading, setHeartRateLoading] = useState(true); // État de chargement pour BPM
+
+  const fetchData = async () => {
+    try {
+      setLoading(true); // Début du chargement
+
+      const today = new Date();
+      const formattedDate = today.toISOString().split('T')[0]; // Formate la date au format YYYY-MM-DD
+
+      // Requête pour récupérer les pas
+      const stepsResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${profile.access_token}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `action=getactivity&startdateymd=${formattedDate}&enddateymd=${formattedDate}`, // Utilise la date formatée
+      });
+
+      const stepsData = await stepsResponse.json();
+
+      if (stepsData.status === 0 && stepsData.body.activities.length > 0) {
+        setSteps(stepsData.body.activities[0].steps);
+        console.log("Steps trouvés")
+      } else {
+        setSteps(0); // Aucune donnée trouvée
+        console.log("Steps non trouvés")
+      }
+
+      // Obtenir la date actuelle
+      const now = new Date();
+
+      // Obtenir le timestamp Unix de maintenant
+      const currentTimestamp = Math.floor(now.getTime() / 1000);
+
+      // Obtenir la date actuelle à minuit
+      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      // Obtenir le timestamp Unix de minuit
+      const midnightTimestamp = Math.floor(midnight.getTime() / 1000);
+
+      console.log('Timestamp Unix de maintenant :', currentTimestamp);
+      console.log('Timestamp Unix de minuit :', midnightTimestamp);
+
+      // Requête pour récupérer la moyenne des BPM
+      const bpmResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${profile.access_token}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `action=getintradayactivity&startdate=${midnightTimestamp}&enddate=${currentTimestamp}`, // Utilise les timestamps Unix
+      });
+
+      const bpmData = await bpmResponse.json();
+
+      if (bpmData.status === 0 && bpmData.body.series) {
+        const seriesArray = Object.values(bpmData.body.series);
+        const heartRates = seriesArray
+          .filter(item => item.heart_rate != null)
+          .map(item => item.heart_rate);
+
+        if (heartRates.length > 0) {
+          const averageBPM = heartRates.reduce((sum, rate) => sum + rate, 0) / heartRates.length;
+          setHeartRateAverage(Math.round(averageBPM)); // Arrondi à l'entier
+          console.log("BPM : ", averageBPM);
+        } else {
+          setHeartRateAverage(0); // Aucun heart_rate trouvéa
+        }
+      } else {
+        setHeartRateAverage(0); // Erreur ou pas de données
+        console.log("BPM non trouvé");
+      } 
+    } catch (error) {
+      console.error('Erreur API :', error);
+      setSteps(0);
+      setHeartRateAverage(0);
+    } finally {
+      setLoading(false); // Fin du chargement
+    }
+  };
+
   const handleLinkWithings = async (code) => {
     const url = 'https://wbsapi.withings.net/v2/oauth2'; // URL de l'API Withings
     const params = new URLSearchParams({
@@ -62,7 +147,6 @@ const HomeScreen = ({ navigation }) => {
       console.error('Erreur lors de la requête à Withings :', error);
     }
   };
-  
 
   useEffect(() => {
     let interval;
@@ -89,6 +173,24 @@ const HomeScreen = ({ navigation }) => {
     // Nettoyer l'intervalle lors du démontage du composant
     return () => clearInterval(interval);
   }, [webModalVisible, currentUrl]); // Dépendances : redémarre l'intervalle si l'URL actuelle change
+
+  // Vérifiez si le compte Withings est lié lors du lancement de l'application
+  useEffect(() => {
+    if (profile.isWithingsLinked) {
+      // Si le compte est lié, appelez fetchData après un délai de 3 secondes
+      const timer = setTimeout(() => {
+        fetchData(); // Appelle fetchData après 3 secondes
+      }, 3000); // 3000 millisecondes = 3 secondes
+
+      // Nettoyage du timer lors du démontage du composant
+      return () => clearTimeout(timer);
+    } else {
+      // Si le compte n'est pas lié, vous pouvez afficher un message ou gérer cela comme vous le souhaitez
+      console.log('Le compte Withings n\'est pas lié.');
+      setSteps(0); // Ou toute autre logique que vous souhaitez appliquer
+    }
+  }, [profile.isWithingsLinked]); // Dépendance pour vérifier si le compte est lié
+
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -132,16 +234,25 @@ const HomeScreen = ({ navigation }) => {
             </TouchableOpacity>
           )}
 
+          {/* Bouton pour rafraîchir les données */}
+          {profile.isWithingsLinked && ( 
+            <TouchableOpacity
+              style={styles.refreshButton}
+              onPress={fetchData} // Appelle la fonction pour rafraîchir les données
+            >
+              <Text style={styles.refreshButtonText}>Rafraîchir les données</Text>
+            </TouchableOpacity>
+          )}
 
           {/* Affichage des statistiques */}
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
               <Text style={styles.statTitle}>Nombre de pas</Text>
-              <Text style={styles.statValue}>7,500</Text>
+              <Text style={styles.statValue}>{loading ? 'Chargement...' : steps.toLocaleString()}</Text>
             </View>
             <View style={styles.statCard}>
               <Text style={styles.statTitle}>Fréquence Cardiaque moyenne</Text>
-              <Text style={styles.statValue}>65</Text>
+              <Text style={styles.statValue}>{loading ? 'Chargement...' : `${heartRateAverage} BPM`}</Text>
             </View>
             <View style={styles.statCard}>
               <Text style={styles.statTitle}>Calories brulées</Text>
@@ -338,6 +449,19 @@ const styles = StyleSheet.create({
   linkWithingsText: {
     color: '#ffffff',
     fontSize: 18,
+    fontWeight: 'bold',
+  },
+  refreshButton: {
+    padding: 10,
+    backgroundColor: '#007bff', // Couleur du bouton
+    borderRadius: 100,
+    alignItems: 'center',
+    marginBottom: 16,
+    width: '40%',
+  },
+  refreshButtonText: {
+    color: '#ffffff',
+    fontSize: 12,
     fontWeight: 'bold',
   },
 });
