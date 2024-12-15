@@ -43,7 +43,7 @@ const SettingsScreen = ({ navigation, onLogout }) => {
               gender: '',
               age: '',
               weight: '',
-              ipaqScore: 0,
+              ipaqScore: null,
               isWithingsLinked: false,
               streak: 0,
               access_token: '',
