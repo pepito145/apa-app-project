@@ -43,7 +43,10 @@ const SettingsScreen = ({ navigation, onLogout }) => {
               gender: '',
               age: '',
               weight: '',
-              ipaqScore: null,
+              ipaqScore: 0,
+              isWithingsLinked: false,
+              access_token: '',
+              refresh_token: '',
             });
             onLogout(); // Appelle la fonction `onLogout` pour gérer la déconnexion
           },

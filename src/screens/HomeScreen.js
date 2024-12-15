@@ -254,10 +254,12 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.statTitle}>Fréquence Cardiaque moyenne</Text>
               <Text style={styles.statValue}>{loading ? 'Chargement...' : `${heartRateAverage} BPM`}</Text>
             </View>
+            {/*
             <View style={styles.statCard}>
               <Text style={styles.statTitle}>Calories brulées</Text>
               <Text style={styles.statValue}>350</Text>
             </View>
+            */}
             <TouchableOpacity
               style={styles.statCard}
               onPress={() => navigation.navigate('StreakDetails')}
