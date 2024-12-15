@@ -15,6 +15,8 @@ export const ProfileProvider = ({ children }) => {
     ipaqScore: '',
     streak: 0,
     isWithingsLinked: false,
+    access_token: '',
+    refresh_token: '',
   });
 
   // Charge les données depuis AsyncStorage

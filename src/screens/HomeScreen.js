@@ -6,7 +6,7 @@ import { ProfileContext } from './ProfileContext'; // Import du contexte
 import mascot from '../../assets/logo-test.png'; // Logo
 
 const HomeScreen = ({ navigation }) => {
-  const { profile } = useContext(ProfileContext); // Accéder au profil partagé
+  const { profile, setProfile, saveProfile } = useContext(ProfileContext); // Accéder au profil partagé
   const [modalVisible, setModalVisible] = useState(false); // Gérer la visibilité du modal
   const [webModalVisible, setWebModalVisible] = useState(false); // Gérer la visibilité du modal WebView 
   const [webUrl, setWebUrl] = useState(''); // État pour l'URL du WebView
@@ -15,6 +15,54 @@ const HomeScreen = ({ navigation }) => {
 
   // Vérification des données personnelles
   const isProfileIncomplete = !profile.firstName || !profile.lastName || !profile.gender || !profile.age || !profile.weight;
+
+  const handleLinkWithings = async (code) => {
+    const url = 'https://wbsapi.withings.net/v2/oauth2'; // URL de l'API Withings
+    const params = new URLSearchParams({
+      action: 'requesttoken',
+      grant_type: 'authorization_code',
+      client_id: '8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25', // Remplacez par votre client_id
+      client_secret: '77f0088525010a3bd6ab17df6d34c0423aa4c16ced8ede88e00b8a26d9da288b', // Remplacez par votre client_secret
+      code: code, // Le code obtenu
+      redirect_uri: 'https://oauth.pstmn.io/v1/callback', // Remplacez par votre redirect_uri
+    });
+  
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+      });
+  
+      const data = await response.json();
+      console.log('Réponse de l\'API Withings :', data);
+
+      if (data.body) {
+        const accessToken = data.body.access_token; // Stocke l'access_token
+        const refreshToken = data.body.refresh_token; // Stocke le refresh_token
+    
+        // Mettez à jour le profil
+        const updatedProfile = {
+          ...profile,
+          access_token: accessToken,
+          refresh_token: refreshToken,
+          isWithingsLinked: true, // Met à jour l'état de liaison
+        };
+    
+        setProfile(updatedProfile); // Mettez à jour l'état du profil
+    
+        // Sauvegarder le profil
+        await saveProfile(updatedProfile);
+      }
+
+      // Vous pouvez mettre à jour l'état ou faire d'autres actions ici
+    } catch (error) {
+      console.error('Erreur lors de la requête à Withings :', error);
+    }
+  };
+  
 
   useEffect(() => {
     let interval;
@@ -31,7 +79,9 @@ const HomeScreen = ({ navigation }) => {
           setExtractedCode(code); // Stocke le code extrait
           console.log('Code extrait :', code); // Affiche le code extrait dans la console
           setWebModalVisible(false); // Ferme le modal WebView
-          profile.isWithingsLinked = true;
+
+          // Appelle la fonction pour lier le compte Withings
+          handleLinkWithings(code);
         }
       }, 5000); // Vérifie toutes les 5 secondes
     }
