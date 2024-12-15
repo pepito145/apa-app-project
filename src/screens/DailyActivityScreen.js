@@ -8,32 +8,32 @@ const DailyActivityScreen = ({ navigation }) => {
   const exercises = [
     {
       id: 1,
-      image: require('../assets/activities/test/exo1.png'),
+      image: require('../../assets/activities/test/exo1.png'),
       advice: 'Montez les talons lentement pour renforcer vos mollets.',
     },
     {
       id: 2,
-      image: require('../assets/activities/test/exo2.png'),
+      image: require('../../assets/activities/test/exo2.png'),
       advice: 'Levez les pointes des pieds pour renforcer vos tibias.',
     },
     {
       id: 3,
-      image: require('../assets/activities/test/exo3.png'),
+      image: require('../../assets/activities/test/exo3.png'),
       advice: 'Effectuez des coups de pied pour travailler la mobilité.',
     },
     {
       id: 4,
-      image: require('../assets/activities/test/exo4.png'),
+      image: require('../../assets/activities/test/exo4.png'),
       advice: 'Tenez un squat léger pour renforcer vos cuisses.',
     },
     {
       id: 5,
-      image: require('../assets/activities/test/exo5.png'),
+      image: require('../../assets/activities/test/exo5.png'),
       advice: 'Effectuez des extensions de jambe pour activer vos quadriceps.',
     },
     {
       id: 6,
-      image: require('../assets/activities/test/exo6.png'),
+      image: require('../../assets/activities/test/exo6.png'),
       advice: 'Marchez sur place pour stimuler votre circulation.',
     },
   ];

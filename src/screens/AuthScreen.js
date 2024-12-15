@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Dimensions, Image } from 'react-native';
 import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
-import logo from '../assets/logo-test.png'; 
+import logo from '../../assets/logo-test.png'; 
 
 const { width, height } = Dimensions.get('window');
 

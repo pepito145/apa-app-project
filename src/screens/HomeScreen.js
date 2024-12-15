@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, Pressable, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
 import { ProfileContext } from './ProfileContext'; // Import du contexte
-import mascot from '../assets/logo-test.png'; // Logo
+import mascot from '../../assets/logo-test.png'; // Logo
 
 const HomeScreen = ({ navigation }) => {
   const { profile } = useContext(ProfileContext); // Accéder au profil partagé

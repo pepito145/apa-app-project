@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import exerciseBank from '../src/data/exerciseBank'; // Import de ton fichier des niveaux
+import exerciseBank from '../data/exerciseBank'; // Import de ton fichier des niveaux
 import { Picker } from '@react-native-picker/picker'; // Import depuis le nouveau package
 
 const ActivitiesScreen = ({ navigation }) => {
@@ -78,7 +78,7 @@ const ActivitiesScreen = ({ navigation }) => {
       <Text style={styles.subtitle}>Voici l'APA que nous t'avons choisi.</Text>
 
       <Image
-        source={require('../assets/activities/test/seance-test.png')}
+        source={require('../../assets/activities/test/seance-test.png')}
         style={styles.activityImage}
         resizeMode="contain"
       />
