@@ -40,6 +40,25 @@ const EditProfileScreen = ({ navigation }) => {
     );
   };
 
+  const resetWithingsLink = () => {
+    Alert.alert(
+      'Réinitialisation',
+      'Êtes-vous sûr de vouloir réinitialiser la liaison au compte Withings ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Réinitialiser',
+          style: 'destructive',
+          onPress: () => {
+            const updatedProfile = { ...profile, isWithingsLinked: false };
+            setProfile(updatedProfile);
+            saveProfile(updatedProfile);
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <LinearGradient colors={['#6dd5ed', '#2193b0']} style={styles.container}>
       <View style={styles.form}>
@@ -128,6 +147,24 @@ const EditProfileScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Liaison compte withings */}
+        <View style={styles.field}>
+          <Text style={styles.label}>Liaison compte withings</Text>
+          <View style={styles.valueRow}>
+            <Text style={styles.value}>
+              {profile.isWithingsLinked ? 'Lié' : 'Non lié'}            
+            </Text>
+            <TouchableOpacity
+              style={styles.resetButton}
+              onPress={resetWithingsLink}
+            >
+              <Text style={styles.resetButtonText}>Réinitialiser</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        
       </View>
 
       {/* Bouton Retour en bas */}

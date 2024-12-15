@@ -14,6 +14,7 @@ export const ProfileProvider = ({ children }) => {
     weight: '',
     ipaqScore: '',
     streak: 0,
+    isWithingsLinked: false,
   });
 
   // Charge les données depuis AsyncStorage

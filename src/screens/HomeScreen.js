@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, Pressable, SafeAreaView } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { WebView } from 'react-native-webview';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, Pressable, SafeAreaView, BackHandler} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
 import { ProfileContext } from './ProfileContext'; // Import du contexte
 import mascot from '../../assets/logo-test.png'; // Logo
@@ -7,9 +8,37 @@ import mascot from '../../assets/logo-test.png'; // Logo
 const HomeScreen = ({ navigation }) => {
   const { profile } = useContext(ProfileContext); // Accéder au profil partagé
   const [modalVisible, setModalVisible] = useState(false); // Gérer la visibilité du modal
+  const [webModalVisible, setWebModalVisible] = useState(false); // Gérer la visibilité du modal WebView 
+  const [webUrl, setWebUrl] = useState(''); // État pour l'URL du WebView
+  const [currentUrl, setCurrentUrl] = useState(''); // État pour stocker l'URL actuelle
+  const [extractedCode, setExtractedCode] = useState(''); // État pour stocker le code extrait
 
   // Vérification des données personnelles
   const isProfileIncomplete = !profile.firstName || !profile.lastName || !profile.gender || !profile.age || !profile.weight;
+
+  useEffect(() => {
+    let interval;
+
+    if (webModalVisible) {
+      // Démarrer l'intervalle pour vérifier l'URL toutes les x secondes
+      interval = setInterval(() => {
+        console.log('URL actuelle :', currentUrl); // Affiche l'URL actuelle dans la console
+
+        // Vérifie si l'URL contient "code="
+        const codeMatch = currentUrl.match(/code=([^&]+)/); // Utilise une expression régulière pour extraire le code
+        if (codeMatch) {
+          const code = codeMatch[1]; // Le code est dans le premier groupe de capture
+          setExtractedCode(code); // Stocke le code extrait
+          console.log('Code extrait :', code); // Affiche le code extrait dans la console
+          setWebModalVisible(false); // Ferme le modal WebView
+          profile.isWithingsLinked = true;
+        }
+      }, 5000); // Vérifie toutes les 5 secondes
+    }
+
+    // Nettoyer l'intervalle lors du démontage du composant
+    return () => clearInterval(interval);
+  }, [webModalVisible, currentUrl]); // Dépendances : redémarre l'intervalle si l'URL actuelle change
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -39,6 +68,20 @@ const HomeScreen = ({ navigation }) => {
               </Text>
             </TouchableOpacity>
           )}
+
+          {/* Lier le compte Withings */}
+          {!profile.isWithingsLinked && (
+            <TouchableOpacity
+              style={styles.linkWithingsButton}
+              onPress={() => {
+                setWebUrl('https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id=8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25&state=randomString&scope=user.activity,user.metrics&redirect_uri=https://oauth.pstmn.io/v1/callback'); // Définir l'URL
+                setWebModalVisible(true); // Ouvrir le modal WebView
+              }} 
+            >
+              <Text style={styles.linkWithingsText}>Lier son compte Withings</Text>
+            </TouchableOpacity>
+          )}
+
 
           {/* Affichage des statistiques */}
           <View style={styles.statsContainer}>
@@ -76,6 +119,28 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </ScrollView>
         
+        {/* Modal pour afficher le WebView */}
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={webModalVisible}
+          onRequestClose={() => setWebModalVisible(false)}
+        >
+          <View style={{ flex: 1 }}>
+            <WebView 
+              source={{ uri: webUrl }} 
+              onNavigationStateChange={(navState) => {
+                setCurrentUrl(navState.url); // Met à jour l'URL actuelle
+              }}
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setWebModalVisible(false)} // Ferme le modal WebView
+            >
+              <Text style={styles.closeButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
 
         {/* Modal pour afficher les détails du streak */}
         <Modal
@@ -208,7 +273,22 @@ const styles = StyleSheet.create({
   },
   safeContainer: {
     flex: 1,
-    backgroundColor: '#2193b0', // Même couleur que l'en-tête
+    backgroundColor: '#2193b0',
+  },
+  linkWithingsButton: {
+    padding: 16,
+    backgroundColor: '#007bff', 
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 16,
+    width: '80%',
+    borderWidth: 2,
+    borderColor: '#6dd5ed',
+  },
+  linkWithingsText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
