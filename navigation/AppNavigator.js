@@ -70,7 +70,7 @@ const TabNavigator = ({ onLogout }) => {
           backgroundColor: '#fff',
           borderTopWidth: 1,
           borderTopColor: '#ccc',
-          height: 60,
+          height: 80,
         },
         tabBarActiveTintColor: '#007bff',
         tabBarInactiveTintColor: '#666',
