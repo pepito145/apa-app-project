@@ -19,7 +19,7 @@ const HomeScreen = ({ navigation }) => {
   const [steps, setSteps] = useState(0); // État pour les pas
   const [loading, setLoading] = useState(true); // État de chargement
   const [heartRateAverage, setHeartRateAverage] = useState(0); // État pour la moyenne BPM
-  const [heartRateLoading, setHeartRateLoading] = useState(true); // État de chargement pour BPM
+  const [lastRefreshTime, setLastRefreshTime] = useState(0); // État pour stocker le dernier temps de rafraîchissement
 
   const fetchData = async () => {
     try {
@@ -60,8 +60,8 @@ const HomeScreen = ({ navigation }) => {
       // Obtenir le timestamp Unix de minuit
       const midnightTimestamp = Math.floor(midnight.getTime() / 1000);
 
-      console.log('Timestamp Unix de maintenant :', currentTimestamp);
-      console.log('Timestamp Unix de minuit :', midnightTimestamp);
+      //console.log('Timestamp Unix de maintenant :', currentTimestamp);
+      //console.log('Timestamp Unix de minuit :', midnightTimestamp);
 
       // Requête pour récupérer la moyenne des BPM
       const bpmResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
@@ -192,6 +192,49 @@ const HomeScreen = ({ navigation }) => {
   }, [profile.isWithingsLinked]); // Dépendance pour vérifier si le compte est lié
 
 
+  const refreshToken = async () => {
+    const url = 'https://wbsapi.withings.net/v2/oauth2'; // URL de l'API Withings
+    const params = new URLSearchParams({
+        action: 'requesttoken',
+        grant_type: 'refresh_token',
+        client_id: '8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25', // Remplacez par votre client_id
+        client_secret: '77f0088525010a3bd6ab17df6d34c0423aa4c16ced8ede88e00b8a26d9da288b', // Remplacez par votre client_secret
+        refresh_token: profile.refresh_token, // Utilise le refresh_token du profil
+    });
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params.toString(),
+        });
+
+        const data = await response.json();
+        console.log('Réponse de l\'API Withings pour le refresh token :', data);
+
+        if (data.body) {
+          const accessToken = data.body.access_token; // Stocke l'access_token
+          const refreshToken = data.body.refresh_token; // Stocke le refresh_token
+      
+          // Mettez à jour le profil
+          const updatedProfile = {
+            ...profile,
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          };
+      
+          setProfile(updatedProfile); // Mettez à jour l'état du profil
+      
+          // Sauvegarder le profil
+          await saveProfile(updatedProfile);
+        }
+      } catch (error) {
+          console.error('Erreur lors de la requête pour rafraîchir le token :', error);
+      }
+  };
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <LinearGradient colors={['#2193b0', '#6dd5ed']} style={styles.container}>
@@ -243,6 +286,15 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.refreshButtonText}>Rafraîchir les données</Text>
             </TouchableOpacity>
           )}
+
+          {profile.isWithingsLinked && ( 
+            <TouchableOpacity
+              style={styles.refreshButton}
+              onPress={refreshToken} // Appelle la fonction pour rafraîchir les données
+            >
+              <Text style={styles.refreshButtonText}>Rafresh token</Text>
+            </TouchableOpacity>
+          )}  
 
           {/* Affichage des statistiques */}
           <View style={styles.statsContainer}>
