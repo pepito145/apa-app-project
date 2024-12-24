@@ -35,7 +35,18 @@ const ActivitiesScreen = ({ navigation }) => {
   }));
 
   const handleAccept = () => {
-    navigation.navigate('DailyActivity'); // Navigue vers la page des activités quotidiennes
+    if (selectedLevel && selectedSession) {
+      const selectedSessionData = exerciseBank.levels[selectedLevel].sessions.find(
+        session => session.id === selectedSession
+      );
+      navigation.navigate('DailyActivity', {
+        level: selectedLevel,
+        session: selectedSessionData,
+        levelTitle: exerciseBank.levels[selectedLevel].metadata.title
+      });
+    } else {
+      alert('Veuillez sélectionner un niveau et une session avant de commencer.');
+    }
   };
 
   const handleReject = () => {
