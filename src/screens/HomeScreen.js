@@ -242,16 +242,6 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.welcomeText}>Bon retour sur APA App !</Text>
           <Image source={mascot} style={styles.mascotte} />
 
-          {/* Vérification de la présence du score IPAQ */}
-          {(profile.ipaqScore == null || profile.ipaqScore === '') && (
-            <TouchableOpacity
-              style={styles.questionnaireButton}
-              onPress={() => navigation.navigate('QuestionnaireIPAQ')} // Naviguer vers la page du questionnaire
-            >
-              <Text style={styles.questionnaireText}>Remplir le questionnaire IPAQ</Text>
-            </TouchableOpacity>
-          )}
-
           {/* Vérification des données personnelles */}
           {isProfileIncomplete && (
             <TouchableOpacity
@@ -265,73 +255,78 @@ const HomeScreen = ({ navigation }) => {
           )}
 
           {/* Lier le compte Withings */}
-          {!profile.isWithingsLinked && (
+          {!profile.isWithingsLinked && !isProfileIncomplete && (
             <TouchableOpacity
               style={styles.linkWithingsButton}
               onPress={() => {
-                setWebUrl('https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id=8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25&state=randomString&scope=user.activity,user.metrics&redirect_uri=https://oauth.pstmn.io/v1/callback'); // Définir l'URL
-                setWebModalVisible(true); // Ouvrir le modal WebView
+                setWebUrl('https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id=8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25&state=randomString&scope=user.activity,user.metrics&redirect_uri=https://oauth.pstmn.io/v1/callback');
+                setWebModalVisible(true);
               }} 
             >
               <Text style={styles.linkWithingsText}>Lier son compte Withings</Text>
             </TouchableOpacity>
           )}
 
-          {/* Bouton pour rafraîchir les données */}
-          {profile.isWithingsLinked && ( 
+          {/* Vérification de la présence du score IPAQ */}
+          {!isProfileIncomplete && profile.isWithingsLinked && (profile.ipaqScore == null || profile.ipaqScore === '') && (
             <TouchableOpacity
-              style={styles.refreshButton}
-              onPress={fetchData} // Appelle la fonction pour rafraîchir les données
+              style={styles.questionnaireButton}
+              onPress={() => navigation.navigate('QuestionnaireIPAQ')}
             >
-              <Text style={styles.refreshButtonText}>Rafraîchir les données</Text>
+              <Text style={styles.questionnaireText}>Remplir le questionnaire IPAQ</Text>
             </TouchableOpacity>
           )}
 
-          {profile.isWithingsLinked && ( 
-            <TouchableOpacity
-              style={styles.refreshButton}
-              onPress={refreshToken} // Appelle la fonction pour rafraîchir les données
-            >
-              <Text style={styles.refreshButtonText}>Rafresh token</Text>
-            </TouchableOpacity>
-          )}  
+          {/* Contenu principal - affiché uniquement quand tout est complété */}
+          {!isProfileIncomplete && profile.isWithingsLinked && profile.ipaqScore && (
+            <>
+              {/* Boutons de rafraîchissement */}
+              <TouchableOpacity
+                style={styles.refreshButton}
+                onPress={fetchData}
+              >
+                <Text style={styles.refreshButtonText}>Rafraîchir les données</Text>
+              </TouchableOpacity>
 
-          {/* Affichage des statistiques */}
-          <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
-              <Text style={styles.statTitle}>Nombre de pas</Text>
-              <Text style={styles.statValue}>{loading ? 'Chargement...' : steps.toLocaleString()}</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statTitle}>Fréquence Cardiaque moyenne</Text>
-              <Text style={styles.statValue}>{loading ? 'Chargement...' : `${heartRateAverage} BPM`}</Text>
-            </View>
-            {/*
-            <View style={styles.statCard}>
-              <Text style={styles.statTitle}>Calories brulées</Text>
-              <Text style={styles.statValue}>350</Text>
-            </View>
-            */}
-            <TouchableOpacity
-              style={styles.statCard}
-              onPress={() => navigation.navigate('StreakDetails')}
-            >
-              <Text style={styles.statTitle}>Streak 🔥</Text>
-              <Text style={styles.statValue}>{profile.streak}</Text>
-            </TouchableOpacity>
-          </View>
+              <TouchableOpacity
+                style={styles.refreshButton}
+                onPress={refreshToken}
+              >
+                <Text style={styles.refreshButtonText}>Rafresh token</Text>
+              </TouchableOpacity>
 
-          {/* Phrase motivante */}
-          <Text style={styles.motivationalText}>
-            Êtes-vous prêt à bouger et faire du sport aujourd’hui ?
-          </Text>
+              {/* Affichage des statistiques */}
+              <View style={styles.statsContainer}>
+                <View style={styles.statCard}>
+                  <Text style={styles.statTitle}>Nombre de pas</Text>
+                  <Text style={styles.statValue}>{loading ? 'Chargement...' : steps.toLocaleString()}</Text>
+                </View>
+                <View style={styles.statCard}>
+                  <Text style={styles.statTitle}>Fréquence Cardiaque moyenne</Text>
+                  <Text style={styles.statValue}>{loading ? 'Chargement...' : `${heartRateAverage} BPM`}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.statCard}
+                  onPress={() => navigation.navigate('StreakDetails')}
+                >
+                  <Text style={styles.statTitle}>Streak 🔥</Text>
+                  <Text style={styles.statValue}>{profile.streak}</Text>
+                </TouchableOpacity>
+              </View>
 
-          <TouchableOpacity
-            style={styles.activityButton}
-            onPress={() => navigation.navigate('Activités')}
-          >
-            <Text style={styles.activityText}>C'est parti !</Text>
-          </TouchableOpacity>
+              {/* Phrase motivante et bouton d'activité */}
+              <Text style={styles.motivationalText}>
+                Êtes-vous prêt à bouger et faire du sport aujourd'hui ?
+              </Text>
+
+              <TouchableOpacity
+                style={styles.activityButton}
+                onPress={() => navigation.navigate('Activités')}
+              >
+                <Text style={styles.activityText}>C'est parti !</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </ScrollView>
         
         {/* Modal pour afficher le WebView */}

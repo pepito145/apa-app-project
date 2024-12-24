@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import exerciseBank from '../data/exerciseBank'; // Import de ton fichier des niveaux
 import DropDownPicker from 'react-native-dropdown-picker';
+import { ProfileContext } from './ProfileContext';
 
 
 const ActivitiesScreen = ({ navigation }) => {
+  const { profile } = useContext(ProfileContext);
+
+  // Fonction pour déterminer le niveau recommandé
+  const getRecommendedLevel = (ipaqScore) => {
+    if (ipaqScore < 600) return 'niveau1';
+    if (ipaqScore >= 600 && ipaqScore <= 3000) return 'niveau2';
+    return 'niveau3';
+  };
 
   const pdfSource = require('../../assets/exercices-pdfs/1etoile.pdf');
 
@@ -19,7 +28,7 @@ const ActivitiesScreen = ({ navigation }) => {
   };
 
   const levels = Object.keys(exerciseBank.levels).filter(level => level);
-  const [selectedLevel, setSelectedLevel] = useState(null);
+  const [selectedLevel, setSelectedLevel] = useState(getRecommendedLevel(profile.ipaqScore));
   const [openLevel, setOpenLevel] = useState(false);
   const [levelItems, setLevelItems] = useState(levels.map(level => ({
     label: exerciseBank.levels[level].metadata.title,
@@ -33,6 +42,12 @@ const ActivitiesScreen = ({ navigation }) => {
     label: `${session.title} - ${session.duration}`,
     value: session.id,
   }));
+
+  // Ajouter un message de recommandation
+  const getRecommendationMessage = () => {
+    const levelTitle = exerciseBank.levels[selectedLevel]?.metadata.title;
+    return `En fonction de votre score IPAQ (${profile.ipaqScore}), nous vous recommandons : ${levelTitle}`;
+  };
 
   const handleAccept = () => {
     if (selectedLevel && selectedSession) {
@@ -63,8 +78,9 @@ const ActivitiesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.recommendationText}>{getRecommendationMessage()}</Text>
 
-<Text style={styles.pickerLabel}>Sélectionne un niveau :</Text>
+      <Text style={styles.pickerLabel}>Sélectionne un niveau :</Text>
     
 <DropDownPicker
       open={openLevel}
@@ -84,24 +100,24 @@ const ActivitiesScreen = ({ navigation }) => {
       onChangeValue={handleLevelChange} // Assurez-vous d'appeler cette fonction
     />
 
-    {selectedLevel && sessions.length > 0 && ( // Affiche le picker de session seulement si un niveau est sélectionné
-      <>
-        <Text style={styles.pickerLabel}>Sélectionne une session :</Text>
-        <DropDownPicker
-          open={openSession}
-          value={selectedSession}
-          items={sessionItems}
-          setOpen={(open) => {
-            setOpenSession(open);
-            if (open) {
-              setOpenLevel(false); // Ferme le picker de niveau si le picker de session est ouvert
-            }
-          }}
-          setValue={setSelectedSession}
-          placeholder="Aucune session sélectionnée"
-        />
-      </>
-    )}
+      {selectedLevel && sessions.length > 0 && ( // Affiche le picker de session seulement si un niveau est sélectionné
+        <>
+          <Text style={styles.pickerLabel}>Sélectionne une session :</Text>
+          <DropDownPicker
+            open={openSession}
+            value={selectedSession}
+            items={sessionItems}
+            setOpen={(open) => {
+              setOpenSession(open);
+              if (open) {
+                setOpenLevel(false); // Ferme le picker de niveau si le picker de session est ouvert
+              }
+            }}
+            setValue={setSelectedSession}
+            placeholder="Aucune session sélectionnée"
+          />
+        </>
+      )}
 
       <Text style={styles.title}>Excellent !</Text>
       <Text style={styles.subtitle}>Voici l'APA que nous t'avons choisi.</Text>
@@ -220,6 +236,22 @@ const styles = StyleSheet.create({
   pdf: {
     width: '90%', // Largeur du PDF
     height: '80%', // Hauteur du PDF
+  },
+  recommendationText: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 15,
+    borderRadius: 8,
+    marginHorizontal: 20,
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
 });
 
