@@ -19,7 +19,7 @@ const HomeScreen = ({ navigation }) => {
   const [steps, setSteps] = useState(0); // État pour les pas
   const [loading, setLoading] = useState(true); // État de chargement
   const [heartRateAverage, setHeartRateAverage] = useState(0); // État pour la moyenne BPM
-  const [heartRateLoading, setHeartRateLoading] = useState(true); // État de chargement pour BPM
+  const [lastRefreshTime, setLastRefreshTime] = useState(0); // État pour stocker le dernier temps de rafraîchissement
 
   const fetchData = async () => {
     try {
@@ -60,8 +60,8 @@ const HomeScreen = ({ navigation }) => {
       // Obtenir le timestamp Unix de minuit
       const midnightTimestamp = Math.floor(midnight.getTime() / 1000);
 
-      console.log('Timestamp Unix de maintenant :', currentTimestamp);
-      console.log('Timestamp Unix de minuit :', midnightTimestamp);
+      //console.log('Timestamp Unix de maintenant :', currentTimestamp);
+      //console.log('Timestamp Unix de minuit :', midnightTimestamp);
 
       // Requête pour récupérer la moyenne des BPM
       const bpmResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
