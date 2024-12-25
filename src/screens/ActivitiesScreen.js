@@ -112,11 +112,13 @@ const ActivitiesScreen = ({ navigation }) => {
 
   const handleLevelChange = (newLevel) => {
     setSelectedLevel(newLevel);
-    // Sélectionner une session aléatoire du niveau
-    const newSessions = newLevel ? exerciseBank.levels[newLevel]?.sessions || [] : [];
-    if (newSessions.length > 0) {
-      const randomIndex = Math.floor(Math.random() * newSessions.length);
-      setSelectedSession(newSessions[randomIndex].id);
+    // Vérifier si le niveau existe et a des sessions
+    if (newLevel && exerciseBank.levels[newLevel] && exerciseBank.levels[newLevel].sessions) {
+      const newSessions = exerciseBank.levels[newLevel].sessions;
+      if (newSessions.length > 0) {
+        const randomIndex = Math.floor(Math.random() * newSessions.length);
+        setSelectedSession(newSessions[randomIndex].id);
+      }
     } else {
       setSelectedSession(null);
     }
@@ -124,15 +126,19 @@ const ActivitiesScreen = ({ navigation }) => {
   };
 
   const handleAccept = () => {
-    if (selectedLevel && selectedSession) {
+    if (selectedLevel && selectedSession && exerciseBank.levels[selectedLevel]) {
       const selectedSessionData = exerciseBank.levels[selectedLevel].sessions.find(
         session => session.id === selectedSession
       );
-      navigation.navigate('DailyActivity', {
-        level: selectedLevel,
-        session: selectedSessionData,
-        levelTitle: exerciseBank.levels[selectedLevel].metadata.title
-      });
+      if (selectedSessionData) {
+        navigation.navigate('DailyActivity', {
+          level: selectedLevel,
+          session: selectedSessionData,
+          levelTitle: exerciseBank.levels[selectedLevel].metadata.title
+        });
+      } else {
+        alert('Une erreur est survenue lors de la sélection de la session.');
+      }
     } else {
       alert('Veuillez sélectionner un niveau et une session avant de commencer.');
     }
@@ -155,7 +161,9 @@ const ActivitiesScreen = ({ navigation }) => {
         setValue={setSelectedLevel}
         setItems={setLevelItems}
         placeholder="Aucun niveau sélectionné"
-        onChangeValue={handleLevelChange}
+        onSelectItem={(item) => {
+          handleLevelChange(item.value);
+        }}
       />
 
       {selectedLevel && sessions.length > 0 && (
