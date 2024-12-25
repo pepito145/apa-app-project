@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Switch, Alert, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, StyleSheet, Switch, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 
-// Configuration des notifications
+// Configuration du gestionnaire de notifications
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -13,234 +14,259 @@ Notifications.setNotificationHandler({
   }),
 });
 
+// Fonction pour vérifier l'inactivité
+const checkInactivity = async () => {
+  try {
+    console.log('Vérification de l\'inactivité...');
+    const activitiesHistory = await AsyncStorage.getItem('activitiesHistory');
+    
+    if (!activitiesHistory) {
+      console.log('Pas d\'historique d\'activités trouvé');
+      return null;
+    }
+
+    const activities = JSON.parse(activitiesHistory);
+    console.log('Historique des activités:', activities);
+
+    if (activities.length === 0) {
+      console.log('Historique des activités vide');
+      return null;
+    }
+
+    // Trier les activités par date (la plus récente en premier)
+    activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const lastActivity = new Date(activities[0].date);
+    const today = new Date();
+    
+    console.log('Dernière activité:', lastActivity);
+    console.log('Aujourd\'hui:', today);
+
+    const diffTime = Math.abs(today - lastActivity);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    console.log('Nombre de jours d\'inactivité:', diffDays);
+    return diffDays;
+  } catch (error) {
+    console.error('Erreur lors de la vérification de l\'inactivité:', error);
+    return null;
+  }
+};
+
 const NotificationsScreen = () => {
-  // États pour chaque notification
-  const [dailyReminder, setDailyReminder] = useState(false);
-  const [activityCompleted, setActivityCompleted] = useState(false);
-  const [weeklyProgress, setWeeklyProgress] = useState(false);
-  const [goalAchieved, setGoalAchieved] = useState(false);
-  const [encouragementMessages, setEncouragementMessages] = useState(false);
+  // États locaux pour chaque notification
+  const [notifications, setNotifications] = useState({
+    daily: false,
+    weekly: false,
+    inactivity: false
+  });
 
-  // Charger les préférences au démarrage
+  // État pour suivre les modifications
+  const [hasChanges, setHasChanges] = useState(false);
+
+  // Charger les préférences au montage
   useEffect(() => {
-    const loadPreferences = async () => {
-      try {
-        const preferences = await AsyncStorage.multiGet([
-          'dailyReminder',
-          'activityCompleted',
-          'weeklyProgress',
-          'goalAchieved',
-          'encouragementMessages',
-        ]);
-
-        if (preferences) {
-          setDailyReminder(JSON.parse(preferences[0][1] || 'false'));
-          setActivityCompleted(JSON.parse(preferences[1][1] || 'false'));
-          setWeeklyProgress(JSON.parse(preferences[2][1] || 'false'));
-          setGoalAchieved(JSON.parse(preferences[3][1] || 'false'));
-          setEncouragementMessages(JSON.parse(preferences[4][1] || 'false'));
-        }
-      } catch (error) {
-        console.error('Erreur lors du chargement des préférences :', error);
-      }
-
-      const requestPermissions = async () => {
-        const { status } = await Notifications.requestPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert(
-            'Permission requise',
-            'Les notifications sont nécessaires pour vous rappeler vos activités.'
-          );
-        }
-      };
-  
-      requestPermissions();
-      loadPreferences();
-    };
-
-    loadPreferences();
+    loadNotificationSettings();
   }, []);
 
+  // Sauvegarder les changements au démontage
+  useEffect(() => {
+    return () => {
+      if (hasChanges) {
+        saveNotificationSettings();
+      }
+    };
+  }, [hasChanges, notifications]);
 
-  // Programmer les notifications
-  const scheduleDailyReminder = async (enabled) => {
-    if (enabled) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "C'est l'heure de votre activité !",
-          body: "N'oubliez pas votre séance d'exercices quotidienne 💪",
-        },
-        trigger: {
-          hour: 13, // Notification à 10h
-          minute: 30,
-          repeats: true,
-        },
-      });
-    } else {
-      await Notifications.cancelAllScheduledNotificationsAsync();
-    }
-  };
-
-  const scheduleWeeklyProgress = async (enabled) => {
-    if (enabled) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Récapitulatif hebdomadaire',
-          body: 'Consultez vos progrès de la semaine ! 📊',
-        },
-        trigger: {
-          weekday: 7, // Dimanche
-          hour: 18,
-          minute: 0,
-          repeats: true,
-        },
-      });
-    }
-  };
-
-  // Modifier la fonction savePreference existante
-  const savePreference = async (key, value) => {
+  // Charger les préférences
+  const loadNotificationSettings = async () => {
     try {
-      await AsyncStorage.setItem(key, JSON.stringify(value));
-      
-      // Gérer les différents types de notifications
-      switch (key) {
-        case 'dailyReminder':
-          await scheduleDailyReminder(value);
-          break;
-        case 'weeklyProgress':
-          await scheduleWeeklyProgress(value);
-          break;
-        case 'activityCompleted':
-          // Ces notifications seront déclenchées après chaque activité
-          break;
-        case 'goalAchieved':
-          // Ces notifications seront déclenchées lors de l'atteinte d'objectifs
-          break;
-        case 'encouragementMessages':
-          // Ces notifications peuvent être programmées aléatoirement
-          break;
+      const settings = await AsyncStorage.getItem('notification_settings');
+      if (settings) {
+        setNotifications(JSON.parse(settings));
       }
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde :', error);
+      console.error('Erreur lors du chargement des préférences:', error);
     }
   };
-  
-  // Fonction pour envoyer une notification immédiate (pour les tests)
-  const sendImmediateNotification = async () => {
-    const { status } = await Notifications.getPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Notifications désactivées', 'Activez les notifications dans les paramètres.');
-      return;
+
+  // Sauvegarder les préférences et programmer les notifications
+  const saveNotificationSettings = async () => {
+    try {
+      // Sauvegarder les préférences
+      await AsyncStorage.setItem('notification_settings', JSON.stringify(notifications));
+      
+      // Annuler toutes les notifications existantes
+      console.log('Annulation des notifications existantes...');
+      const scheduledNotifs = await Notifications.getAllScheduledNotificationsAsync();
+      console.log('Notifications programmées:', scheduledNotifs);
+      await Notifications.cancelAllScheduledNotificationsAsync();
+
+      // Reprogrammer les notifications activées
+      if (notifications.daily) {
+        console.log('Programmation de la notification quotidienne...');
+        const dailyNotif = {
+          content: {
+            title: "🏃‍♂️ C'est l'heure de bouger !",
+            body: "Votre séance d'APA vous attend. Un petit effort pour un grand bien-être !",
+          },
+          trigger: {
+            hour: 10,
+            minute: 0,
+            repeats: true,
+          },
+          identifier: 'daily_reminder_' + Date.now()
+        };
+        await Notifications.scheduleNotificationAsync(dailyNotif);
+        console.log('Notification quotidienne programmée:', dailyNotif);
+      }
+
+      if (notifications.weekly) {
+        console.log('Programmation de la notification hebdomadaire...');
+        const weeklyNotif = {
+          content: {
+            title: "📊 Bilan hebdomadaire",
+            body: "Découvrez vos progrès de la semaine et fixez-vous de nouveaux objectifs !",
+          },
+          trigger: {
+            weekday: 7,
+            hour: 18,
+            minute: 0,
+            repeats: true,
+          },
+          identifier: 'weekly_summary_' + Date.now()
+        };
+        await Notifications.scheduleNotificationAsync(weeklyNotif);
+        console.log('Notification hebdomadaire programmée:', weeklyNotif);
+      }
+
+      if (notifications.inactivity) {
+        console.log('Configuration de la vérification d\'inactivité...');
+        
+        // Vérification immédiate
+        const currentInactiveDays = await checkInactivity();
+        console.log('Jours d\'inactivité actuels:', currentInactiveDays);
+
+        if (currentInactiveDays && currentInactiveDays >= 3) {
+          console.log('Envoi d\'une alerte d\'inactivité immédiate');
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: "⚠️ Attention !",
+              body: `Cela fait ${currentInactiveDays} jours que vous n'avez pas fait d'exercice. On s'y remet ensemble ?`,
+            },
+            trigger: null,
+            identifier: 'inactivity_immediate_' + Date.now()
+          });
+        }
+
+        // Programmer la vérification quotidienne
+        console.log('Programmation de la vérification quotidienne');
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: "Vérification d'activité",
+            body: "Vérification quotidienne de votre activité",
+          },
+          trigger: {
+            hour: 18,
+            minute: 0,
+            repeats: true,
+          },
+          identifier: 'inactivity_check_' + Date.now()
+        });
+      }
+
+      // Vérifier les notifications programmées
+      const finalNotifs = await Notifications.getAllScheduledNotificationsAsync();
+      console.log('Notifications finales programmées:', finalNotifs);
+
+      setHasChanges(false);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde des préférences:', error);
     }
-  
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'Test de notification',
-        body: 'Cette notification apparaît immédiatement !',
-      },
-      trigger: null, // null signifie notification immédiate
+  };
+
+  // Gérer les changements de switch
+  const handleToggle = (type) => {
+    setNotifications(prev => ({
+      ...prev,
+      [type]: !prev[type]
+    }));
+    setHasChanges(true);
+  };
+
+  const NotificationItem = ({ title, description, icon, type }) => (
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <MaterialIcons name={icon} size={24} color="#2193b0" />
+        <Text style={styles.cardTitle}>{title}</Text>
+      </View>
+      <View style={styles.cardContent}>
+        <Text style={styles.cardDescription}>{description}</Text>
+        <Switch
+          value={notifications[type]}
+          onValueChange={() => handleToggle(type)}
+          trackColor={{ false: '#ccc', true: '#2193b0' }}
+          thumbColor={notifications[type] ? '#fff' : '#f4f3f4'}
+          ios_backgroundColor="#ccc"
+        />
+      </View>
+    </View>
+  );
+
+  // Ajouter un listener pour les vérifications quotidiennes
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(async (notification) => {
+      if (notification.request.content.title === "Vérification d'activité") {
+        const inactiveDays = await checkInactivity();
+        if (inactiveDays && inactiveDays >= 3) {
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: "⚠️ Attention !",
+              body: `Cela fait ${inactiveDays} jours que vous n'avez pas fait d'exercice. On s'y remet ensemble ?`,
+            },
+            trigger: null,
+            identifier: 'inactivity_alert_' + Date.now()
+          });
+        }
+      }
     });
-  
-    Alert.alert('Notification envoyée !', 'La notification devrait apparaître.');
-  };
+
+    return () => subscription.remove();
+  }, []);
 
   return (
-    <LinearGradient colors={['#6dd5ed', '#2193b0']} style={styles.container}>
+    <LinearGradient 
+      colors={['#6dd5ed', '#2193b0']} 
+      style={styles.container}
+    >
+      <ScrollView style={styles.scrollView}>
 
-      {/* Section Activités */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Activités</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Rappels d'activité</Text>
+          <NotificationItem
+            type="daily"
+            title="Rappel quotidien"
+            description="Recevez un rappel chaque matin à 10h pour votre séance d'APA"
+            icon="alarm"
+          />
 
-        {/* Rappel quotidien */}
-        <View style={styles.optionRow}>
-          <Text style={styles.optionText}>Rappel quotidien</Text>
-          <Switch
-            value={dailyReminder}
-            onValueChange={(value) => {
-              setDailyReminder(value);
-              savePreference('dailyReminder', value);
-            }}
-            trackColor={{ false: '#ccc', true: '#007bff' }}
-            thumbColor={dailyReminder ? '#007bff' : '#f4f3f4'}
+          <NotificationItem
+            type="inactivity"
+            title="Alerte d'inactivité"
+            description="Soyez notifié après 3 jours sans activité"
+            icon="running-with-errors"
           />
         </View>
 
-        {/* Confirmation d’activité terminée */}
-        <View style={styles.optionRow}>
-          <Text style={styles.optionText}>Confirmation d’activité terminée</Text>
-          <Switch
-            value={activityCompleted}
-            onValueChange={(value) => {
-              setActivityCompleted(value);
-              savePreference('activityCompleted', value);
-            }}
-            trackColor={{ false: '#ccc', true: '#007bff' }}
-            thumbColor={activityCompleted ? '#007bff' : '#f4f3f4'}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Suivi et progrès</Text>
+          <NotificationItem
+            type="weekly"
+            title="Bilan hebdomadaire"
+            description="Recevez un récapitulatif de vos activités chaque dimanche"
+            icon="insert-chart"
           />
         </View>
-      </View>
-
-      {/* Section Objectifs */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Objectifs</Text>
-
-        {/* Progrès vers l’objectif hebdomadaire */}
-        <View style={styles.optionRow}>
-          <Text style={styles.optionText}>Progrès hebdomadaire</Text>
-          <Switch
-            value={weeklyProgress}
-            onValueChange={(value) => {
-              setWeeklyProgress(value);
-              savePreference('weeklyProgress', value);
-            }}
-            trackColor={{ false: '#ccc', true: '#007bff' }}
-            thumbColor={weeklyProgress ? '#007bff' : '#f4f3f4'}
-          />
-        </View>
-
-        {/* Atteinte d’un objectif */}
-        <View style={styles.optionRow}>
-          <Text style={styles.optionText}>Atteinte d’un objectif</Text>
-          <Switch
-            value={goalAchieved}
-            onValueChange={(value) => {
-              setGoalAchieved(value);
-              savePreference('goalAchieved', value);
-            }}
-            trackColor={{ false: '#ccc', true: '#007bff' }}
-            thumbColor={goalAchieved ? '#007bff' : '#f4f3f4'}
-          />
-        </View>
-      </View>
-
-      {/* Section Motivation */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Motivation</Text>
-
-        {/* Messages d’encouragement */}
-        <View style={styles.optionRow}>
-          <Text style={styles.optionText}>Messages d’encouragement</Text>
-          <Switch
-            value={encouragementMessages}
-            onValueChange={(value) => {
-              setEncouragementMessages(value);
-              savePreference('encouragementMessages', value);
-            }}
-            trackColor={{ false: '#ccc', true: '#007bff' }}
-            thumbColor={encouragementMessages ? '#007bff' : '#f4f3f4'}
-          />
-        </View>
-      </View>
-
-      {/* Bouton de test */}
-      <TouchableOpacity
-        style={styles.testButton}
-        onPress={sendImmediateNotification}
-      >
-        <Text style={styles.testButtonText}>Tester les notifications</Text>
-      </TouchableOpacity>
-
+      </ScrollView>
     </LinearGradient>
   );
 };
@@ -248,63 +274,59 @@ const NotificationsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollView: {
+    flex: 1,
     padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#fff',
+    marginBottom: 25,
     textAlign: 'center',
-    marginBottom: 20,
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginLeft: 10,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardDescription: {
+    fontSize: 14,
+    color: '#666',
+    flex: 1,
+    marginRight: 10,
   },
   section: {
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#fff',
     marginBottom: 10,
-  },
-  optionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  optionText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  testButton: {
-    backgroundColor: '#ffffff',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    alignSelf: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  testButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2193b0',
-    textAlign: 'center',
   },
 });
 
