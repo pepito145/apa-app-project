@@ -22,8 +22,14 @@ const ActivitiesScreen = ({ navigation }) => {
         return storedLevel;
       }
       
-      // Si pas de niveau stocké, utiliser le score IPAQ
-      console.log("Aucun niveau recommandé trouvé, utilisation du score IPAQ:", ipaqScore);
+      // Si pas de niveau stocké, vérifier si l'IPAQ score existe
+      if (!ipaqScore && ipaqScore !== 0) {
+        console.log("Pas de score IPAQ -> niveau1 par défaut");
+        return 'niveau1';
+      }
+      
+      // Si le score IPAQ existe, utiliser la logique normale
+      console.log("Utilisation du score IPAQ:", ipaqScore);
       if (ipaqScore < 600) {
         console.log("Score IPAQ < 600 -> niveau1");
         return 'niveau1';

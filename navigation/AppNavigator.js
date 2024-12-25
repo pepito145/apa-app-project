@@ -37,7 +37,7 @@ const SettingsStack = ({ onLogout }) => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Settings"
+        name="Paramètres "
         children={(props) => <SettingsScreen {...props} onLogout={onLogout} />}
         options={{ headerShown: false }}
       />
