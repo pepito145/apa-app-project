@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import de FontAwesome depuis react-native-vector-icons
+import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProfileContext } from './ProfileContext';
+import exerciseBank from '../data/exerciseBank';
 
 const DailyActivityScreen = ({ navigation, route }) => {
   const { level, session, levelTitle } = route.params;
@@ -43,8 +44,7 @@ useEffect(() => {
       setShowCongrats(false);
       setCurrentExercise(currentExercise + 1);
     } else {
-      setIsFeedbackPhase(true); // Passe �� la phase de feedback après le dernier exercice
-      setIsFeedbackPhase(true);
+      setIsFeedbackPhase(true); // Passe à la phase de feedback après le dernier exercice
     }
   };
 
@@ -56,11 +56,34 @@ useEffect(() => {
     }
   };
 
-  const { profile, updateStreak } = useContext(ProfileContext); // Accéder au streak depuis le contexte
+  const { profile, updateStreak, setProfile } = useContext(ProfileContext); // Accéder au streak depuis le contexte
   // Fonction pour incrémenter le streak
   const incrementStreak = async () => {
     const newStreak = profile.streak + 1;
     await updateStreak(newStreak);
+  };
+
+  const calculateNextSession = (difficultyRating, painRating, currentLevel) => {
+    const averageRating = (difficultyRating + painRating) / 2;
+    console.log('Moyenne des notes:', averageRating);
+    console.log('Niveau actuel:', currentLevel);
+    
+    // Déterminer le prochain niveau en fonction de la moyenne
+    let nextLevel = currentLevel;
+    // Si la moyenne est élevée (trop difficile), on baisse le niveau
+    if (averageRating > 3.8 && currentLevel !== 'niveau1') {
+      nextLevel = `niveau${parseInt(currentLevel.slice(-1)) - 1}`; // Descendre d'un niveau
+      console.log('Trop difficile, on descend au niveau:', nextLevel);
+    } 
+    // Si la moyenne est basse (trop facile), on monte le niveau
+    else if (averageRating < 1.2 && currentLevel !== 'niveau3') {
+      nextLevel = `niveau${parseInt(currentLevel.slice(-1)) + 1}`; // Monter d'un niveau
+      console.log('Trop facile, on monte au niveau:', nextLevel);
+    }
+
+    return {
+      level: nextLevel
+    };
   };
 
   const handleSubmitFeedback = async () => {
@@ -71,6 +94,28 @@ useEffect(() => {
         month: 'short',
         year: 'numeric'
       });
+
+      // Calcul du prochain niveau recommandé
+      const nextRecommendation = calculateNextSession(difficultyRating, painRating, route.params.level);
+      console.log('Prochain niveau recommandé:', nextRecommendation);
+
+      // Sauvegarder le niveau recommandé séparément
+      await AsyncStorage.setItem('recommendedLevel', nextRecommendation.level);
+      console.log('Niveau recommandé sauvegardé:', nextRecommendation.level);
+
+      // Mise à jour du profil
+      const updatedProfile = {
+        ...profile,
+        lastSessionFeedback: {
+          difficulty: difficultyRating,
+          pain: painRating,
+          date: currentDate
+        }
+      };
+
+      console.log('Profil mis à jour:', updatedProfile);
+      await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      setProfile(updatedProfile);
 
       // Appel de la fonction pour incrémenter le streak
       const newStreak = await incrementStreak();
@@ -91,7 +136,7 @@ useEffect(() => {
       const activities = existingHistory ? JSON.parse(existingHistory) : [];
 
       // Ajouter la nouvelle activité
-      activities.unshift(newActivity); // Ajoute au début du tableau
+      activities.unshift(newActivity);
 
       // Sauvegarder l'historique mis à jour
       await AsyncStorage.setItem('activitiesHistory', JSON.stringify(activities));
@@ -100,9 +145,19 @@ useEffect(() => {
       setPainRatingSaved(painRating);
       Alert.alert(
         'Merci pour votre retour !', 
-        `Exercices terminés : ${completedExercises}/${exercises.length}\nTemps total : ${minutesElapsed} minutes\nDifficulté : ${difficultyRating} étoiles\nDouleur : ${painRating} étoiles`
+        `Exercices terminés : ${completedExercises}/${exercises.length}\nTemps total : ${minutesElapsed} minutes\nDifficulté : ${difficultyRating} étoiles\nDouleur : ${painRating} étoiles`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'MainTabs', params: { screen: 'Accueil', refresh: true } }],
+              });
+            }
+          }
+        ]
       );
-      navigation.navigate('MainTabs', { screen: 'Accueil' }); // Retourne à l'accueil
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des données :', error);
       Alert.alert('Erreur', 'Une erreur est survenue lors de la sauvegarde des données.');

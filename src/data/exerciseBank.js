@@ -78,42 +78,42 @@ const exerciseBank = {
               id: 'n1s2e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session2/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s2e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session2/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s2e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session2/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s2e4',
               order: 4,
               name: 'Exercice 4',
-              image: require('../../assets/exercises/level1/session1/ex4.png'),
+              image: require('../../assets/exercises/level1/session2/ex4.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s2e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session2/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s2e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session2/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -131,42 +131,42 @@ const exerciseBank = {
               id: 'n1s3e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session3/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s3e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session3/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s3e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session3/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s3e4',
               order: 4,
               name: 'Exercice 4',
-              image: require('../../assets/exercises/level1/session1/ex4.png'),
+              image: require('../../assets/exercises/level1/session3/ex4.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s3e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session3/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s3e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session3/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -184,42 +184,42 @@ const exerciseBank = {
               id: 'n1s4e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session4/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s4e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session4/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s4e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session4/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s4e4',
               order: 4,
               name: 'Exercice 4',
-              image: require('../../assets/exercises/level1/session1/ex4.png'),
+              image: require('../../assets/exercises/level1/session4/ex4.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s4e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session4/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s4e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session4/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -237,42 +237,42 @@ const exerciseBank = {
               id: 'n1s5e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session5/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s5e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session5/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s5e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session5/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s5e4',
               order: 4,
               name: 'Exercice 4',
-              image: require('../../assets/exercises/level1/session1/ex4.png'),
+              image: require('../../assets/exercises/level1/session5/ex4.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s5e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session5/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s5e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session5/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -290,42 +290,42 @@ const exerciseBank = {
               id: 'n1s6e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session6/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s6e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session6/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s6e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session6/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s6e4',
               order: 4,
               name: 'Exercice 4',
-              image: require('../../assets/exercises/level1/session1/ex4.png'),
+              image: require('../../assets/exercises/level1/session6/ex4.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s6e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session6/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s6e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session6/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -343,42 +343,42 @@ const exerciseBank = {
               id: 'n1s7e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session7/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s7e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session7/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s7e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session7/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s7e4',
               order: 4,
               name: 'Exercice 4',
-              image: require('../../assets/exercises/level1/session1/ex4.png'),
+              image: require('../../assets/exercises/level1/session7/ex4.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s7e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session7/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s7e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session7/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -396,42 +396,42 @@ const exerciseBank = {
               id: 'n1s8e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session8/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s8e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session8/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s8e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session8/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s8e4',
               order: 4,
               name: 'Exercice 4',
-              image: require('../../assets/exercises/level1/session1/ex4.png'),
+              image: require('../../assets/exercises/level1/session8/ex4.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s8e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session8/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s8e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session8/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -449,42 +449,42 @@ const exerciseBank = {
               id: 'n1s9e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session9/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s9e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session9/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s9e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session9/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s9e4',
               order: 4,
               name: 'Exercice 4',
-              image: require('../../assets/exercises/level1/session1/ex4.png'),
+              image: require('../../assets/exercises/level1/session9/ex4.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s9e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session9/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s9e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session9/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -502,21 +502,21 @@ const exerciseBank = {
               id: 'n1s10e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session10/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s10e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session10/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s10e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session10/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
@@ -530,14 +530,14 @@ const exerciseBank = {
               id: 'n1s10e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session10/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s10e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session10/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -555,42 +555,42 @@ const exerciseBank = {
               id: 'n1s11e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session11/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s11e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session11/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s11e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session11/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s11e4',
               order: 4,
               name: 'Exercice 4',
-              image: require('../../assets/exercises/level1/session1/ex4.png'),
+              image: require('../../assets/exercises/level1/session11/ex4.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s11e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session11/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s11e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session11/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -608,42 +608,42 @@ const exerciseBank = {
               id: 'n1s12e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level1/session12/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s12e2',
               order: 2,
               name: 'Exercice 2',
-              image: require('../../assets/exercises/level1/session1/ex2.png'),
+              image: require('../../assets/exercises/level1/session12/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s12e3',
               order: 3,
               name: 'Exercice 3',
-              image: require('../../assets/exercises/level1/session1/ex3.png'),
+              image: require('../../assets/exercises/level1/session12/ex3.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s12e4',
               order: 4,
               name: 'Exercice 4',
-              image: require('../../assets/exercises/level1/session1/ex4.png'),
+              image: require('../../assets/exercises/level1/session12/ex4.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s12e5',
               order: 5,
               name: 'Exercice 5',
-              image: require('../../assets/exercises/level1/session1/ex5.png'),
+              image: require('../../assets/exercises/level1/session12/ex5.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             },
             {
               id: 'n1s12e6',
               order: 6,
               name: 'Exercice 6',
-              image: require('../../assets/exercises/level1/session1/ex6.png'),
+              image: require('../../assets/exercises/level1/session12/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]          
@@ -670,7 +670,42 @@ const exerciseBank = {
               id: 'n2s1e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level2/session1/ex1.png'),
+              consigne: 'Phrase d\'aide pour guider l\'exercice'
+            },
+            {
+              id: 'n1s1e2',
+              order: 1,
+              name: 'Exercice 2',
+              image: require('../../assets/exercises/level2/session1/ex2.png'),
+              consigne: 'Phrase d\'aide pour guider l\'exercice'
+            },
+            {
+              id: 'n1s1e3',
+              order: 1,
+              name: 'Exercice 3',
+              image: require('../../assets/exercises/level2/session1/ex3.png'),
+              consigne: 'Phrase d\'aide pour guider l\'exercice'
+            },
+            {
+              id: 'n1s1e4',
+              order: 1,
+              name: 'Exercice 4',
+              image: require('../../assets/exercises/level2/session1/ex4.png'),
+              consigne: 'Phrase d\'aide pour guider l\'exercice'
+            },
+            {
+              id: 'n1s1e5',
+              order: 1,
+              name: 'Exercice 5',
+              image: require('../../assets/exercises/level2/session1/ex5.png'),
+              consigne: 'Phrase d\'aide pour guider l\'exercice'
+            },
+            {
+              id: 'n1s1e6',
+              order: 1,
+              name: 'Exercice 6',
+              image: require('../../assets/exercises/level2/session1/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]
@@ -688,7 +723,42 @@ const exerciseBank = {
               id: 'n2s1e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level2/session1/ex1.png'),
+              consigne: 'Phrase d\'aide pour guider l\'exercice'
+            },
+            {
+              id: 'n2s1e2',
+              order: 1,
+              name: 'Exercice 2',
+              image: require('../../assets/exercises/level2/session1/ex2.png'),
+              consigne: 'Phrase d\'aide pour guider l\'exercice'
+            },
+            {
+              id: 'n2s1e3',
+              order: 1,
+              name: 'Exercice 3',
+              image: require('../../assets/exercises/level2/session1/ex3.png'),
+              consigne: 'Phrase d\'aide pour guider l\'exercice'
+            },
+            {
+              id: 'n2s1e4',
+              order: 1,
+              name: 'Exercice 4',
+              image: require('../../assets/exercises/level2/session1/ex4.png'),
+              consigne: 'Phrase d\'aide pour guider l\'exercice'
+            },
+            {
+              id: 'n2s1e5',
+              order: 1,
+              name: 'Exercice 5',
+              image: require('../../assets/exercises/level2/session1/ex5.png'),
+              consigne: 'Phrase d\'aide pour guider l\'exercice'
+            },
+            {
+              id: 'n2s1e6',
+              order: 1,
+              name: 'Exercice 6',
+              image: require('../../assets/exercises/level2/session1/ex6.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]
@@ -715,7 +785,7 @@ const exerciseBank = {
               id: 'n3s1e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level3/session1/ex1.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]
@@ -733,7 +803,7 @@ const exerciseBank = {
               id: 'n3s1e1',
               order: 1,
               name: 'Exercice 1',
-              image: require('../../assets/exercises/level1/session1/ex1.png'),
+              image: require('../../assets/exercises/level3/session1/ex2.png'),
               consigne: 'Phrase d\'aide pour guider l\'exercice'
             }
           ]
