@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { ProfileContext } from './ProfileContext';
 
 
@@ -126,42 +126,46 @@ const IPAQForm = ({ navigation }) => {
   if (currentBlock > 0 && currentBlock <= blocks.length) {
     const block = blocks[currentBlock - 1];
     return (
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>{block.title}</Text>
-        {block.questions.map((question, index) => (
-          <View key={index} style={styles.questionContainer}>
-            <Text style={styles.question}>{question.label}</Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              placeholder="Votre réponse"
-              value={answers[question.stateKey]}
-              onChangeText={(text) => {
-                // Vérifie si le texte ne contient que des chiffres
-                if (/^\d*$/.test(text)) {
-                  setAnswers({ ...answers, [question.stateKey]: text });
-                }
-              }}
-            />
-          </View>
-        ))}
-        {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.container}>
+          <Text style={styles.title}>{block.title}</Text>
+          {block.questions.map((question, index) => (
+            <View key={index} style={styles.questionContainer}>
+              <Text style={styles.question}>{question.label}</Text>
+              <TextInput
+                style={styles.input}
+                keyboardType="numeric"
+                placeholder="Votre réponse"
+                value={answers[question.stateKey]}
+                onChangeText={(text) => {
+                  if (/^\d*$/.test(text)) {
+                    setAnswers({ ...answers, [question.stateKey]: text });
+                  }
+                }}
+              />
+            </View>
+          ))}
+          {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
 
-        <TouchableOpacity
-          style={styles.buttonThin}
-          onPress={currentBlock < blocks.length ? nextBlock : submitForm}
-        >
-          <Text style={styles.buttonThinText}>
-            {currentBlock < blocks.length ? 'Continuer' : 'Terminer'}
-          </Text>
-        </TouchableOpacity>
-
-        {currentBlock > 1 && (
-          <TouchableOpacity style={styles.backButton} onPress={previousBlock}>
-            <Text style={styles.backButtonText}>Retour</Text>
+          <TouchableOpacity
+            style={styles.buttonThin}
+            onPress={currentBlock < blocks.length ? nextBlock : submitForm}
+          >
+            <Text style={styles.buttonThinText}>
+              {currentBlock < blocks.length ? 'Continuer' : 'Terminer'}
+            </Text>
           </TouchableOpacity>
-        )}
-      </ScrollView>
+
+          {currentBlock > 1 && (
+            <TouchableOpacity style={styles.backButton} onPress={previousBlock}>
+              <Text style={styles.backButtonText}>Retour</Text>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     );
   }
 

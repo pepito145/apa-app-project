@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'reac
 import { LinearGradient } from 'expo-linear-gradient';
 import { Picker } from '@react-native-picker/picker';
 import { ProfileContext } from './ProfileContext'; // Import du contexte
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const EditProfileScreen = ({ navigation }) => {
+const EditProfileScreen = ({ navigation, route }) => {
+  const { onLogout } = route.params;
   const { profile, setProfile, saveProfile } = useContext(ProfileContext);
   const [editingField, setEditingField] = useState(null);
   const [tempValue, setTempValue] = useState('');
@@ -53,6 +55,66 @@ const EditProfileScreen = ({ navigation }) => {
             const updatedProfile = { ...profile, isWithingsLinked: false };
             setProfile(updatedProfile);
             saveProfile(updatedProfile);
+          },
+        },
+      ]
+    );
+  };
+
+  const handleResetAll = () => {
+    Alert.alert(
+      'Attention !',
+      'Êtes-vous sûr de vouloir réinitialiser complètement l\'application ?\n\nCette action est irréversible et supprimera :\n\n- Votre profil\n- Votre historique d\'activités\n- Vos paramètres\n- La liaison Withings\n- Toutes les données enregistrées\n\nVous serez déconnecté de l\'application.',
+      [
+        { 
+          text: 'Annuler',
+          style: 'cancel'
+        },
+        {
+          text: 'Réinitialiser',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Dernière confirmation',
+              'Êtes-vous vraiment sûr de vouloir tout supprimer ? Cette action est définitive.',
+              [
+                { 
+                  text: 'Non, annuler',
+                  style: 'cancel'
+                },
+                {
+                  text: 'Oui, tout supprimer',
+                  style: 'destructive',
+                  onPress: async () => {
+                    try {
+                      // Supprimer toutes les données stockées
+                      await AsyncStorage.clear();
+                      
+                      // Réinitialiser le profil
+                      const emptyProfile = {
+                        firstName: '',
+                        lastName: '',
+                        gender: '',
+                        age: '',
+                        weight: '',
+                        ipaqScore: null,
+                        isWithingsLinked: false,
+                        streak: 0,
+                        access_token: '',
+                        refresh_token: '',
+                      };
+                      setProfile(emptyProfile);
+                      
+                      // Déconnecter l'utilisateur
+                      onLogout();
+                    } catch (error) {
+                      console.error('Erreur lors de la réinitialisation:', error);
+                      Alert.alert('Erreur', 'Une erreur est survenue lors de la réinitialisation.');
+                    }
+                  },
+                },
+              ]
+            );
           },
         },
       ]
@@ -167,9 +229,12 @@ const EditProfileScreen = ({ navigation }) => {
         
       </View>
 
-      {/* Bouton Retour en bas */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Accueil")}>
-        <Text style={styles.backButtonText}>Sauvegarder et quitter</Text>
+      {/* Bouton de réinitialisation */}
+      <TouchableOpacity 
+        style={styles.resetAllButton} 
+        onPress={handleResetAll}
+      >
+        <Text style={styles.resetAllButtonText}>Réinitialiser l'application</Text>
       </TouchableOpacity>
     </LinearGradient>
   );
@@ -291,6 +356,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   saveButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  resetAllButton: {
+    backgroundColor: '#ff3b30',
+    paddingVertical: 15,
+    borderRadius: 100,
+    alignItems: 'center',
+    marginBottom: 20,
+    marginHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  resetAllButtonText: {
+    fontSize: 18,
     color: '#ffffff',
     fontWeight: 'bold',
   },

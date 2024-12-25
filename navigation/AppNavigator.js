@@ -78,15 +78,15 @@ const TabNavigator = ({ onLogout }) => {
           let iconName;
 
           if (route.name === 'Accueil') {
-            iconName = focused ? 'home' : 'home-outline';
+            iconName = focused ? 'home' : 'home';
           } else if (route.name === 'Statistiques') {
-            iconName = focused ? 'stats-chart' : 'stats-chart-outline';
+            iconName = focused ? 'stats-chart' : 'stats-chart';
           } else if (route.name === 'Activités') {
-            iconName = focused ? 'fitness' : 'fitness-outline';
+            iconName = focused ? 'fitness' : 'fitness';
           } else if (route.name === 'Paramètres') {
-            iconName = focused ? 'settings' : 'settings-outline';
+            iconName = focused ? 'settings' : 'settings';
           } else if (route.name === 'Profil') {
-            iconName = focused ? 'person' : 'person-outline';
+            iconName = focused ? 'person' : 'person';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -137,7 +137,11 @@ const AppNavigator = ({ onLogout }) => {
         <Stack.Screen
           name="StreakDetails"
           component={StreakDetailsScreen}
-          options={{ title: 'Fonctionnement des streaks', headerShown: true }}
+          options={{ 
+            title: 'Fonctionnement des streaks', 
+            headerShown: true,
+            headerBackTitle: 'Retour'
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

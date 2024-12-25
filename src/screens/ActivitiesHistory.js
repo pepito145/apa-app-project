@@ -5,69 +5,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const ActivitiesHistory = ({ navigation }) => {
 
   // Données fictives pour les activités
-  const defaultActivities = [
-    {
-      date: '28 Nov 2024',
-      name: 'Séance 2 étoiles numéro 3',
-      duration: '30 min',
-      calories: '150 kcal',
-      exercisesCompleted: 8,
-      totalExercises: 10,
-      painLevel: 3,
-      difficulty: 2,
-    },
-    {
-      date: '27 Nov 2024',
-      name: 'Séance 3 étoiles numéro 5',
-      duration: '45 min',
-      calories: '300 kcal',
-      exercisesCompleted: 12,
-      totalExercises: 12,
-      painLevel: 4,
-      difficulty: 3,
-    },
-    {
-      date: '26 Nov 2024',
-      name: 'Séance 1 étoile numéro 1',
-      duration: '20 min',
-      calories: '250 kcal',
-      exercisesCompleted: 5,
-      totalExercises: 8,
-      painLevel: 1,
-      difficulty: 1,
-    },
-    {
-      date: '25 Nov 2024',
-      name: 'Séance 3 étoiles numéro 8',
-      duration: '60 min',
-      calories: '400 kcal',
-      exercisesCompleted: 15,
-      totalExercises: 15,
-      painLevel: 5,
-      difficulty: 4,
-    },
-    {
-      date: '24 Nov 2024',
-      name: 'Séance 2 étoiles numéro 6',
-      duration: '15 min',
-      calories: '50 kcal',
-      exercisesCompleted: 3,
-      totalExercises: 5,
-      painLevel: 2,
-      difficulty: 2,
-    },
-  ];
+  const defaultActivities = [];
 
-  const [activities, setActivities] = useState(defaultActivities);
+  const [activities, setActivities] = useState([]);
 
   useEffect(() => {
     const loadActivities = async () => {
       try {
         const savedActivities = await AsyncStorage.getItem('activitiesHistory');
         if (savedActivities) {
-          // Fusionner les activités sauvegardées avec les activités par défaut
           const parsedActivities = JSON.parse(savedActivities);
-          setActivities([...parsedActivities, ...defaultActivities]);
+          setActivities(parsedActivities);
         }
       } catch (error) {
         console.error('Erreur lors du chargement de l\'historique:', error);

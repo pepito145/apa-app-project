@@ -1,9 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { WebView } from 'react-native-webview';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, Pressable, SafeAreaView, BackHandler} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, Pressable, SafeAreaView, BackHandler, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
 import { ProfileContext } from './ProfileContext'; // Import du contexte
 import mascot from '../../assets/logo-test.png'; // Logo
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from '@react-native-picker/picker';
 
 const HomeScreen = ({ navigation }) => {
   const { profile, setProfile, saveProfile } = useContext(ProfileContext); // Accéder au profil partagé
@@ -12,6 +14,24 @@ const HomeScreen = ({ navigation }) => {
   const [webUrl, setWebUrl] = useState(''); // État pour l'URL du WebView
   const [currentUrl, setCurrentUrl] = useState(''); // État pour stocker l'URL actuelle
   const [extractedCode, setExtractedCode] = useState(''); // État pour stocker le code extrait
+
+  // États pour le formulaire du modal
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    age: '',
+    weight: '',
+    gender: ''
+  });
+
+  // Fonction pour vérifier si le formulaire est valide
+  const isFormValid = () => {
+    return formData.firstName.trim() !== '' &&
+           formData.lastName.trim() !== '' &&
+           formData.age.trim() !== '' &&
+           formData.weight.trim() !== '' &&
+           formData.gender !== '';
+  };
 
   // Vérification des données personnelles
   const isProfileIncomplete = !profile.firstName || !profile.lastName || !profile.gender || !profile.age || !profile.weight;
@@ -235,6 +255,47 @@ const HomeScreen = ({ navigation }) => {
       }
   };
 
+  const handleSaveProfile = async () => {
+    // Validation des champs
+    if (!formData.firstName || !formData.lastName || !formData.age || !formData.weight) {
+      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      return;
+    }
+
+    // Validation de l'âge
+    const age = parseInt(formData.age);
+    if (isNaN(age) || age < 0 || age > 120) {
+      Alert.alert('Erreur', 'Veuillez entrer un âge valide');
+      return;
+    }
+
+    // Validation du poids
+    const weight = parseFloat(formData.weight);
+    if (isNaN(weight) || weight < 20 || weight > 300) {
+      Alert.alert('Erreur', 'Veuillez entrer un poids valide');
+      return;
+    }
+
+    // Mise à jour du profil
+    const updatedProfile = {
+      ...profile,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      age: formData.age,
+      weight: formData.weight,
+      gender: formData.gender
+    };
+
+    try {
+      await saveProfile(updatedProfile);
+      setProfile(updatedProfile);
+      setModalVisible(false);
+      Alert.alert('Succès', 'Vos informations ont été enregistrées avec succès !');
+    } catch (error) {
+      Alert.alert('Erreur', 'Une erreur est survenue lors de l\'enregistrement');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <LinearGradient colors={['#2193b0', '#6dd5ed']} style={styles.container}>
@@ -246,13 +307,109 @@ const HomeScreen = ({ navigation }) => {
           {isProfileIncomplete && (
             <TouchableOpacity
               style={styles.incompleteProfileButton}
-              onPress={() => navigation.navigate('Paramètres', { screen: 'EditProfile' })}
+              onPress={() => setModalVisible(true)}
             >
               <Text style={styles.incompleteProfileText}>
                 Complétez vos informations personnelles
               </Text>
             </TouchableOpacity>
           )}
+
+          {/* Modal pour les informations personnelles */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              style={styles.modalOverlay}
+            >
+              <View style={styles.modalContent}>
+
+                  <Text style={styles.modalTitle}>Vos informations</Text>
+                  
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Prénom"
+                    value={formData.firstName}
+                    onChangeText={(text) => setFormData({...formData, firstName: text})}
+                  />
+
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Nom"
+                    value={formData.lastName}
+                    onChangeText={(text) => setFormData({...formData, lastName: text})}
+                  />
+
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Âge"
+                    keyboardType="numeric"
+                    value={formData.age}
+                    onChangeText={(text) => setFormData({...formData, age: text})}
+                  />
+
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Poids (kg)"
+                    keyboardType="numeric"
+                    value={formData.weight}
+                    onChangeText={(text) => setFormData({...formData, weight: text})}
+                  />
+
+                  <View style={styles.genderContainer}>
+                    <View style={styles.radioContainer}>
+                      <Text style={styles.radioLabel}>Genre : </Text>
+                      <TouchableOpacity
+                        style={styles.radioOption}
+                        onPress={() => setFormData({...formData, gender: 'Homme'})}
+                      >
+                        <View style={styles.radio}>
+                          {formData.gender === 'Homme' && <View style={styles.radioSelected} />}
+                        </View>
+                        <Text style={styles.radioLabel}>Homme</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.radioOption}
+                        onPress={() => setFormData({...formData, gender: 'Femme'})}
+                      >
+                        <View style={styles.radio}>
+                          {formData.gender === 'Femme' && <View style={styles.radioSelected} />}
+                        </View>
+                        <Text style={styles.radioLabel}>Femme</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <View style={styles.modalButtons}>
+                    <TouchableOpacity
+                      style={[styles.modalButton, styles.cancelButton]}
+                      onPress={() => setModalVisible(false)}
+                    >
+                      <Text style={styles.modalButtonText}>Annuler</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[
+                        styles.modalButton,
+                        styles.saveButton,
+                        !isFormValid() && styles.saveButtonDisabled
+                      ]}
+                      onPress={handleSaveProfile}
+                      disabled={!isFormValid()}
+                    >
+                      <Text style={[
+                        styles.modalButtonText,
+                        !isFormValid() && styles.saveButtonTextDisabled
+                      ]}>Enregistrer</Text>
+                    </TouchableOpacity>
+                  </View>
+              </View>
+            </KeyboardAvoidingView>
+          </Modal>
 
           {/* Lier le compte Withings */}
           {!profile.isWithingsLinked && !isProfileIncomplete && (
@@ -332,23 +489,27 @@ const HomeScreen = ({ navigation }) => {
         {/* Modal pour afficher le WebView */}
         <Modal
           animationType="slide"
-          transparent={false}
+          transparent={true}
           visible={webModalVisible}
           onRequestClose={() => setWebModalVisible(false)}
         >
-          <View style={{ flex: 1 }}>
+          <View style={styles.webViewContainer}>
+            <View style={styles.webViewHeader}>
+              <TouchableOpacity
+                style={styles.closeWebViewButton}
+                onPress={() => setWebModalVisible(false)}
+              >
+                <Text style={styles.closeWebViewText}>✕</Text>
+              </TouchableOpacity>
+              <Text style={styles.webViewTitle}>Connexion Withings</Text>
+            </View>
             <WebView 
               source={{ uri: webUrl }} 
               onNavigationStateChange={(navState) => {
-                setCurrentUrl(navState.url); // Met à jour l'URL actuelle
+                setCurrentUrl(navState.url);
               }}
+              style={styles.webView}
             />
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setWebModalVisible(false)} // Ferme le modal WebView
-            >
-              <Text style={styles.closeButtonText}>Fermer</Text>
-            </TouchableOpacity>
           </View>
         </Modal>
 
@@ -512,6 +673,137 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    width: '90%',
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2193b0',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  picker: {
+    height: 50,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 8,
+    marginHorizontal: 5,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#FF5722',
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  genderContainer: {
+    marginBottom: 15,
+  },
+  radioContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  radioOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  radio: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: '#2193b0',
+    borderRadius: 10,
+    marginRight: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioSelected: {
+    width: 12,
+    height: 12,
+    backgroundColor: '#2193b0',
+    borderRadius: 6,
+  },
+  radioLabel: {
+    fontSize: 16,
+    color: '#333',
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#cccccc',
+  },
+  saveButtonTextDisabled: {
+    color: '#666666',
+  },
+  webViewContainer: {
+    flex: 1,
+    marginTop: 40,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: 'hidden',
+  },
+  webViewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: '#2193b0',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  closeWebViewButton: {
+    padding: 8,
+  },
+  closeWebViewText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  webViewTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 15,
+  },
+  webView: {
+    flex: 1,
   },
 });
 

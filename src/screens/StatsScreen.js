@@ -17,15 +17,15 @@ const StatsScreen = () => {
           <Text style={styles.sectionTitle}>Activité physique</Text>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>Nombre de pas</Text>
-            <Text style={styles.statValue}>7,500</Text>
+            <Text style={styles.statValue}>00</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>Calories brûlées</Text>
-            <Text style={styles.statValue}>350 kcal</Text>
+            <Text style={styles.statValue}>00 kcal</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>Activités complétées</Text>
-            <Text style={styles.statValue}>12</Text>
+            <Text style={styles.statValue}>00</Text>
           </View>
         </View>
 
@@ -34,15 +34,15 @@ const StatsScreen = () => {
           <Text style={styles.sectionTitle}>Santé</Text>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>BPM moyen</Text>
-            <Text style={styles.statValue}>72</Text>
+            <Text style={styles.statValue}>00</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>Sommeil (heures)</Text>
-            <Text style={styles.statValue}>7h 45m</Text>
+            <Text style={styles.statValue}>00h 00m</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>Niveau de stress</Text>
-            <Text style={styles.statValue}>Modéré</Text>
+            <Text style={styles.statValue}>00</Text>
           </View>
         </View>
 
@@ -51,11 +51,11 @@ const StatsScreen = () => {
           <Text style={styles.sectionTitle}>Historique</Text>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>Streak actuel</Text>
-            <Text style={styles.statValue}>5 jours</Text>
+            <Text style={styles.statValue}>00 jours</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>Meilleur streak</Text>
-            <Text style={styles.statValue}>10 jours</Text>
+            <Text style={styles.statValue}>00 jours</Text>
           </View>
         </View>
 
@@ -64,7 +64,7 @@ const StatsScreen = () => {
           <Text style={styles.sectionTitle}>Respiration</Text>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>Respirations par minute</Text>
-            <Text style={styles.statValue}>16 rpm</Text>
+            <Text style={styles.statValue}>00 rpm</Text>
           </View>
         </View>
       </ScrollView>

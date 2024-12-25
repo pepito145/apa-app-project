@@ -7,7 +7,7 @@ const SettingsScreen = ({ navigation, onLogout }) => {
   const { setProfile } = useContext(ProfileContext); // Accéde à setProfile pour réinitialiser le profil
 
   const handleProfileEdit = () => {
-    navigation.navigate('EditProfile');
+    navigation.navigate('EditProfile', { onLogout });
   };
 
   const handlePreferences = () => {
