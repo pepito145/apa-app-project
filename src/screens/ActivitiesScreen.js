@@ -151,7 +151,6 @@ const ActivitiesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.pickerLabel}>Sélectionne un niveau :</Text>
     
       <DropDownPicker
         open={openLevel}
@@ -168,7 +167,6 @@ const ActivitiesScreen = ({ navigation }) => {
 
       {selectedLevel && sessions.length > 0 && (
         <>
-          <Text style={styles.pickerLabel}>Sélectionne une session :</Text>
           <DropDownPicker
             open={openSession}
             value={selectedSession}
