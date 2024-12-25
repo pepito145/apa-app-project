@@ -41,12 +41,18 @@ const HomeScreen = ({ navigation }) => {
   const [heartRateAverage, setHeartRateAverage] = useState(0); // État pour la moyenne BPM
   const [lastRefreshTime, setLastRefreshTime] = useState(0); // État pour stocker le dernier temps de rafraîchissement
 
+  // États pour gérer les erreurs
+  const [stepsError, setStepsError] = useState(false);
+  const [heartRateError, setHeartRateError] = useState(false);
+
   const fetchData = async () => {
     try {
-      setLoading(true); // Début du chargement
+      setLoading(true);
+      setStepsError(false);
+      setHeartRateError(false);
 
       const today = new Date();
-      const formattedDate = today.toISOString().split('T')[0]; // Formate la date au format YYYY-MM-DD
+      const formattedDate = today.toISOString().split('T')[0];
 
       // Requête pour récupérer les pas
       const stepsResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
@@ -55,33 +61,25 @@ const HomeScreen = ({ navigation }) => {
           Authorization: `Bearer ${profile.access_token}`,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `action=getactivity&startdateymd=${formattedDate}&enddateymd=${formattedDate}`, // Utilise la date formatée
+        body: `action=getactivity&startdateymd=${formattedDate}&enddateymd=${formattedDate}`,
       });
 
       const stepsData = await stepsResponse.json();
 
-      if (stepsData.status === 0 && stepsData.body.activities.length > 0) {
-        setSteps(stepsData.body.activities[0].steps);
-        console.log("Steps trouvés")
+      if (stepsData.status === 0) {
+        // Si la requête réussit, on met les steps à 0 ou à la valeur trouvée
+        setSteps(stepsData.body.activities.length > 0 ? stepsData.body.activities[0].steps : 0);
+        console.log("Requête steps réussie")
       } else {
-        setSteps(0); // Aucune donnée trouvée
-        console.log("Steps non trouvés")
+        setStepsError(true);
+        console.log("Erreur requête steps")
       }
 
       // Obtenir la date actuelle
       const now = new Date();
-
-      // Obtenir le timestamp Unix de maintenant
       const currentTimestamp = Math.floor(now.getTime() / 1000);
-
-      // Obtenir la date actuelle à minuit
       const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-      // Obtenir le timestamp Unix de minuit
       const midnightTimestamp = Math.floor(midnight.getTime() / 1000);
-
-      //console.log('Timestamp Unix de maintenant :', currentTimestamp);
-      //console.log('Timestamp Unix de minuit :', midnightTimestamp);
 
       // Requête pour récupérer la moyenne des BPM
       const bpmResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
@@ -90,34 +88,40 @@ const HomeScreen = ({ navigation }) => {
           Authorization: `Bearer ${profile.access_token}`,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `action=getintradayactivity&startdate=${midnightTimestamp}&enddate=${currentTimestamp}`, // Utilise les timestamps Unix
+        body: `action=getintradayactivity&startdate=${midnightTimestamp}&enddate=${currentTimestamp}`,
       });
 
       const bpmData = await bpmResponse.json();
 
-      if (bpmData.status === 0 && bpmData.body.series) {
-        const seriesArray = Object.values(bpmData.body.series);
-        const heartRates = seriesArray
-          .filter(item => item.heart_rate != null)
-          .map(item => item.heart_rate);
+      if (bpmData.status === 0) {
+        if (bpmData.body.series) {
+          const seriesArray = Object.values(bpmData.body.series);
+          const heartRates = seriesArray
+            .filter(item => item.heart_rate != null)
+            .map(item => item.heart_rate);
 
-        if (heartRates.length > 0) {
-          const averageBPM = heartRates.reduce((sum, rate) => sum + rate, 0) / heartRates.length;
-          setHeartRateAverage(Math.round(averageBPM)); // Arrondi à l'entier
-          console.log("BPM : ", averageBPM);
+          if (heartRates.length > 0) {
+            const averageBPM = heartRates.reduce((sum, rate) => sum + rate, 0) / heartRates.length;
+            setHeartRateAverage(Math.round(averageBPM));
+            console.log("BPM trouvé :", averageBPM);
+          } else {
+            setHeartRateAverage(0);
+            console.log("Pas de BPM dans les données");
+          }
         } else {
-          setHeartRateAverage(0); // Aucun heart_rate trouvéa
+          setHeartRateAverage(0);
+          console.log("Pas de séries dans les données");
         }
       } else {
-        setHeartRateAverage(0); // Erreur ou pas de données
-        console.log("BPM non trouvé");
-      } 
+        setHeartRateError(true);
+        console.log("Erreur requête BPM");
+      }
     } catch (error) {
       console.error('Erreur API :', error);
-      setSteps(0);
-      setHeartRateAverage(0);
+      setStepsError(true);
+      setHeartRateError(true);
     } finally {
-      setLoading(false); // Fin du chargement
+      setLoading(false);
     }
   };
 
@@ -213,46 +217,60 @@ const HomeScreen = ({ navigation }) => {
 
 
   const refreshToken = async () => {
-    const url = 'https://wbsapi.withings.net/v2/oauth2'; // URL de l'API Withings
+    // Vérifier si 3 heures se sont écoulées depuis le dernier refresh
+    const threeHoursInMs = 3 * 60 * 60 * 1000; // 3 heures en millisecondes
+    const now = Date.now();
+    
+    if (profile.lastRefreshTime && (now - profile.lastRefreshTime) < threeHoursInMs) {
+      const timeLeft = Math.ceil((threeHoursInMs - (now - profile.lastRefreshTime)) / (60 * 1000));
+      Alert.alert(
+        'Refresh non autorisé',
+        `Vous devez attendre ${timeLeft} minutes avant de pouvoir rafraîchir le token.`
+      );
+      return;
+    }
+
+    const url = 'https://wbsapi.withings.net/v2/oauth2';
     const params = new URLSearchParams({
-        action: 'requesttoken',
-        grant_type: 'refresh_token',
-        client_id: '8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25', // Remplacez par votre client_id
-        client_secret: '77f0088525010a3bd6ab17df6d34c0423aa4c16ced8ede88e00b8a26d9da288b', // Remplacez par votre client_secret
-        refresh_token: profile.refresh_token, // Utilise le refresh_token du profil
+      action: 'requesttoken',
+      grant_type: 'refresh_token',
+      client_id: '8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25',
+      client_secret: '77f0088525010a3bd6ab17df6d34c0423aa4c16ced8ede88e00b8a26d9da288b',
+      refresh_token: profile.refresh_token,
     });
 
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: params.toString(),
-        });
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString(),
+      });
 
-        const data = await response.json();
-        console.log('Réponse de l\'API Withings pour le refresh token :', data);
+      const data = await response.json();
+      console.log('Réponse de l\'API Withings pour le refresh token :', data);
 
-        if (data.body) {
-          const accessToken = data.body.access_token; // Stocke l'access_token
-          const refreshToken = data.body.refresh_token; // Stocke le refresh_token
-      
-          // Mettez à jour le profil
-          const updatedProfile = {
-            ...profile,
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          };
-      
-          setProfile(updatedProfile); // Mettez à jour l'état du profil
-      
-          // Sauvegarder le profil
-          await saveProfile(updatedProfile);
-        }
-      } catch (error) {
-          console.error('Erreur lors de la requête pour rafraîchir le token :', error);
+      if (data.body) {
+        const accessToken = data.body.access_token;
+        const refreshToken = data.body.refresh_token;
+    
+        // Mettre à jour le profil avec le nouveau timestamp
+        const updatedProfile = {
+          ...profile,
+          access_token: accessToken,
+          refresh_token: refreshToken,
+          lastRefreshTime: now, // Ajouter le timestamp du refresh
+        };
+    
+        setProfile(updatedProfile);
+        await saveProfile(updatedProfile);
+        Alert.alert('Succès', 'Le token a été rafraîchi avec succès.');
       }
+    } catch (error) {
+      console.error('Erreur lors de la requête pour rafraîchir le token :', error);
+      Alert.alert('Erreur', 'Une erreur est survenue lors du rafraîchissement du token.');
+    }
   };
 
   const handleSaveProfile = async () => {
@@ -456,11 +474,15 @@ const HomeScreen = ({ navigation }) => {
               <View style={styles.statsContainer}>
                 <View style={styles.statCard}>
                   <Text style={styles.statTitle}>Nombre de pas</Text>
-                  <Text style={styles.statValue}>{loading ? 'Chargement...' : steps.toLocaleString()}</Text>
+                  <Text style={styles.statValue}>
+                    {loading ? 'Chargement...' : stepsError ? 'N/A' : steps.toLocaleString()}
+                  </Text>
                 </View>
                 <View style={styles.statCard}>
                   <Text style={styles.statTitle}>Fréquence Cardiaque moyenne</Text>
-                  <Text style={styles.statValue}>{loading ? 'Chargement...' : `${heartRateAverage} BPM`}</Text>
+                  <Text style={styles.statValue}>
+                    {loading ? 'Chargement...' : heartRateError ? 'N/A' : `${heartRateAverage} BPM`}
+                  </Text>
                 </View>
                 <TouchableOpacity
                   style={styles.statCard}

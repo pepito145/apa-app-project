@@ -9,6 +9,68 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const ActivitiesScreen = ({ navigation }) => {
   const { profile } = useContext(ProfileContext);
   const [recommendedLevel, setRecommendedLevel] = useState(null);
+  const [selectedLevel, setSelectedLevel] = useState(null);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [openLevel, setOpenLevel] = useState(false);
+  const [openSession, setOpenSession] = useState(false);
+
+  const levels = Object.keys(exerciseBank.levels).filter(level => level);
+  const [levelItems, setLevelItems] = useState(levels.map(level => ({
+    label: exerciseBank.levels[level].metadata.title,
+    value: level,
+  })));
+
+  // Fonction pour sélectionner une session aléatoire
+  const selectRandomSession = (level) => {
+    const availableSessions = exerciseBank.levels[level]?.sessions || [];
+    if (availableSessions.length > 0) {
+      const randomIndex = Math.floor(Math.random() * availableSessions.length);
+      return availableSessions[randomIndex].id;
+    }
+    return null;
+  };
+
+  // Fonction pour sauvegarder la session actuelle
+  const saveCurrentSession = async (level, sessionId) => {
+    try {
+      await AsyncStorage.setItem('currentSession', JSON.stringify({
+        level,
+        sessionId,
+        timestamp: Date.now()
+      }));
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde de la session:', error);
+    }
+  };
+
+  // Fonction pour charger la session sauvegardée
+  const loadSavedSession = async (level) => {
+    try {
+      const savedSessionData = await AsyncStorage.getItem('currentSession');
+      if (savedSessionData) {
+        const { level: savedLevel, sessionId, timestamp } = JSON.parse(savedSessionData);
+        
+        // Si le niveau a changé ou si c'est une nouvelle journée, sélectionner une nouvelle session
+        const now = new Date();
+        const savedDate = new Date(timestamp);
+        if (level !== savedLevel || now.getDate() !== savedDate.getDate()) {
+          const newSessionId = selectRandomSession(level);
+          await saveCurrentSession(level, newSessionId);
+          return newSessionId;
+        }
+        
+        return sessionId;
+      }
+      
+      // Si pas de session sauvegardée, en sélectionner une nouvelle
+      const newSessionId = selectRandomSession(level);
+      await saveCurrentSession(level, newSessionId);
+      return newSessionId;
+    } catch (error) {
+      console.error('Erreur lors du chargement de la session:', error);
+      return selectRandomSession(level);
+    }
+  };
 
   // Fonction pour déterminer le niveau recommandé
   const getRecommendedLevel = async (ipaqScore) => {
@@ -46,15 +108,7 @@ const ActivitiesScreen = ({ navigation }) => {
     }
   };
 
-  const levels = Object.keys(exerciseBank.levels).filter(level => level);
-  const [selectedLevel, setSelectedLevel] = useState(null);
-  const [openLevel, setOpenLevel] = useState(false);
-  const [levelItems, setLevelItems] = useState(levels.map(level => ({
-    label: exerciseBank.levels[level].metadata.title,
-    value: level,
-  })));
-
-  // Utiliser useFocusEffect pour mettre à jour le niveau recommandé à chaque fois qu'on revient sur l'écran
+  // Utiliser useFocusEffect pour mettre à jour le niveau recommandé
   useFocusEffect(
     React.useCallback(() => {
       const loadRecommendedLevel = async () => {
@@ -64,16 +118,9 @@ const ActivitiesScreen = ({ navigation }) => {
         setSelectedLevel(level);
         setRecommendedLevel(level);
         
-        // Sélectionner une session aléatoire du niveau recommandé
         if (level) {
-          const availableSessions = exerciseBank.levels[level]?.sessions || [];
-          if (availableSessions.length > 0) {
-            const randomIndex = Math.floor(Math.random() * availableSessions.length);
-            console.log("Session aléatoire sélectionnée:", availableSessions[randomIndex].title);
-            setSelectedSession(availableSessions[randomIndex].id);
-          } else {
-            setSelectedSession(null);
-          }
+          const sessionId = await loadSavedSession(level);
+          setSelectedSession(sessionId);
         }
       };
       
@@ -81,8 +128,17 @@ const ActivitiesScreen = ({ navigation }) => {
     }, [profile])
   );
 
-  const [selectedSession, setSelectedSession] = useState(null);
-  const [openSession, setOpenSession] = useState(false);
+  const handleLevelChange = async (newLevel) => {
+    setSelectedLevel(newLevel);
+    if (newLevel && exerciseBank.levels[newLevel]) {
+      const sessionId = await loadSavedSession(newLevel);
+      setSelectedSession(sessionId);
+    } else {
+      setSelectedSession(null);
+    }
+    setOpenSession(false);
+  };
+
   const sessions = selectedLevel ? exerciseBank.levels[selectedLevel]?.sessions || [] : [];
   const sessionItems = sessions.map(session => ({
     label: `${session.title} - ${session.duration}`,
@@ -116,19 +172,20 @@ const ActivitiesScreen = ({ navigation }) => {
     }
   };
 
-  const handleLevelChange = (newLevel) => {
-    setSelectedLevel(newLevel);
-    // Vérifier si le niveau existe et a des sessions
-    if (newLevel && exerciseBank.levels[newLevel] && exerciseBank.levels[newLevel].sessions) {
-      const newSessions = exerciseBank.levels[newLevel].sessions;
-      if (newSessions.length > 0) {
-        const randomIndex = Math.floor(Math.random() * newSessions.length);
-        setSelectedSession(newSessions[randomIndex].id);
-      }
-    } else {
-      setSelectedSession(null);
+  // Fonction pour sélectionner une session aléatoire différente de la session actuelle
+  const selectDifferentRandomSession = (level, currentSessionId) => {
+    const availableSessions = exerciseBank.levels[level]?.sessions || [];
+    if (availableSessions.length > 1) {
+      let newSessionId;
+      do {
+        const randomIndex = Math.floor(Math.random() * availableSessions.length);
+        newSessionId = availableSessions[randomIndex].id;
+      } while (newSessionId === currentSessionId);
+      return newSessionId;
+    } else if (availableSessions.length === 1) {
+      return availableSessions[0].id;
     }
-    setOpenSession(false);
+    return null;
   };
 
   const handleAccept = () => {
@@ -150,14 +207,23 @@ const ActivitiesScreen = ({ navigation }) => {
     }
   };
 
-  const handleReject = () => {
-    alert('D\'accord, nous choisirons une autre activité.');
-    navigation.navigate('Accueil'); // Retourne à l'écran précédent
+  const handleReject = async () => {
+    if (selectedLevel) {
+      const newSessionId = selectDifferentRandomSession(selectedLevel, selectedSession);
+      if (newSessionId) {
+        await saveCurrentSession(selectedLevel, newSessionId);
+        setSelectedSession(newSessionId);
+        alert('Voici une nouvelle activité pour vous !');
+      } else {
+        alert('Désolé, aucune autre activité n\'est disponible pour ce niveau.');
+      }
+    }
   };
 
   return (
     <View style={styles.container}>
     
+      {/* Pickers pour le développement - à décommenter si besoin
       <DropDownPicker
         open={openLevel}
         value={selectedLevel}
@@ -187,22 +253,31 @@ const ActivitiesScreen = ({ navigation }) => {
           />
         </>
       )}
+      */}
 
       {selectedLevel && selectedSession && (
         <>
-          <Text style={styles.title}>Excellent !</Text>
-          <Text style={styles.subtitle}>
-            Voici l'APA que nous t'avons choisi : {'\n'}
-            {exerciseBank.levels[selectedLevel].metadata.title} - {
-              exerciseBank.levels[selectedLevel].sessions.find(
-                session => session.id === selectedSession
-              ).title
-            }
+          <Text>
+            <Text style={styles.presentationText}>
+              Voici l'APA que nous t'avons choisi :
+            </Text>
+            {'\n\n'}
+            <Text style={styles.sessionText}>
+              {exerciseBank.levels[selectedLevel].metadata.title} - {
+                exerciseBank.levels[selectedLevel].sessions.find(
+                  session => session.id === selectedSession
+                ).title
+              }
+            </Text>
           </Text>
 
           <View style={styles.summaryContainer}>
             <Text style={styles.summaryTitle}>Résumé de la séance :</Text>
-            <Text style={styles.summaryText}>Résumé à venir</Text>
+            <Text style={styles.summaryText}>
+              {exerciseBank.levels[selectedLevel].sessions.find(
+                session => session.id === selectedSession
+              ).resume || "Résumé à venir"}
+            </Text>
           </View>
 
           <View style={styles.buttonContainer}>
@@ -237,11 +312,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 18,
-    color: '#666666',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333333',
     textAlign: 'center',
-    marginVertical: 15,
-    lineHeight: 24,
+    marginVertical: 20,
+    lineHeight: 32,
   },
   summaryContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -366,6 +442,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  presentationText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333333',
+    textAlign: 'center',
+    lineHeight: 24,
+    width: '100%',
+    paddingHorizontal: 10,
+  },
+  sessionText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333333',
+    textAlign: 'center',
+    lineHeight: 26,
+    marginTop: 5,
   },
 });
 
