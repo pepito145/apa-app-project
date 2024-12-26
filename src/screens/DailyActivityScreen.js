@@ -209,8 +209,6 @@ useEffect(() => {
       ) : (
         <View style={styles.feedbackContainer}>
           <Text style={styles.title}>Félicitations !</Text>
-          <Text style={styles.stats}>Fréquence cardiaque moyenne : 100 bpm</Text>
-          <Text style={styles.stats}>Calories brûlées : 1000 kcal</Text>
 
           <View style={styles.feedbackSection}>
             <Text style={styles.feedbackLabel}>

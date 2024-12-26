@@ -373,14 +373,12 @@ const StatsScreen = ({ navigation }) => {
               value={stats.averageDifficulty}
               icon="speed"
               unit="/5"
-              description={stats.difficultyProgress > 0 ? `+${stats.difficultyProgress} de progression` : `${stats.difficultyProgress} de progression`}
             />
             <StatCard
               title="Douleur Moyenne"
               value={stats.averagePain}
               icon="healing"
               unit="/5"
-              description={stats.painProgress > 0 ? `-${stats.painProgress} de douleur` : `+${-stats.painProgress} de douleur`}
             />
           </View>
 
