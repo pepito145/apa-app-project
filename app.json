@@ -22,7 +22,7 @@
       },
       "package": "com.pepito145.apaappproject",
       "permissions": []
-      },
+    },
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -30,6 +30,7 @@
       "eas": {
         "projectId": "68a7b094-04c5-4d74-959f-ad0421a6a3f3"
       }
-    }
+    },
+    "owner": "pepito145"
   }
 }
