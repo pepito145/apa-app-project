@@ -20,7 +20,7 @@ const exerciseBank = {
           title: 'Séance 1',
           description: 'Première séance découverte',
           duration: '20min',
-          resume: "Cette première séance de niveau 1 est une introduction douce à l'activité physique.\n\nElle se compose d'exercices simples de mobilité articulaire et d'étirements légers, parfaits pour débuter ou reprendre une activité physique en douceur.",
+          resume: "Au programme : \n - Monter les talons \n - Monter les pointes de pied \n - Coups de pied \n - Montées de genoux \n - Ecarter bras \n - Pousser devant",
           exercises: [
             {
               id: 'n1s1e1',
@@ -74,7 +74,7 @@ const exerciseBank = {
           title: 'Séance 2',
           description: 'Deuxième séance découverte',
           duration: '25min',
-          resume: "Cette deuxième séance introduit des mouvements de renforcement très doux.\n\nL'accent est mis sur la posture et la respiration, avec des exercices qui peuvent être réalisés assis ou debout selon votre confort.",
+          resume: "Au programme : \n - Poser talon devant \n - Serrer les genoux \n - Ecarter jambe sur le côté \n - Pose pointe sous la chaise \n - Biceps \n - Grands applaudissements",
           exercises: [
             {
               id: 'n1s2e1',
@@ -128,7 +128,7 @@ const exerciseBank = {
           title: 'Séance 3',
           description: 'Troisième séance découverte',
           duration: '20min',
-          resume: "La troisième séance se concentre sur la mobilité des membres inférieurs.\n\nDes exercices doux pour les jambes et les hanches sont proposés, accompagnés de périodes de repos adaptées à votre rythme.",
+          resume: "Au programme : \n - Montées de genoux \n - Ecart latéral \n - Ecarter les genoux \n - Pose pointe sous la chaise \n - Petits applaudissements \n - Bras vers le ciel",
           exercises: [
             {
               id: 'n1s3e1',
@@ -182,7 +182,7 @@ const exerciseBank = {
           title: 'Séance 4',
           description: 'Quatrième séance découverte',
           duration: '20min',
-          resume: "Cette séance se concentre sur la coordination et l'équilibre.\n\nDes exercices simples pour améliorer votre stabilité et votre confiance dans les mouvements quotidiens.",
+          resume: "Au programme : \n - Monter les talons \n - Monter les pointes de pied \n - Montées de genoux \n - Poser talon devant \n - Triceps bras \n - Pousser devant",
           exercises: [
             {
               id: 'n1s4e1',
@@ -236,7 +236,7 @@ const exerciseBank = {
           title: 'Séance 5',
           description: 'Cinquième séance découverte',
           duration: '20min',
-          resume: "Une séance douce de renforcement musculaire.\n\nDes exercices adaptés pour tonifier vos muscles en douceur, avec une attention particulière à la respiration.",
+          resume: "Au programme : \n - Serrer les genoux \n - Ecart latéral \n - Coups de pied \n - Ecarter jambe sur le côté \n - Ecarter les bras \n - Ecarter bras",
           exercises: [
             {
               id: 'n1s5e1',
@@ -290,7 +290,7 @@ const exerciseBank = {
           title: 'Séance 6',
           description: 'Sixième séance découverte',
           duration: '20min',
-          resume: "Cette séance introduit des mouvements d'étirement plus approfondis.\n\nUn travail en douceur pour améliorer votre souplesse et votre amplitude articulaire.",
+          resume: "Au programme : \n - Ecarter les genoux \n - Montées de genoux \n - Pose pointe sous la chaise \n - Ecart latéral \n - Mains au ciel \n - Grands applaudissements",
           exercises: [
             {
               id: 'n1s6e1',
@@ -344,7 +344,7 @@ const exerciseBank = {
           title: 'Séance 7',
           description: 'Septième séance découverte',
           duration: '20min',
-          resume: "Une séance axée sur la mobilité générale.\n\nDes exercices variés pour entretenir la souplesse de vos articulations et prévenir les raideurs.",
+          resume: "Au programme : \n - Monter les talons \n - Serrer les genoux \n - Ecarter les genoux \n - Poser talon devant \n - Ecarter/Serrer \n - Biceps",
           exercises: [
             {
               id: 'n1s7e1',
@@ -398,7 +398,7 @@ const exerciseBank = {
           title: 'Séance 8',
           description: 'Huitième séance découverte',
           duration: '20min',
-          resume: "Cette séance combine équilibre et renforcement léger.\n\nUn mélange d'exercices pour améliorer votre stabilité tout en renforçant vos muscles en douceur.",
+          resume: "Au programme : \n - Ecart latéral \n - Montées de genoux \n - Coups de pied \n - Pose pointe sous la chaise \n - Boxe \n - Bras vers le ciel",
           exercises: [
             {
               id: 'n1s8e1',
@@ -452,7 +452,7 @@ const exerciseBank = {
           title: 'Séance 9',
           description: 'Neuvième séance découverte',
           duration: '20min',
-          resume: "Une séance focalisée sur la posture et l'alignement.\n\nDes exercices simples pour améliorer votre maintien et réduire les tensions musculaires.",
+          resume: "Au programme : \n - Monter les pointes de pied \n - Ecarter jambe sur le côté \n - Ecart latéral \n - Poser talon devant \n - Rameur \n - Petits applaudissements",
           exercises: [
             {
               id: 'n1s9e1',
@@ -506,7 +506,7 @@ const exerciseBank = {
           title: 'Séance 10',
           description: 'Dixième séance découverte',
           duration: '20min',
-          resume: "Cette séance propose un travail doux de coordination.\n\nDes mouvements simples pour améliorer la synchronisation de vos gestes et votre agilité.",
+          resume: "Au programme : \n - Monter les talons \n - Montées de genoux \n - Ecart latéral \n - Serrer les genoux \n - Triceps bras \n - Biceps",
           exercises: [
             {
               id: 'n1s10e1',
@@ -560,7 +560,7 @@ const exerciseBank = {
           title: 'Séance 11',
           description: 'Onzième séance découverte',
           duration: '20min',
-          resume: "Une séance complète de mobilité et renforcement.\n\nUn programme varié qui combine tous les aspects travaillés jusqu'à présent de manière progressive.",
+          resume: "Au programme : \n - Pose pointe sous la chaise \n - Monter les talons \n - Ecarter jambe sur le côté \n - Ecarter les genoux \n - Petits applaudissements \n - Mains au ciel",
           exercises: [
             {
               id: 'n1s11e1',
@@ -614,7 +614,7 @@ const exerciseBank = {
           title: 'Séance 12',
           description: 'Douzième séance découverte',
           duration: '20min',
-          resume: "La dernière séance du niveau 1 consolide vos acquis.\n\nUn programme complet qui reprend les exercices clés pour préparer la transition vers le niveau suivant.",
+          resume: "Au programme : \n - Coups de pied \n - Poser talon devant \n - Monter les pointes de pied \n - Ecart latéral \n - Ecarter/Serrer \n - Pousser devant",
           exercises: [
             {
               id: 'n1s12e1',
@@ -677,7 +677,7 @@ const exerciseBank = {
           title: 'Séance 1',
           description: 'Première séance intermédiaire',
           duration: '25min',
-          resume: "Cette première séance de niveau intermédiaire met l'accent sur le renforcement musculaire modéré.\n\nVous découvrirez des exercices plus dynamiques qui sollicitent plusieurs groupes musculaires, tout en restant accessibles.",
+          resume: "Au programme : \n - Montées sur pointes de pied \n - Montées de genoux \n - Coups de pied \n - Ecarts jambe/bras \n - Boxe \n - Rameur",
           exercises: [
             {
               id: 'n2s1e1',
@@ -731,7 +731,7 @@ const exerciseBank = {
           title: 'Séance 2',
           description: 'Deuxième séance intermédiaire',
           duration: '25min',
-          resume: "Cette séance se concentre sur l'amélioration de l'équilibre et la coordination.\n\nLes exercices combinent travail proprioceptif et renforcement musculaire pour une meilleure stabilité globale.",
+          resume: "Au programme : \n - Tandem \n - Pose talon devant \n - Talons fesses \n - Ecarter la jambe \n - Triceps bras \n - Ecarter les bras",
           exercises: [
             {
               id: 'n2s2e1',
@@ -785,7 +785,7 @@ const exerciseBank = {
           title: 'Séance 3',
           description: 'Troisième séance intermédiaire',
           duration: '25min',
-          resume: "Une séance axée sur le cardio-training adapté.\n\nAlternance d'exercices dynamiques et de récupération active pour améliorer votre endurance tout en préservant vos articulations.",
+          resume: "Au programme : \n - Ecarter Serrer \n - Tendre jambe/bras \n - Montées de genoux + Coups de pied \n - Pose pointe derrière \n - Mains au ciel \n - Ecarter/Serrer",
           exercises: [
             {
               id: 'n2s3e1',
@@ -839,7 +839,7 @@ const exerciseBank = {
           title: 'Séance 4',
           description: 'Quatrième séance intermédiaire',
           duration: '25min',
-          resume: "Cette séance cible le renforcement du haut du corps.\n\nDes exercices variés pour les épaules, les bras et le dos, avec une attention particulière à la posture et à la respiration.",
+          resume: "Au programme : \n - Montées sur pointes de pied \n - Tandem \n - Lever de chaise \n - Montées de genoux \n - Triceps bras \n - Ecarter bras",
           exercises: [
             {
               id: 'n2s4e1',
@@ -893,7 +893,7 @@ const exerciseBank = {
           title: 'Séance 5',
           description: 'Cinquième séance intermédiaire',
           duration: '25min',
-          resume: "Une séance dédiée au renforcement des membres inférieurs.\n\nTravail progressif des jambes et des hanches pour améliorer votre force et votre stabilité au quotidien.",
+          resume: "Au programme : \n - Pose talon devant \n - Tendre jambe/bras \n - Coups de pied \n - Talons fesses \n - Mains au ciel \n - Biceps",
           exercises: [
             {
               id: 'n2s5e1',
@@ -947,7 +947,7 @@ const exerciseBank = {
           title: 'Séance 6',
           description: 'Sixième séance intermédiaire',
           duration: '25min',
-          resume: "Cette séance combine mobilité et renforcement.\n\nUn mélange équilibré d'exercices pour améliorer votre souplesse tout en maintenant un travail musculaire efficace.",
+          resume: "Au programme : \n - Montées de genoux + Coups de pied \n - Ecarts jambe/bras \n - Lever de chaise \n - Pose pointe derrière \n - Boxe \n - Petits applaudissements",
           exercises: [
             {
               id: 'n2s6e1',
@@ -1001,7 +1001,7 @@ const exerciseBank = {
           title: 'Séance 7',
           description: 'Septième séance intermédiaire',
           duration: '25min',
-          resume: "Une séance complète de cardio-renforcement.\n\nAlternance d'exercices cardiovasculaires et de renforcement musculaire pour un entraînement complet et stimulant.",
+          resume: "Au programme : \n - Monter pointes de pied \n - Lever de chaise \n - Montées de genoux + Coups de pied \n - Tandem \n - Pousser devant \n - Ecarter les bras",
           exercises: [
             {
               id: 'n2s7e1',
@@ -1055,7 +1055,7 @@ const exerciseBank = {
           title: 'Séance 8',
           description: 'Huitième séance intermédiaire',
           duration: '25min',
-          resume: "Cette séance se concentre sur le gainage et la stabilité centrale.\n\nDes exercices ciblés pour renforcer vos abdominaux et votre dos, essentiels pour une bonne posture.",
+          resume: "Au programme : \n - Tandem pointes de pied \n - Tendre jambe/bras \n - Ecarts jambe/bras \n - Pose pointe derrière \n - Ecarter/Serrer \n - Grands applaudissements",
           exercises: [
             {
               id: 'n2s8e1',
@@ -1109,7 +1109,7 @@ const exerciseBank = {
           title: 'Séance 9',
           description: 'Neuvième séance intermédiaire',
           duration: '25min',
-          resume: "Une séance d'entraînement fonctionnel adaptée.\n\nDes exercices inspirés des mouvements quotidiens pour améliorer votre force et votre agilité dans vos activités journalières.",
+          resume: "Au programme : \n - Montées de genoux \n - Talons fesses \n - Ecarter la jambe \n - Pose pointe derrière \n - Bras vers le ciel \n - Rameur",
           exercises: [
             {
               id: 'n2s9e1',
@@ -1163,7 +1163,7 @@ const exerciseBank = {
           title: 'Séance 10',
           description: 'Dixième séance intermédiaire',
           duration: '25min',
-          resume: "Cette séance met l'accent sur la coordination et la précision.\n\nDes exercices qui combinent mouvements complexes pour améliorer votre contrôle corporel et votre équilibre.",
+          resume: "Au programme : \n - Monter pointes de pied \n - Tendre jambe/bras \n - Montées de genoux \n - Pose talon devant \n - Biceps \n - Boxe",
           exercises: [
             {
               id: 'n2s10e1',
@@ -1217,7 +1217,7 @@ const exerciseBank = {
           title: 'Séance 11',
           description: 'Onzième séance intermédiaire',
           duration: '25min',
-          resume: "Une séance de renforcement global progressive.\n\nDes exercices qui sollicitent l'ensemble du corps avec une intensité croissante pour améliorer votre endurance musculaire.",
+          resume: "Au programme : \n - Tandem pointes de pied \n - Coups de pied \n - Montées de genoux + Coups de pied \n - Talons fesses \n - Grands applaudissements \n - Ecarter les bras",
           exercises: [
             {
               id: 'n2s11e1',
@@ -1271,7 +1271,7 @@ const exerciseBank = {
           title: 'Séance 12',
           description: 'Douzième séance intermédiaire',
           duration: '25min',
-          resume: "Cette dernière séance du niveau 2 combine tous les aspects travaillés.\n\nUn programme complet qui intègre cardio, renforcement et équilibre pour consolider vos progrès.",
+          resume: "Au programme : \n - Pose pointe derrière \n - Tandem \n - Montées sur pointes de pied \n - Ecarter la jambe \n - Mains au ciel \n - Bras vers le ciel",
           exercises: [
             {
               id: 'n2s12e1',
@@ -1334,7 +1334,7 @@ const exerciseBank = {
           title: 'Séance 1',
           description: 'Première séance avancée',
           duration: '30min',
-          resume: "Cette première séance de niveau avancé propose un travail cardio-musculaire intense.\n\nVous découvrirez des exercices complexes qui demandent plus d'endurance et de coordination.",
+          resume: "Au programme : \n - Pousser contre le mur \n - Bouteille derrière \n - Bouteille devant \n - Squat + Bras + Bouteilles \n - Monter bras + bouteilles \n - Biceps + bouteilles",
           exercises: [
             {
               id: 'n3s1e1',
@@ -1388,7 +1388,7 @@ const exerciseBank = {
           title: 'Séance 2',
           description: 'Deuxième séance avancée',
           duration: '30min',
-          resume: "Une séance focalisée sur le renforcement musculaire avancé.\n\nDes exercices qui sollicitent plusieurs groupes musculaires simultanément pour un travail plus intense.",
+          resume: "Au programme : \n - Bouteille sur le côté \n - Chaise mur \n - Fentes latérales \n - Squat + Bras + Bouteilles \n - Boxe + bouteilles \n - Ecart + bouteilles",
           exercises: [
             {
               id: 'n3s2e1',
@@ -1442,7 +1442,7 @@ const exerciseBank = {
           title: 'Séance 3',
           description: 'Troisième séance avancée',
           duration: '30min',
-          resume: "Cette séance combine cardio intense et exercices de force.\n\nUn programme exigeant qui alterne entre phases cardiovasculaires soutenues et renforcement musculaire.",
+          resume: "Au programme : \n - Fentes frontales \n - Montées de genoux chaise \n - Le flamant rose \n - Ecarts bras + jambe + bouteille \n - Elévation + bouteilles \n - Ecarts + bouteilles",
           exercises: [
             {
               id: 'n3s3e1',
@@ -1496,7 +1496,7 @@ const exerciseBank = {
           title: 'Séance 4',
           description: 'Quatrième séance avancée',
           duration: '30min',
-          resume: "Une séance dédiée au renforcement avancé du haut du corps.\n\nDes exercices complexes pour les épaules, les bras et le dos, nécessitant force et endurance.",
+          resume: "Au programme : \n - Talon contre le mur \n - Montées de genoux chaise \n - Pointe de pied contre le mur \n - Montées de genoux + bouteille \n - Elévations + bouteilles \n - Ecarts latéraux + bouteilles",
           exercises: [
             {
               id: 'n3s4e1',
@@ -1550,7 +1550,7 @@ const exerciseBank = {
           title: 'Séance 5',
           description: 'Cinquième séance avancée',
           duration: '30min',
-          resume: "Cette séance cible le renforcement intense des membres inférieurs.\n\nUn travail approfondi des jambes et des hanches avec des exercices demandant plus de puissance.",
+          resume: "Au programme : \n - Squats sans chaise \n - Squats une jambe \n - Pousser contre le mur \n - Squat + Bras + Bouteilles \n - Devant/Derrière + bouteilles \n - Pompes tables",
           exercises: [
             {
               id: 'n3s5e1',
@@ -1604,7 +1604,7 @@ const exerciseBank = {
           title: 'Séance 6',
           description: 'Sixième séance avancée',
           duration: '30min',
-          resume: "Une séance de gainage et stabilité de niveau avancé.\n\nDes exercices complexes de gainage dynamique pour renforcer en profondeur vos muscles posturaux.",
+          resume: "Au programme : \n - Bouteille sur le côté \n - Fentes frontales \n - Talon contre le mur \n - Squat + Bras + Bouteilles \n - Grands écarts \n - Bras sur les côtés",
           exercises: [
             {
               id: 'n3s6e1',
@@ -1658,7 +1658,7 @@ const exerciseBank = {
           title: 'Séance 7',
           description: 'Septième séance avancée',
           duration: '30min',
-          resume: "Cette séance propose un entraînement fonctionnel avancé.\n\nDes mouvements complexes qui combinent force, équilibre et coordination pour un travail global intense.",
+          resume: "Au programme : \n - Fentes frontales \n - Chaise mur \n - Fentes pointes de pied \n - Ecarts bras + jambe + bouteille \n - Rameur \n - Demi superman",
           exercises: [
             {
               id: 'n3s7e1',
@@ -1712,7 +1712,7 @@ const exerciseBank = {
           title: 'Séance 8',
           description: 'Huitième séance avancée',
           duration: '30min',
-          resume: "Une séance intensive de cardio-training.\n\nDes exercices à haute intensité alternant avec des phases de récupération active pour améliorer votre capacité cardiovasculaire.",
+          resume: "Au programme : \n - Montées de genoux chaise \n - Bouteille devant \n - Fentes latérales \n - Montées de genoux + bouteille \n - Monter bras + bouteilles \n - Boxe + bouteilles",
           exercises: [
             {
               id: 'n3s8e1',
@@ -1766,7 +1766,7 @@ const exerciseBank = {
           title: 'Séance 9',
           description: 'Neuvième séance avancée',
           duration: '30min',
-          resume: "Cette séance met l'accent sur la puissance et l'explosivité.\n\nDes exercices dynamiques qui demandent force et vitesse d'exécution pour améliorer vos performances.",
+          resume: "Au programme : \n - Le flamant rose \n - Pointe de pied contre le mur \n - Pousser contre le mur \n - Tendre la jambe + bouteille \n - Elévation + bouteilles \n - Superman",
           exercises: [
             {
               id: 'n3s9e1',
@@ -1820,7 +1820,7 @@ const exerciseBank = {
           title: 'Séance 10',
           description: 'Dixième séance avancée',
           duration: '30min',
-          resume: "Une séance de renforcement global de haute intensité.\n\nUn programme complet qui sollicite tous les groupes musculaires avec des exercices complexes et intenses.",
+          resume: "Au programme : \n - Pousser contre le mur \n - Chaise mur \n - Le flamant rose \n - Ecart latéral bouteille \n - Biceps + bouteilles \n - Ecart + bouteilles",
           exercises: [
             {
               id: 'n3s10e1',
@@ -1874,7 +1874,7 @@ const exerciseBank = {
           title: 'Séance 11',
           description: 'Onzième séance avancée',
           duration: '30min',
-          resume: "Cette séance combine tous les aspects du niveau avancé.\n\nUn mélange exigeant de cardio intense, de force et de coordination pour un entraînement complet.",
+          resume: "Au programme : \n - Bouteille devant \n - Fentes pointes de pied \n - Squats sans chaise \n - Tendre la jambe + bouteille \n - Biceps + bouteilles \n - Grands écarts",
           exercises: [
             {
               id: 'n3s11e1',
@@ -1928,7 +1928,7 @@ const exerciseBank = {
           title: 'Séance 12',
           description: 'Douzième séance avancée',
           duration: '30min',
-          resume: "La dernière séance du niveau 3 pousse vos limites.\n\nUn programme final qui intègre les exercices les plus challengeants pour tester votre progression.",
+          resume: "Au programme : \n - Talon contre le mur \n - Chaise mur \n - Pompes tables \n - Rameur \n - Tendre jambe derrière \n - Le pont",
           exercises: [
             {
               id: 'n3s12e1',
