@@ -61,25 +61,44 @@ const IPAQForm = ({ navigation }) => {
   };
 
   const calculateScore = () => {
-    const intenseMET =
-      (parseInt(answers.intenseDays) || 0) *
-      ((parseInt(answers.intenseHours) || 0) * 60 + (parseInt(answers.intenseMinutes) || 0)) *
-      8.0;
-    const moderateMET =
-      (parseInt(answers.moderateDays) || 0) *
-      ((parseInt(answers.moderateHours) || 0) * 60 + (parseInt(answers.moderateMinutes) || 0)) *
-      4.0;
-    const walkingMET =
-      (parseInt(answers.walkingDays) || 0) *
-      ((parseInt(answers.walkingEpisodes) || 0) * 10) *
-      3.3;
+    const intenseDays = Math.max(0, parseInt(answers.intenseDays) || 0);
+    const intenseHours = Math.max(0, parseInt(answers.intenseHours) || 0);
+    const intenseMinutes = Math.max(0, parseInt(answers.intenseMinutes) || 0);
+    const moderateDays = Math.max(0, parseInt(answers.moderateDays) || 0);
+    const moderateHours = Math.max(0, parseInt(answers.moderateHours) || 0);
+    const moderateMinutes = Math.max(0, parseInt(answers.moderateMinutes) || 0);
+    const walkingDays = Math.max(0, parseInt(answers.walkingDays) || 0);
+    const walkingEpisodes = Math.max(0, parseInt(answers.walkingEpisodes) || 0);
 
-    return intenseMET + moderateMET + walkingMET;
+    const intenseMinutesTotal = intenseDays * ((intenseHours * 60) + intenseMinutes);
+    const moderateMinutesTotal = moderateDays * ((moderateHours * 60) + moderateMinutes);
+    const walkingMinutesTotal = walkingDays * (walkingEpisodes * 10);
+
+    const intenseMET = intenseMinutesTotal * 8.0;
+    const moderateMET = moderateMinutesTotal * 4.0;
+    const walkingMET = walkingMinutesTotal * 3.3;
+
+    const totalScore = intenseMET + moderateMET + walkingMET;
+
+    if (totalScore === 0) {
+        return 1;
+    }
+
+    return Math.max(1, Math.round(totalScore));
   };
 
   const submitForm = () => {
     const ipaqScore = calculateScore();
-    const updatedProfile = { ...profile, ipaqScore };
+    
+    if (isNaN(ipaqScore) || ipaqScore < 1) {
+      setErrorMessage('Erreur dans le calcul du score. Veuillez vérifier vos réponses.');
+      return;
+    }
+
+    const updatedProfile = { 
+      ...profile, 
+      ipaqScore: Math.max(1, Math.round(ipaqScore))
+    };
 
     const block = blocks[currentBlock - 1];
     const hasEmptyFields = block.questions.some((question) => !answers[question.stateKey]?.trim());
@@ -87,9 +106,14 @@ const IPAQForm = ({ navigation }) => {
     if (hasEmptyFields) {
       setErrorMessage('Veuillez remplir tous les champs avant de continuer.');
     } else {
-      setProfile(updatedProfile);
-      saveProfile(updatedProfile);
-      navigation.goBack();
+      try {
+        setProfile(updatedProfile);
+        saveProfile(updatedProfile);
+        navigation.goBack();
+      } catch (error) {
+        console.error('Erreur lors de la sauvegarde du profil:', error);
+        setErrorMessage('Une erreur est survenue lors de la sauvegarde.');
+      }
     }
   };
 
