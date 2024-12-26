@@ -1,145 +1,199 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { ProfileContext } from './ProfileContext'; // Import du contexte
+import React from 'react';
+import { View, Text, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const StreakDetailsScreen = () => {
-  const { profile, updateStreak } = useContext(ProfileContext); // Accéder au streak depuis le contexte
-
-  // Incrémente le streak
-  const handleIncrement = async () => {
-    const newStreak = profile.streak + 1;
-    await updateStreak(newStreak);
-  };
-
-  // Réinitialise le streak
-  const handleReset = async () => {
-    await updateStreak(0);
-  };
-
   return (
-    <View style={styles.container}>
-      {/* Contenu principal */}
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Comment est calculé le streak ?</Text>
-        <Text style={styles.text}>
-          Le streak correspond au nombre de jours consécutifs pendant lesquels vous avez atteint
-          vos objectifs quotidiens d'activité physique.
-        </Text>
-        <Text style={styles.text}>
-          Plus précisément, un streak augmente chaque jour où vous remplissez vos objectifs (comme
-          faire 10 000 pas ou brûler 500 calories).
-        </Text>
-        <Text style={styles.text}>
-          Si vous manquez un jour, le streak est réinitialisé à 0. Alors, continuez à bouger pour
-          maintenir votre progression !
-        </Text>
+    <SafeAreaView style={styles.safeContainer}>
+      <LinearGradient colors={['#6dd5ed', '#2193b0']} style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Text style={styles.headerTitle}>Comprendre les Séries</Text>
 
-        {/* Astuce ou information motivante */}
-        <View style={styles.tipContainer}>
-          <Text style={styles.tipTitle}>Astuce :</Text>
-          <Text style={styles.tipText}>
-            Essayez de planifier des pauses actives chaque jour pour ne jamais casser votre streak.
-          </Text>
-        </View>
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <MaterialIcons name="local-fire-department" size={24} color="#2193b0" />
+              <Text style={styles.cardTitle}>Qu'est-ce qu'une série ?</Text>
+            </View>
+            <Text style={styles.cardText}>
+              Une série représente le nombre de jours consécutifs pendant lesquels vous avez effectué des activités. 
+              Plus votre série est longue, plus vous êtes régulier dans votre pratique !
+            </Text>
+          </View>
 
-        {/* Boutons pour gérer le streak */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.incrementButton} onPress={handleIncrement}>
-            <Text style={styles.buttonText}>Incrémenter le streak</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-            <Text style={styles.buttonText}>Réinitialiser le streak</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <MaterialIcons name="calendar-today" size={24} color="#2193b0" />
+              <Text style={styles.cardTitle}>Comment maintenir une série ?</Text>
+            </View>
+            <Text style={styles.cardText}>
+              Pour maintenir votre série active, vous devez réaliser au moins une activité par jour.
+              Si vous manquez un jour, votre série sera réinitialisée.
+            </Text>
+          </View>
 
-        {/* Affichage actuel du streak */}
-        <View style={styles.streakDisplay}>
-          <Text style={styles.streakTitle}>Streak actuel :</Text>
-          <Text style={styles.streakValue}>{profile.streak}</Text>
-        </View>
-      </ScrollView>
-    </View>
+          <View style={styles.exampleCard}>
+            <Text style={styles.exampleTitle}>Exemple :</Text>
+            <View style={styles.example}>
+              <View style={styles.dayBox}>
+                <Text style={styles.dayText}>Lundi</Text>
+                <MaterialIcons name="check-circle" size={24} color="#4CAF50" />
+              </View>
+              <View style={styles.dayBox}>
+                <Text style={styles.dayText}>Mardi</Text>
+                <MaterialIcons name="check-circle" size={24} color="#4CAF50" />
+              </View>
+              <View style={styles.dayBox}>
+                <Text style={styles.dayText}>Mercredi</Text>
+                <MaterialIcons name="check-circle" size={24} color="#4CAF50" />
+              </View>
+              <Text style={styles.streakResult}>= Série de 3 jours ! 🎉</Text>
+            </View>
+          </View>
+
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <MaterialIcons name="emoji-events" size={24} color="#2193b0" />
+              <Text style={styles.cardTitle}>Objectifs</Text>
+            </View>
+            <Text style={styles.cardText}>
+              Essayez de maintenir une série aussi longue que possible ! Voici quelques objectifs :
+            </Text>
+            <View style={styles.goalsList}>
+              <View style={styles.goalItem}>
+                <MaterialIcons name="star" size={20} color="#FFD700" />
+                <Text style={styles.goalText}>3 jours : Bon début !</Text>
+              </View>
+              <View style={styles.goalItem}>
+                <MaterialIcons name="star" size={20} color="#FFD700" />
+                <Text style={styles.goalText}>5 jours : Excellente régularité !</Text>
+              </View>
+              <View style={styles.goalItem}>
+                <MaterialIcons name="star" size={20} color="#FFD700" />
+                <Text style={styles.goalText}>7 jours : Champion de la semaine !</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <MaterialIcons name="tips-and-updates" size={24} color="#2193b0" />
+              <Text style={styles.cardTitle}>Conseils</Text>
+            </View>
+            <Text style={styles.cardText}>
+              • Choisissez un moment régulier dans la journée{'\n'}
+              • Activez les notifications de rappel{'\n'}
+              • Commencez doucement et augmentez progressivement{'\n'}
+              • Célébrez chaque petit progrès !
+            </Text>
+          </View>
+        </ScrollView>
+      </LinearGradient>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: '#6dd5ed',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#f4f6f8',
   },
-  content: {
-    padding: 20,
+  scrollContainer: {
+    padding: 16,
   },
-  title: {
+  headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
+    color: '#fff',
+    marginBottom: 20,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
-  text: {
-    fontSize: 16,
-    color: '#555',
-    lineHeight: 24,
-    marginBottom: 16,
-  },
-  tipContainer: {
-    backgroundColor: '#e3f2fd',
+  card: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 12,
     padding: 16,
-    borderRadius: 8,
-    marginTop: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  tipTitle: {
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#007bff',
-    marginBottom: 8,
+    color: '#2193b0',
+    marginLeft: 8,
   },
-  tipText: {
+  cardText: {
     fontSize: 16,
-    color: '#007bff',
+    color: '#666',
     lineHeight: 24,
   },
-  buttonContainer: {
-    marginTop: 20,
-    flexDirection: 'row', // Positionne les boutons côte à côte
-    justifyContent: 'space-between', // Ajoute un espace égal entre les boutons
-    width: '100%', // Prend toute la largeur de l'écran
-    paddingHorizontal: 20, // Ajoute des marges sur les côtés
+  exampleCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  incrementButton: {
-    backgroundColor: '#4caf50',
-    paddingVertical: 12,
-    borderRadius: 8,
-    flex: 1, // Permet de répartir également les boutons
-    alignItems: 'center',
-    marginRight: 10, // Ajoute un espace entre les boutons
-  },
-  resetButton: {
-    backgroundColor: '#FF6347',
-    paddingVertical: 12,
-    borderRadius: 8,
-    flex: 1, // Permet de répartir également les boutons
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
+  exampleTitle: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#2193b0',
+    marginBottom: 12,
   },
-  streakDisplay: {
-    marginTop: 30,
+  example: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    padding: 12,
+  },
+  dayBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
-  streakTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+  dayText: {
+    fontSize: 16,
+    color: '#666',
   },
-  streakValue: {
-    fontSize: 28,
+  streakResult: {
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#007bff',
+    color: '#2193b0',
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  goalsList: {
+    marginTop: 12,
+  },
+  goalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 4,
+  },
+  goalText: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 8,
   },
 });
 
