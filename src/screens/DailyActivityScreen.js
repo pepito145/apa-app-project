@@ -1,42 +1,57 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProfileContext } from './ProfileContext';
-import exerciseBank from '../data/exerciseBank';
 
 const DailyActivityScreen = ({ navigation, route }) => {
   const { level, session, levelTitle } = route.params;
   const exercises = session.exercises || [];
+  const { profile, updateStreak } = useContext(ProfileContext);
 
-  // Nouveaux états
-const [completedExercises, setCompletedExercises] = useState(0);
-const [elapsedTime, setElapsedTime] = useState(0);
-const [timer, setTimer] = useState(null);
-
-
-// Démarrage du timer au début
-useEffect(() => {
-  const startTime = Date.now();
-  const interval = setInterval(() => {
-    setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
-  }, 1000);
-  setTimer(interval);
-
-  return () => clearInterval(interval);
-}, []);
-
+  // États
+  const [completedExercises, setCompletedExercises] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [currentExercise, setCurrentExercise] = useState(0);
   const [showCongrats, setShowCongrats] = useState(false);
-  const [isFeedbackPhase, setIsFeedbackPhase] = useState(false); // Phase de feedback
+  const [isFeedbackPhase, setIsFeedbackPhase] = useState(false);
   const [difficultyRating, setDifficultyRating] = useState(0);
   const [painRating, setPainRating] = useState(0);
-  const [difficultyRatingSaved, setDifficultyRatingSaved] = useState(0);
-  const [painRatingSaved, setPainRatingSaved] = useState(0);
+  const [isTimerActive, setIsTimerActive] = useState(true);
+
+  // Empêcher le retour en arrière
+  useEffect(() => {
+    navigation.setOptions({
+      gestureEnabled: false,
+      headerLeft: null,
+    });
+  }, []);
+
+  // Timer
+  useEffect(() => {
+    const startTime = Date.now();
+    let interval;
+    
+    if (isTimerActive) {
+      interval = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+      }, 1000);
+    }
+    
+    return () => clearInterval(interval);
+  }, [isTimerActive]);
+
+  // Formatage du temps écoulé
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
 
   const handleExerciseFinished = () => {
     setShowCongrats(true);
-    setCompletedExercises((prev) => prev + 1);
+    setCompletedExercises(prev => prev + 1);
   };
 
   const handleNextExercise = () => {
@@ -44,7 +59,8 @@ useEffect(() => {
       setShowCongrats(false);
       setCurrentExercise(currentExercise + 1);
     } else {
-      setIsFeedbackPhase(true); // Passe à la phase de feedback après le dernier exercice
+      setIsTimerActive(false); // Arrêter le timer
+      setIsFeedbackPhase(true);
     }
   };
 
@@ -52,38 +68,22 @@ useEffect(() => {
     if (currentExercise < exercises.length - 1) {
       setCurrentExercise(currentExercise + 1);
     } else {
-      setIsFeedbackPhase(true); // Passe à la phase de feedback après le dernier exercice
+      setIsTimerActive(false); // Arrêter le timer
+      setIsFeedbackPhase(true);
     }
-  };
-
-  const { profile, updateStreak, setProfile } = useContext(ProfileContext); // Accéder au streak depuis le contexte
-  // Fonction pour incrémenter le streak
-  const incrementStreak = async () => {
-    const newStreak = profile.streak + 1;
-    await updateStreak(newStreak);
   };
 
   const calculateNextSession = (difficultyRating, painRating, currentLevel) => {
     const averageRating = (difficultyRating + painRating) / 2;
-    console.log('Moyenne des notes:', averageRating);
-    console.log('Niveau actuel:', currentLevel);
-    
-    // Déterminer le prochain niveau en fonction de la moyenne
     let nextLevel = currentLevel;
-    // Si la moyenne est élevée (trop difficile), on baisse le niveau
+    
     if (averageRating > 3.8 && currentLevel !== 'niveau1') {
-      nextLevel = `niveau${parseInt(currentLevel.slice(-1)) - 1}`; // Descendre d'un niveau
-      console.log('Trop difficile, on descend au niveau:', nextLevel);
-    } 
-    // Si la moyenne est basse (trop facile), on monte le niveau
-    else if (averageRating < 1.2 && currentLevel !== 'niveau3') {
-      nextLevel = `niveau${parseInt(currentLevel.slice(-1)) + 1}`; // Monter d'un niveau
-      console.log('Trop facile, on monte au niveau:', nextLevel);
+      nextLevel = `niveau${parseInt(currentLevel.slice(-1)) - 1}`;
+    } else if (averageRating < 1.2 && currentLevel !== 'niveau3') {
+      nextLevel = `niveau${parseInt(currentLevel.slice(-1)) + 1}`;
     }
 
-    return {
-      level: nextLevel
-    };
+    return { level: nextLevel };
   };
 
   const handleSubmitFeedback = async () => {
@@ -95,13 +95,9 @@ useEffect(() => {
         year: 'numeric'
       });
 
-      // Calcul du prochain niveau recommandé
-      const nextRecommendation = calculateNextSession(difficultyRating, painRating, route.params.level);
-      console.log('Prochain niveau recommandé:', nextRecommendation);
-
-      // Sauvegarder le niveau recommandé séparément
+      // Calcul du prochain niveau
+      const nextRecommendation = calculateNextSession(difficultyRating, painRating, level);
       await AsyncStorage.setItem('recommendedLevel', nextRecommendation.level);
-      console.log('Niveau recommandé sauvegardé:', nextRecommendation.level);
 
       // Mise à jour du profil
       const updatedProfile = {
@@ -112,14 +108,12 @@ useEffect(() => {
           date: currentDate
         }
       };
-
-      console.log('Profil mis à jour:', updatedProfile);
       await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-      setProfile(updatedProfile);
 
-      // Appel de la fonction pour incrémenter le streak
-      const newStreak = await incrementStreak();
+      // Incrémenter le streak
+      await updateStreak(profile.streak + 1);
 
+      // Sauvegarder l'activité
       const newActivity = {
         date: currentDate,
         name: `${levelTitle} - ${session.title}`,
@@ -131,46 +125,33 @@ useEffect(() => {
         difficulty: difficultyRating
       };
 
-      // Récupérer l'historique existant
       const existingHistory = await AsyncStorage.getItem('activitiesHistory');
       const activities = existingHistory ? JSON.parse(existingHistory) : [];
-
-      // Ajouter la nouvelle activité
       activities.unshift(newActivity);
-
-      // Sauvegarder l'historique mis à jour
       await AsyncStorage.setItem('activitiesHistory', JSON.stringify(activities));
 
-      setDifficultyRatingSaved(difficultyRating);
-      setPainRatingSaved(painRating);
       Alert.alert(
-        'Merci pour votre retour !', 
-        `Exercices terminés : ${completedExercises}/${exercises.length}\nTemps total : ${minutesElapsed} minutes\nDifficulté : ${difficultyRating} étoiles\nDouleur : ${painRating} étoiles`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'MainTabs', params: { screen: 'Accueil', refresh: true } }],
-              });
-            }
-          }
-        ]
+        'Séance terminée !',
+        'Félicitations pour avoir complété votre séance !',
+        [{ text: 'OK', onPress: () => navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs', params: { screen: 'Accueil', refresh: true } }],
+        })}]
       );
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde des données :', error);
-      Alert.alert('Erreur', 'Une erreur est survenue lors de la sauvegarde des données.');
+      console.error('Erreur lors de la sauvegarde:', error);
+      Alert.alert('Erreur', 'Une erreur est survenue lors de la sauvegarde.');
     }
   };
 
   const renderStars = (rating, setRating) => {
     return [...Array(5)].map((_, index) => (
       <TouchableOpacity key={index} onPress={() => setRating(index + 1)}>
-        <Icon
-          name={index < rating ? 'star' : 'star-o'} // Affiche une étoile pleine ou vide
-          size={24}
-          color={index < rating ? '#FFD700' : '#CCCCCC'} // Jaune pour rempli, gris sinon
+        <MaterialIcons
+          name={index < rating ? 'star' : 'star-outline'}
+          size={32}
+          color={index < rating ? '#FFD700' : '#CCCCCC'}
+          style={styles.star}
         />
       </TouchableOpacity>
     ));
@@ -178,189 +159,315 @@ useEffect(() => {
 
   const exercise = exercises[currentExercise];
 
-  return (
-    <View style={styles.container}>
-      {!isFeedbackPhase ? (
-        !showCongrats ? (
-          <>
-            <Text style={styles.title}>{session.title}</Text>
-            <Text style={styles.subtitle}>Exercice {currentExercise + 1}/{exercises.length}</Text>
-            <Image source={exercise.image} style={styles.exerciseImage} resizeMode="contain" />
-            <Text style={styles.advice}>{exercise.description || exercise.advice}</Text>
-
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.finishedButton} onPress={handleExerciseFinished}>
-                <Text style={styles.buttonText}>Exercice fini !</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.skipButton} onPress={handleSkipExercise}>
-                <Text style={styles.buttonText}>Passer</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        ) : (
-          <View style={styles.congratsContainer}>
-            <Text style={styles.congratsTitle}>Bravo !</Text>
-            <Text style={styles.congratsSubtitle}>+10 XP gagné !</Text>
-            <TouchableOpacity style={styles.nextButton} onPress={handleNextExercise}>
-              <Text style={styles.buttonText}>Exercice suivant</Text>
-            </TouchableOpacity>
-          </View>
-        )
-      ) : (
-        <View style={styles.feedbackContainer}>
-          <Text style={styles.title}>Félicitations !</Text>
-
-          <View style={styles.feedbackSection}>
-            <Text style={styles.feedbackLabel}>
-              Comment évalues-tu le niveau de difficulté de la séance ?
-            </Text>
-            <View style={styles.starsContainer}>
-              {renderStars(difficultyRating, setDifficultyRating)}
-            </View>
-          </View>
-
-          <View style={styles.feedbackSection}>
-            <Text style={styles.feedbackLabel}>
-              Quel niveau de douleur as-tu ressenti ?
-            </Text>
-            <View style={styles.starsContainer}>
-              {renderStars(painRating, setPainRating)}
-            </View>
-          </View>
-
-          <TouchableOpacity
-            style={[
-              styles.submitButton,
-              (difficultyRating === 0 || painRating === 0) && styles.submitButtonDisabled, // Applique un style désactivé
-            ]}
-            onPress={handleSubmitFeedback}
-            disabled={difficultyRating === 0 || painRating === 0} // Désactive le bouton si aucune étoile sélectionnée
-          >
-              <Text style={styles.submitButtonText}>Envoyer</Text>
-          </TouchableOpacity>
+  const renderExerciseScreen = () => (
+    <View style={styles.exerciseContainer}>
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Text style={styles.levelText}>{levelTitle}</Text>
+          <Text style={styles.sessionText}>{session.title}</Text>
         </View>
-      )}
+        <Text style={styles.timer}>{formatTime(elapsedTime)}</Text>
+      </View>
+
+      <View style={styles.progressBar}>
+        <View style={[styles.progressFill, { width: `${(currentExercise + 1) * 100 / exercises.length}%` }]} />
+      </View>
+      <Text style={styles.progress}>Exercice {currentExercise + 1}/{exercises.length}</Text>
+
+      <View style={styles.imageContainer}>
+        <Image source={exercise.image} style={styles.exerciseImage} resizeMode="contain" />
+      </View>
+      
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.skipButton} onPress={handleSkipExercise}>
+          <MaterialIcons name="skip-next" size={24} color="#fff" />
+          <Text style={styles.buttonText}>Passer</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.completeButton} onPress={handleExerciseFinished}>
+          <MaterialIcons name="check-circle" size={24} color="#fff" />
+          <Text style={styles.buttonText}>Terminé</Text>
+        </TouchableOpacity>
+      </View>
     </View>
+  );
+
+  const renderCongratsScreen = () => (
+    <View style={styles.congratsContainer}>
+      <MaterialIcons name="emoji-events" size={80} color="#FFD700" />
+      <Text style={styles.congratsTitle}>Bravo !</Text>
+      <Text style={styles.congratsText}>Exercice complété avec succès</Text>
+      <Text style={styles.xpText}>+10 XP</Text>
+      <TouchableOpacity style={styles.nextButton} onPress={handleNextExercise}>
+        <Text style={styles.buttonText}>Exercice suivant</Text>
+        <MaterialIcons name="arrow-forward" size={24} color="#fff" />
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderFeedbackScreen = () => (
+    <View style={styles.feedbackContainer}>
+      <MaterialIcons name="assessment" size={60} color="#2193b0" />
+      <Text style={styles.feedbackTitle}>Séance terminée !</Text>
+      
+      <View style={styles.statsCard}>
+        <View style={styles.statRow}>
+          <MaterialIcons name="timer" size={24} color="#2193b0" />
+          <Text style={styles.statText}>Durée : {formatTime(elapsedTime)}</Text>
+        </View>
+        <View style={styles.statRow}>
+          <MaterialIcons name="fitness-center" size={24} color="#2193b0" />
+          <Text style={styles.statText}>Exercices : {completedExercises}/{exercises.length}</Text>
+        </View>
+      </View>
+
+      <View style={styles.ratingContainer}>
+        <Text style={styles.ratingTitle}>Difficulté de la séance</Text>
+        <View style={styles.starsContainer}>
+          {renderStars(difficultyRating, setDifficultyRating)}
+        </View>
+
+        <Text style={styles.ratingTitle}>Niveau de douleur ressenti</Text>
+        <View style={styles.starsContainer}>
+          {renderStars(painRating, setPainRating)}
+        </View>
+      </View>
+
+      <TouchableOpacity
+        style={[styles.submitButton, (!difficultyRating || !painRating) && styles.submitButtonDisabled]}
+        onPress={handleSubmitFeedback}
+        disabled={!difficultyRating || !painRating}
+      >
+        <Text style={styles.submitButtonText}>Terminer la séance</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={[styles.safeContainer, { backgroundColor: '#6dd5ed' }]}>
+      <LinearGradient
+        colors={['#6dd5ed', '#2193b0']}
+        style={styles.container}
+      >
+        {!isFeedbackPhase ? (
+          !showCongrats ? renderExerciseScreen() : renderCongratsScreen()
+        ) : (
+          renderFeedbackScreen()
+        )}
+      </LinearGradient>
+      <View style={[styles.bottomSafeArea, { backgroundColor: '#2193b0' }]} />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#FAF3E0',
-    justifyContent: 'center',
-    alignItems: 'center',
+  },
+  bottomSafeArea: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 34, // Hauteur de la barre de navigation iOS
+  },
+  exerciseContainer: {
+    flex: 1,
     padding: 20,
+    justifyContent: 'space-between',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: '#666666',
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 20,
   },
-  advice: {
+  headerLeft: {
+    flex: 1,
+  },
+  levelText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  sessionText: {
     fontSize: 16,
-    color: '#666666',
+    color: '#fff',
+    opacity: 0.8,
+    marginTop: 4,
+  },
+  timer: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  progressBar: {
+    height: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: 4,
+    marginBottom: 10,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 4,
+  },
+  progress: {
+    fontSize: 16,
+    color: '#fff',
     textAlign: 'center',
-    marginTop: 20,
+    marginBottom: 20,
+  },
+  imageContainer: {
+    height: '40%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 'auto',
+    marginBottom: 'auto',
   },
   exerciseImage: {
     width: '100%',
-    height: 300,
-    marginBottom: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#CCC',
+    height: '100%',
+    borderRadius: 15,
+    backgroundColor: '#fff',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 20,
-  },
-  finishedButton: {
-    flex: 1,
-    backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    marginHorizontal: 10,
-    borderRadius: 8,
-    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    marginTop: 'auto',
   },
   skipButton: {
-    flex: 1,
-    backgroundColor: '#FF5722',
-    paddingVertical: 12,
-    marginHorizontal: 10,
-    borderRadius: 8,
+    backgroundColor: '#ff5047',
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  congratsContainer: {
     justifyContent: 'center',
-    alignItems: 'center',
-  },
-  congratsTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 10,
-  },
-  congratsSubtitle: {
-    fontSize: 20,
-    color: '#4CAF50',
-    marginBottom: 20,
-  },
-  nextButton: {
-    backgroundColor: '#FFC107',
     paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 25,
+    flex: 0.45,
+  },
+  completeButton: {
+    backgroundColor: '#4CAF50',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    flex: 0.45,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  congratsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  congratsTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 20,
+  },
+  congratsText: {
+    fontSize: 18,
+    color: '#fff',
+    marginTop: 10,
+  },
+  xpText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFD700',
+    marginTop: 20,
+    marginBottom: 40,
+  },
+  nextButton: {
+    backgroundColor: '#4CAF50',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
   },
   feedbackContainer: {
     flex: 1,
-    justifyContent: 'center',
+    padding: 20,
     alignItems: 'center',
-    width: '100%',
   },
-  feedbackSection: {
-    marginVertical: 20,
-  },
-  feedbackLabel: {
-    fontSize: 16,
+  feedbackTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#333333',
+    color: '#fff',
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  statsCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 15,
+    padding: 20,
+    width: '100%',
+    marginBottom: 30,
+  },
+  statRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 10,
+  },
+  statText: {
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 10,
+  },
+  ratingContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 15,
+    padding: 20,
+    width: '100%',
+    marginBottom: 30,
+  },
+  ratingTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2193b0',
+    marginBottom: 15,
     textAlign: 'center',
   },
   starsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    marginBottom: 20,
+  },
+  star: {
+    marginHorizontal: 5,
   },
   submitButton: {
-    backgroundColor: '#FFB84D',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-    paddingHorizontal: 20,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    marginTop: 'auto',
   },
   submitButtonDisabled: {
-    backgroundColor: '#CCCCCC', // Gris pour montrer que le bouton est désactivé
+    backgroundColor: '#CCCCCC',
   },
   submitButtonText: {
-    fontSize: 16,
+    color: '#fff',
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFFFFF',
   },
 });
 

@@ -1,9 +1,14 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import exerciseBank from '../data/exerciseBank';
 import { ProfileContext } from './ProfileContext';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = width * 0.9;
 
 const ActivitiesScreen = ({ navigation }) => {
   const { profile } = useContext(ProfileContext);
@@ -41,21 +46,38 @@ const ActivitiesScreen = ({ navigation }) => {
     }
   };
 
-  // Charger la session au montage du composant
+  // Charger la session au montage du composant et quand le niveau recommandé change
   useFocusEffect(
     React.useCallback(() => {
       const loadSession = async () => {
         try {
-          // Obtenir le niveau recommandé
-          const recLevel = getRecommendedLevel(profile.ipaqScore);
+          // Obtenir le niveau recommandé depuis le stockage ou le score IPAQ
+          const savedRecommendedLevel = await AsyncStorage.getItem('recommendedLevel');
+          const recLevel = savedRecommendedLevel || getRecommendedLevel(profile.ipaqScore);
+          
+          // Sauvegarder immédiatement le niveau recommandé si basé sur IPAQ
+          if (!savedRecommendedLevel && profile.ipaqScore) {
+            await AsyncStorage.setItem('recommendedLevel', recLevel);
+          }
+          
           setRecommendedLevel(recLevel);
           
           // Charger la session sauvegardée ou en créer une nouvelle
           const savedSession = await AsyncStorage.getItem('currentSession');
           if (savedSession) {
-            const { level, sessionId } = JSON.parse(savedSession);
-            setSelectedLevel(level);
-            setSelectedSession(sessionId);
+            const { level, sessionId, timestamp } = JSON.parse(savedSession);
+            // Si le niveau recommandé a changé, on met à jour la session
+            if (level !== recLevel) {
+              const newSessionId = selectRandomSession(recLevel);
+              setSelectedLevel(recLevel);
+              setSelectedSession(newSessionId);
+              if (newSessionId) {
+                await saveCurrentSession(recLevel, newSessionId);
+              }
+            } else {
+              setSelectedLevel(level);
+              setSelectedSession(sessionId);
+            }
           } else {
             setSelectedLevel(recLevel);
             const newSessionId = selectRandomSession(recLevel);
@@ -103,7 +125,6 @@ const ActivitiesScreen = ({ navigation }) => {
     }
   };
 
-  // Fonction pour sélectionner une session aléatoire différente de la session actuelle
   const selectDifferentRandomSession = (level, currentSessionId) => {
     const availableSessions = exerciseBank.levels[level]?.sessions || [];
     if (availableSessions.length > 1) {
@@ -119,121 +140,246 @@ const ActivitiesScreen = ({ navigation }) => {
     return null;
   };
 
+  const getDifficultyColor = (level) => {
+    switch(level) {
+      case 'niveau1':
+        return '#4CAF50'; // Vert pour débutant
+      case 'niveau2':
+        return '#FF9800'; // Orange pour intermédiaire
+      case 'niveau3':
+        return '#f44336'; // Rouge pour avancé
+      default:
+        return '#2193b0';
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      {selectedLevel && selectedSession && exerciseBank.levels[selectedLevel] && (
-        <>
-          <Text>
-            <Text style={styles.presentationText}>
-              Voici l'APA que nous t'avons choisi :
+    <SafeAreaView style={styles.safeContainer}>
+      <LinearGradient
+        colors={['#6dd5ed', '#2193b0']}
+        style={styles.container}
+      >
+        {!profile.ipaqScore ? (
+          <View style={styles.emptyContainer}>
+            <MaterialIcons name="info" size={80} color="#fff" />
+            <Text style={styles.emptyTitle}>Configuration requise</Text>
+            <Text style={styles.emptyText}>
+              Pour vous proposer des activités adaptées, nous avons besoin que vous complétiez toutes les informations demandées sur l'écran d'accueil.
             </Text>
-            {'\n\n'}
-            <Text style={styles.sessionText}>
-              {exerciseBank.levels[selectedLevel]?.metadata?.title} - {
-                exerciseBank.levels[selectedLevel]?.sessions.find(
-                  session => session.id === selectedSession
-                )?.title || "Session"
-              }
-            </Text>
-          </Text>
-
-          <View style={styles.summaryContainer}>
-            <Text style={styles.summaryTitle}>Résumé de la séance :</Text>
-            <Text style={styles.summaryText}>
-              {exerciseBank.levels[selectedLevel]?.sessions.find(
-                session => session.id === selectedSession
-              )?.resume || "Résumé à venir"}
-            </Text>
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.acceptButton} onPress={handleAccept}>
-              <Text style={styles.buttonText}>Commencer !</Text>
+            <TouchableOpacity 
+              style={styles.homeButton}
+              onPress={() => navigation.navigate('MainTabs', { screen: 'Accueil' })}
+            >
+              <MaterialIcons name="home" size={24} color="#2193b0" />
+              <Text style={styles.homeButtonText}>Retour à l'accueil</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.rejectButton} onPress={handleReject}>
-              <Text style={[styles.buttonText, styles.rejectButtonText]}>
-                Cette activité{'\n'}ne me convient pas
+          </View>
+        ) : selectedLevel && selectedSession && exerciseBank.levels[selectedLevel] ? (
+          <View style={styles.content}>
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>Séance proposée</Text>
+              <Text style={styles.headerSubtitle}>
+                Basée sur votre niveau d'activité physique
               </Text>
-            </TouchableOpacity>
+            </View>
+
+            <View style={styles.sessionCard}>
+              <View style={styles.levelBadge}>
+                <MaterialIcons 
+                  name="fitness-center" 
+                  size={20} 
+                  color={getDifficultyColor(selectedLevel)} 
+                />
+                <Text style={[styles.levelText, { color: getDifficultyColor(selectedLevel) }]}>
+                  {exerciseBank.levels[selectedLevel]?.metadata?.title}
+                </Text>
+              </View>
+
+              <Text style={styles.sessionTitle}>
+                {exerciseBank.levels[selectedLevel]?.sessions.find(
+                  session => session.id === selectedSession
+                )?.title || "Session"}
+              </Text>
+
+              <View style={styles.summaryContainer}>
+                <MaterialIcons name="info-outline" size={24} color="#2193b0" />
+                <Text style={styles.summaryText}>
+                  {exerciseBank.levels[selectedLevel]?.sessions.find(
+                    session => session.id === selectedSession
+                  )?.resume || "Résumé à venir"}
+                </Text>
+              </View>
+
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity 
+                  style={styles.acceptButton}
+                  onPress={handleAccept}
+                >
+                  <MaterialIcons name="play-arrow" size={24} color="#fff" />
+                  <Text style={styles.buttonText}>Commencer</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={styles.rejectButton}
+                  onPress={handleReject}
+                >
+                  <MaterialIcons name="refresh" size={24} color="#2193b0" />
+                  <Text style={styles.rejectButtonText}>Changer de séance</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </>
-      )}
-    </View>
+        ) : null}
+      </LinearGradient>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: '#6dd5ed',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#FAF3E0',
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
+  header: {
+    marginBottom: 30,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#fff',
+    opacity: 0.9,
+  },
+  sessionCard: {
+    width: CARD_WIDTH,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    alignSelf: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  levelBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(33, 147, 176, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginBottom: 16,
+  },
+  levelText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 6,
+  },
+  sessionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+  },
+  summaryContainer: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(33, 147, 176, 0.1)',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 20,
+  },
+  summaryText: {
+    flex: 1,
+    fontSize: 16,
+    color: '#666',
+    marginLeft: 12,
+    lineHeight: 22,
+  },
+  buttonContainer: {
+    marginTop: 'auto',
+  },
+  acceptButton: {
+    backgroundColor: '#4CAF50',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 15,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  rejectButton: {
+    backgroundColor: 'rgba(33, 147, 176, 0.1)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 15,
+    borderRadius: 12,
+  },
+  rejectButtonText: {
+    color: '#2193b0',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  emptyContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
-  presentationText: {
-    fontSize: 20,
-    color: '#333333',
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 20,
+    marginBottom: 10,
     textAlign: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    opacity: 0.9,
+    marginBottom: 30,
     lineHeight: 24,
   },
-  sessionText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333333',
-    textAlign: 'center',
-    marginTop: 8,
-    lineHeight: 26,
-  },
-  summaryContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    padding: 20,
-    borderRadius: 10,
-    width: '100%',
-    marginVertical: 20,
+  homeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
   },
-  summaryTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  summaryText: {
-    fontSize: 16,
-    color: '#666',
-    lineHeight: 22,
-  },
-  buttonContainer: {
-    width: '100%',
-    marginTop: 20,
-  },
-  acceptButton: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    alignItems: 'center',
-  },
-  rejectButton: {
-    backgroundColor: '#FFF',
-    borderRadius: 10,
-    padding: 15,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#666',
-  },
-  buttonText: {
-    color: '#FFF',
+  homeButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  rejectButtonText: {
-    color: '#666',
-    textAlign: 'center',
+    color: '#2193b0',
+    marginLeft: 8,
   },
 });
 

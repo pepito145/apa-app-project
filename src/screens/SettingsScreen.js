@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, SafeAreaView, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ProfileContext } from './ProfileContext';
@@ -8,33 +8,50 @@ import * as Notifications from 'expo-notifications';
 
 const SettingsScreen = ({ navigation, onLogout }) => {
   const { setProfile } = useContext(ProfileContext);
-  const [dataSize, setDataSize] = useState('Calcul...');
+  const [dataSize, setDataSize] = useState('25 MB');
+  const [storageModalVisible, setStorageModalVisible] = useState(false);
+  const [storageDetails, setStorageDetails] = useState({
+    total: '25 MB',
+    appSize: '25 MB',
+    userDataSize: '0 KB',
+  });
 
   // Calculer la taille des données stockées
   const calculateDataSize = async () => {
     try {
       const keys = await AsyncStorage.getAllKeys();
       let totalSize = 0;
+
       for (const key of keys) {
         const value = await AsyncStorage.getItem(key);
         if (value) {
-          // Calcul plus précis en comptant les caractères
-          totalSize += new TextEncoder().encode(value).length;
+          const size = new TextEncoder().encode(value).length;
+          totalSize += size;
         }
       }
-      // Convertir en KB avec 2 décimales
-      const sizeInKB = (totalSize / 1024).toFixed(2);
-      setDataSize(sizeInKB + ' KB');
+      
+      // Taille de l'application en bytes (25 MB = 25 * 1024 * 1024 bytes)
+      const appSizeBytes = 25 * 1024 * 1024;
+      
+      // Calcul des tailles en différentes unités
+      const userDataSizeKB = (totalSize / 1024).toFixed(2);
+      const userDataSizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+      const totalSizeMB = ((appSizeBytes + totalSize) / (1024 * 1024)).toFixed(2);
+      
+      // Mise à jour des états
+      setDataSize(`${totalSizeMB} MB`);
+      setStorageDetails({
+        total: `${totalSizeMB} MB`,
+        appSize: '25 MB',
+        userDataSize: `${userDataSizeKB} KB`,
+      });
+      setStorageModalVisible(true);
     } catch (error) {
       console.error('Erreur lors du calcul de la taille des données:', error);
       setDataSize('Erreur');
+      Alert.alert('Erreur', 'Impossible de calculer la taille du stockage');
     }
   };
-
-  // Calculer la taille au montage
-  React.useEffect(() => {
-    calculateDataSize();
-  }, []);
 
   const handleProfileEdit = () => {
     navigation.navigate('EditProfile', { onLogout });
@@ -108,9 +125,6 @@ const SettingsScreen = ({ navigation, onLogout }) => {
                           {
                             text: 'OK',
                             onPress: () => {
-                              calculateDataSize();
-                              // Utiliser onLogout pour rediriger vers l'écran d'authentification
-                              onLogout();
                             }
                           }
                         ]
@@ -235,6 +249,43 @@ const SettingsScreen = ({ navigation, onLogout }) => {
             <MaterialIcons name="logout" size={24} color="#fff" />
             <Text style={styles.logoutText}>Se déconnecter</Text>
           </TouchableOpacity>
+
+          {/* Modal pour les détails du stockage */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={storageModalVisible}
+            onRequestClose={() => setStorageModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Détails du stockage</Text>
+                <View style={styles.storageSummary}>
+                  <View style={styles.storageTotal}>
+                    <Text style={styles.storageTotalLabel}>Stockage total</Text>
+                    <Text style={styles.storageTotalValue}>{storageDetails.total}</Text>
+                  </View>
+                  <View style={styles.storageBreakdown}>
+                    <View style={styles.storageBreakdownItem}>
+                      <Text style={styles.storageBreakdownLabel}>Application</Text>
+                      <Text style={styles.storageBreakdownValue}>{storageDetails.appSize}</Text>
+                    </View>
+                    <View style={styles.storageBreakdownItem}>
+                      <Text style={styles.storageBreakdownLabel}>Données utilisateur</Text>
+                      <Text style={styles.storageBreakdownValue}>{storageDetails.userDataSize}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  style={styles.modalCloseButton}
+                  onPress={() => setStorageModalVisible(false)}
+                >
+                  <Text style={styles.modalCloseButtonText}>Fermer</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>
@@ -324,6 +375,114 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    width: '90%',
+    maxHeight: '80%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2193b0',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  modalScroll: {
+    maxHeight: '70%',
+  },
+  storageItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  storageItemKey: {
+    flex: 1,
+    fontSize: 14,
+    color: '#333',
+  },
+  storageItemSize: {
+    fontSize: 14,
+    color: '#666',
+    marginLeft: 10,
+  },
+  modalCloseButton: {
+    backgroundColor: '#2193b0',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 15,
+    alignItems: 'center',
+  },
+  modalCloseButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  storageSummary: {
+    marginBottom: 20,
+  },
+  storageTotal: {
+    alignItems: 'center',
+    marginBottom: 15,
+    padding: 10,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+  },
+  storageTotalLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  storageTotalValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2193b0',
+  },
+  storageBreakdown: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  storageBreakdownItem: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    marginHorizontal: 5,
+  },
+  storageBreakdownLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 5,
+  },
+  storageBreakdownValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  detailsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#666',
+    marginBottom: 10,
   },
 });
 

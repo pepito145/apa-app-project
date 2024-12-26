@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import { ProfileContext } from './ProfileContext';
-
 
 const IPAQForm = ({ navigation }) => {
   const { profile, setProfile, saveProfile } = useContext(ProfileContext);
@@ -19,6 +20,26 @@ const IPAQForm = ({ navigation }) => {
     sittingHours: '',
     sittingMinutes: '',
   });
+
+  const validateInput = (text, type) => {
+    if (type === 'days') {
+      return /^([0-7])?$/.test(text);
+    } else if (type === 'hours') {
+      return /^([0-9]|1[0-9]|2[0-3])?$/.test(text);
+    } else if (type === 'minutes') {
+      return /^([0-5]?[0-9])?$/.test(text);
+    } else if (type === 'episodes') {
+      return /^([0-9]|[1-9][0-9])?$/.test(text);
+    }
+    return /^\d*$/.test(text);
+  };
+
+  const handleInputChange = (text, stateKey, type) => {
+    if (validateInput(text, type)) {
+      setAnswers({ ...answers, [stateKey]: text });
+      setErrorMessage('');
+    }
+  };
 
   const nextBlock = () => {
     const block = blocks[currentBlock - 1];
@@ -63,7 +84,6 @@ const IPAQForm = ({ navigation }) => {
     const block = blocks[currentBlock - 1];
     const hasEmptyFields = block.questions.some((question) => !answers[question.stateKey]?.trim());
 
-
     if (hasEmptyFields) {
       setErrorMessage('Veuillez remplir tous les champs avant de continuer.');
     } else {
@@ -75,171 +95,335 @@ const IPAQForm = ({ navigation }) => {
 
   const blocks = [
     {
-      title: 'Bloc 1 : Activités intenses des 7 derniers jours',
+      title: 'Activités intenses',
+      subtitle: 'Au cours des 7 derniers jours',
+      description: 'Les activités physiques intenses font référence aux activités qui demandent un effort physique important et font respirer beaucoup plus difficilement que normalement.',
       questions: [
-        { label: 'Combien de jours avez-vous effectué des activités physiques intenses ?', stateKey: 'intenseDays' },
-        { label: 'Combien d’heures par jour en moyenne ? (heures)', stateKey: 'intenseHours' },
-        { label: 'Combien de minutes par jour en moyenne ? (minutes)', stateKey: 'intenseMinutes' },
+        { 
+          label: 'Nombre de jours', 
+          stateKey: 'intenseDays',
+          type: 'days',
+          placeholder: '0-7 jours',
+          icon: 'calendar-today'
+        },
+        { 
+          label: 'Heures par jour', 
+          stateKey: 'intenseHours',
+          type: 'hours',
+          placeholder: '0-23 heures',
+          icon: 'schedule'
+        },
+        { 
+          label: 'Minutes par jour', 
+          stateKey: 'intenseMinutes',
+          type: 'minutes',
+          placeholder: '0-59 minutes',
+          icon: 'timer'
+        },
       ],
     },
     {
-      title: 'Bloc 2 : Activités modérées des 7 derniers jours',
+      title: 'Activités modérées',
+      subtitle: 'Au cours des 7 derniers jours',
+      description: 'Les activités physiques modérées font référence aux activités qui demandent un effort physique modéré et font respirer un peu plus difficilement que normalement.',
       questions: [
-        { label: 'Combien de jours avez-vous effectué des activités physiques modérées ?', stateKey: 'moderateDays' },
-        { label: 'Combien d’heures par jour en moyenne ? (heures)', stateKey: 'moderateHours' },
-        { label: 'Combien de minutes par jour en moyenne ? (minutes)', stateKey: 'moderateMinutes' },
+        { 
+          label: 'Nombre de jours', 
+          stateKey: 'moderateDays',
+          type: 'days',
+          placeholder: '0-7 jours',
+          icon: 'calendar-today'
+        },
+        { 
+          label: 'Heures par jour', 
+          stateKey: 'moderateHours',
+          type: 'hours',
+          placeholder: '0-23 heures',
+          icon: 'schedule'
+        },
+        { 
+          label: 'Minutes par jour', 
+          stateKey: 'moderateMinutes',
+          type: 'minutes',
+          placeholder: '0-59 minutes',
+          icon: 'timer'
+        },
       ],
     },
     {
-      title: 'Bloc 3 : Marche des 7 derniers jours',
+      title: 'Marche',
+      subtitle: 'Au cours des 7 derniers jours',
+      description: 'La marche inclut la marche au travail et à la maison, la marche pour se déplacer d\'un lieu à un autre, et toute autre marche que vous auriez pu faire pour la récréation, le sport ou les loisirs.',
       questions: [
-        { label: 'Combien de jours avez-vous marché pendant au moins 10 minutes d’affilée ?', stateKey: 'walkingDays' },
-        { label: 'Combien d’épisodes de marche d’au moins 10 minutes avez-vous effectués ?', stateKey: 'walkingEpisodes' },
+        { 
+          label: 'Nombre de jours de marche (min. 10 minutes)', 
+          stateKey: 'walkingDays',
+          type: 'days',
+          placeholder: '0-7 jours',
+          icon: 'directions-walk'
+        },
+        { 
+          label: 'Nombre d\'épisodes de marche par jour', 
+          stateKey: 'walkingEpisodes',
+          type: 'episodes',
+          placeholder: '0-99 épisodes',
+          icon: 'repeat'
+        },
       ],
     },
     {
-      title: 'Bloc 4 : Temps passé assis au cours des 7 derniers jours',
+      title: 'Temps assis',
+      subtitle: 'Au cours des 7 derniers jours',
+      description: 'Le temps passé assis comprend le temps passé au travail, à la maison, en cours et pendant les loisirs. Il peut s\'agir du temps passé assis à un bureau, chez des amis, à lire, à être assis ou allongé pour regarder la télévision.',
       questions: [
-        { label: 'Combien d’heures par jour en moyenne êtes-vous resté assis ?', stateKey: 'sittingHours' },
-        { label: 'Combien de minutes par jour en moyenne êtes-vous resté assis ?', stateKey: 'sittingMinutes' },
+        { 
+          label: 'Heures par jour', 
+          stateKey: 'sittingHours',
+          type: 'hours',
+          placeholder: '0-23 heures',
+          icon: 'event-seat'
+        },
+        { 
+          label: 'Minutes par jour', 
+          stateKey: 'sittingMinutes',
+          type: 'minutes',
+          placeholder: '0-59 minutes',
+          icon: 'timer'
+        },
       ],
     },
   ];
 
-  if (currentBlock === 0) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Bienvenue dans le questionnaire IPAQ</Text>
-        <Text style={styles.subtitle}>
-          Ce questionnaire mesure votre niveau d’activité physique au cours des 7 derniers jours. Veuillez répondre honnêtement.
-        </Text>
-        <TouchableOpacity style={styles.buttonThin} onPress={() => setCurrentBlock(1)}>
-          <Text style={styles.buttonThinText}>Commencer</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonThinText}>Remplir le questionnaire plus tard</Text>
+  const renderWelcomeScreen = () => (
+    <View style={styles.container}>
+      <MaterialIcons name="directions-run" size={60} color="#2193b0" style={styles.welcomeIcon} />
+      <Text style={styles.title}>Questionnaire IPAQ</Text>
+      <Text style={styles.subtitle}>
+        Ce questionnaire évalue votre niveau d'activité physique des 7 derniers jours pour mieux adapter vos exercices.
+      </Text>
+      <TouchableOpacity style={styles.primaryButton} onPress={() => setCurrentBlock(1)}>
+        <Text style={styles.buttonText}>Commencer</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.secondaryButtonText}>Remplir plus tard</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderQuestionBlock = (block) => (
+    <ScrollView contentContainerStyle={styles.blockContainer}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.blockTitle}>{block.title}</Text>
+        <Text style={styles.blockSubtitle}>{block.subtitle}</Text>
+        <Text style={styles.description}>{block.description}</Text>
+      </View>
+
+      {block.questions.map((question, index) => (
+        <View key={index} style={styles.questionContainer}>
+          <View style={styles.labelContainer}>
+            <MaterialIcons name={question.icon} size={24} color="#2193b0" />
+            <Text style={styles.questionLabel}>{question.label}</Text>
+          </View>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            placeholder={question.placeholder}
+            value={answers[question.stateKey]}
+            onChangeText={(text) => handleInputChange(text, question.stateKey, question.type)}
+            maxLength={2}
+          />
+        </View>
+      ))}
+
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+
+      <View style={styles.buttonContainer}>
+        {currentBlock > 1 && (
+          <TouchableOpacity style={styles.secondaryButton} onPress={previousBlock}>
+            <MaterialIcons name="arrow-back" size={24} color="#666" />
+            <Text style={styles.secondaryButtonText}>Retour</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={[styles.primaryButton, currentBlock === 1 && styles.fullWidthButton]}
+          onPress={currentBlock < blocks.length ? nextBlock : submitForm}
+        >
+          <Text style={styles.buttonText}>
+            {currentBlock < blocks.length ? 'Continuer' : 'Terminer'}
+          </Text>
+          <MaterialIcons 
+            name={currentBlock < blocks.length ? "arrow-forward" : "check"} 
+            size={24} 
+            color="#fff" 
+          />
         </TouchableOpacity>
       </View>
-    );
-  }
+    </ScrollView>
+  );
 
-  if (currentBlock > 0 && currentBlock <= blocks.length) {
-    const block = blocks[currentBlock - 1];
-    return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+  return (
+    <SafeAreaView style={styles.safeContainer}>
+      <LinearGradient
+        colors={['#6dd5ed', '#2193b0']}
+        style={styles.gradient}
+        end={{ x: 0, y: 1 }}
       >
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>{block.title}</Text>
-          {block.questions.map((question, index) => (
-            <View key={index} style={styles.questionContainer}>
-              <Text style={styles.question}>{question.label}</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                placeholder="Votre réponse"
-                value={answers[question.stateKey]}
-                onChangeText={(text) => {
-                  if (/^\d*$/.test(text)) {
-                    setAnswers({ ...answers, [question.stateKey]: text });
-                  }
-                }}
-              />
-            </View>
-          ))}
-          {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-
-          <TouchableOpacity
-            style={styles.buttonThin}
-            onPress={currentBlock < blocks.length ? nextBlock : submitForm}
-          >
-            <Text style={styles.buttonThinText}>
-              {currentBlock < blocks.length ? 'Continuer' : 'Terminer'}
-            </Text>
-          </TouchableOpacity>
-
-          {currentBlock > 1 && (
-            <TouchableOpacity style={styles.backButton} onPress={previousBlock}>
-              <Text style={styles.backButtonText}>Retour</Text>
-            </TouchableOpacity>
-          )}
-        </ScrollView>
-      </KeyboardAvoidingView>
-    );
-  }
-
-  return null;
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.keyboardView}
+        >
+          {currentBlock === 0 
+            ? renderWelcomeScreen()
+            : renderQuestionBlock(blocks[currentBlock - 1])
+          }
+        </KeyboardAvoidingView>
+      </LinearGradient>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: '#2193b0',
+  },
+  gradient: {
+    flex: 1,
+  },
+  keyboardView: {
+    flex: 1,
+  },
   container: {
-    flexGrow: 1,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#f5f5f5',
+    padding: 20,
+  },
+  welcomeIcon: {
+    marginBottom: 20,
+  },
+  blockContainer: {
+    padding: 20,
+  },
+  headerContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
+    color: '#fff',
     marginBottom: 16,
     textAlign: 'center',
-    color: '#333',
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  blockTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2193b0',
+    marginBottom: 8,
+  },
+  blockSubtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 12,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#fff',
     textAlign: 'center',
     marginBottom: 32,
+    lineHeight: 24,
+  },
+  description: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
   },
   questionContainer: {
-    marginBottom: 16,
-    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
   },
-  question: {
+  labelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  questionLabel: {
     fontSize: 16,
-    marginBottom: 8,
     color: '#333',
+    marginLeft: 10,
+    flex: 1,
   },
   input: {
+    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#ddd',
     borderRadius: 8,
     padding: 12,
-    backgroundColor: '#fff',
+    fontSize: 16,
+    color: '#333',
   },
-  buttonThin: {
-    backgroundColor: '#007bff',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginTop: 12,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    gap: 10,
+  },
+  primaryButton: {
+    backgroundColor: '#2193b0',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
     alignItems: 'center',
-    width: '80%',
+    justifyContent: 'center',
+    minWidth: 120,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
-  buttonThinText: {
+  fullWidthButton: {
+    flex: 1,
+    marginLeft: 0,
+  },
+  secondaryButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
+  },
+  buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    marginRight: 8,
   },
-  backButton: {
-    backgroundColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    width: '80%',
-    marginTop: 12,
-  },
-  backButtonText: {
-    color: '#333',
-    fontSize: 18,
-    fontWeight: 'bold',
+  secondaryButtonText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
   error: {
-    color: 'red',
-    marginTop: 10,
+    color: '#ff3b30',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: 10,
+    borderRadius: 8,
     textAlign: 'center',
+    marginBottom: 15,
   },
 });
 

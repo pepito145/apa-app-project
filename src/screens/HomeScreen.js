@@ -1,21 +1,22 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { WebView } from 'react-native-webview';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, Pressable, SafeAreaView, BackHandler, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
-import { ProfileContext } from './ProfileContext'; // Import du contexte
-import mascot from '../../assets/logo-test.png'; // Logo
+import { LinearGradient } from 'expo-linear-gradient';
+import { ProfileContext } from './ProfileContext';
+import mascot from '../../assets/logo-test.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
+import { MaterialIcons } from '@expo/vector-icons';
+import * as WebBrowser from 'expo-web-browser';
 
 const HomeScreen = ({ navigation }) => {
-  const { profile, setProfile, saveProfile } = useContext(ProfileContext); // Accéder au profil partagé
-  const [modalVisible, setModalVisible] = useState(false); // Gérer la visibilité du modal
-  const [webModalVisible, setWebModalVisible] = useState(false); // Gérer la visibilité du modal WebView 
-  const [webUrl, setWebUrl] = useState(''); // État pour l'URL du WebView
-  const [currentUrl, setCurrentUrl] = useState(''); // État pour stocker l'URL actuelle
-  const [extractedCode, setExtractedCode] = useState(''); // État pour stocker le code extrait
+  const { profile, setProfile, saveProfile, markFirstVisitComplete } = useContext(ProfileContext);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [webModalVisible, setWebModalVisible] = useState(false);
+  const [webUrl, setWebUrl] = useState('');
+  const [currentUrl, setCurrentUrl] = useState('');
+  const [extractedCode, setExtractedCode] = useState('');
 
-  // États pour le formulaire du modal
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -24,7 +25,6 @@ const HomeScreen = ({ navigation }) => {
     gender: ''
   });
 
-  // Fonction pour vérifier si le formulaire est valide
   const isFormValid = () => {
     return formData.firstName.trim() !== '' &&
            formData.lastName.trim() !== '' &&
@@ -33,17 +33,25 @@ const HomeScreen = ({ navigation }) => {
            formData.gender !== '';
   };
 
-  // Vérification des données personnelles
   const isProfileIncomplete = !profile.firstName || !profile.lastName || !profile.gender || !profile.age || !profile.weight;
 
-  const [steps, setSteps] = useState(0); // État pour les pas
-  const [loading, setLoading] = useState(true); // État de chargement
-  const [heartRateAverage, setHeartRateAverage] = useState(0); // État pour la moyenne BPM
-  const [lastRefreshTime, setLastRefreshTime] = useState(0); // État pour stocker le dernier temps de rafraîchissement
+  const [steps, setSteps] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [heartRateAverage, setHeartRateAverage] = useState(0);
+  const [lastRefreshTime, setLastRefreshTime] = useState(0);
 
-  // États pour gérer les erreurs
   const [stepsError, setStepsError] = useState(false);
   const [heartRateError, setHeartRateError] = useState(false);
+
+  const webViewRef = useRef(null);
+
+  const baseWithingsUrl = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id=8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25&state=randomString&scope=user.activity,user.metrics&redirect_uri=https://oauth.pstmn.io/v1/callback';
+
+  useEffect(() => {
+    if (profile.isFirstVisit) {
+      markFirstVisitComplete();
+    }
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -54,7 +62,6 @@ const HomeScreen = ({ navigation }) => {
       const today = new Date();
       const formattedDate = today.toISOString().split('T')[0];
 
-      // Requête pour récupérer les pas
       const stepsResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
         method: 'POST',
         headers: {
@@ -67,7 +74,6 @@ const HomeScreen = ({ navigation }) => {
       const stepsData = await stepsResponse.json();
 
       if (stepsData.status === 0) {
-        // Si la requête réussit, on met les steps à 0 ou à la valeur trouvée
         setSteps(stepsData.body.activities.length > 0 ? stepsData.body.activities[0].steps : 0);
         console.log("Requête steps réussie")
       } else {
@@ -75,13 +81,11 @@ const HomeScreen = ({ navigation }) => {
         console.log("Erreur requête steps")
       }
 
-      // Obtenir la date actuelle
       const now = new Date();
       const currentTimestamp = Math.floor(now.getTime() / 1000);
       const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const midnightTimestamp = Math.floor(midnight.getTime() / 1000);
 
-      // Requête pour récupérer la moyenne des BPM
       const bpmResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
         method: 'POST',
         headers: {
@@ -126,14 +130,14 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleLinkWithings = async (code) => {
-    const url = 'https://wbsapi.withings.net/v2/oauth2'; // URL de l'API Withings
+    const url = 'https://wbsapi.withings.net/v2/oauth2';
     const params = new URLSearchParams({
       action: 'requesttoken',
       grant_type: 'authorization_code',
-      client_id: '8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25', // Remplacez par votre client_id
-      client_secret: '77f0088525010a3bd6ab17df6d34c0423aa4c16ced8ede88e00b8a26d9da288b', // Remplacez par votre client_secret
-      code: code, // Le code obtenu
-      redirect_uri: 'https://oauth.pstmn.io/v1/callback', // Remplacez par votre redirect_uri
+      client_id: '8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25',
+      client_secret: '77f0088525010a3bd6ab17df6d34c0423aa4c16ced8ede88e00b8a26d9da288b',
+      code: code,
+      redirect_uri: 'https://oauth.pstmn.io/v1/callback',
     });
   
     try {
@@ -149,24 +153,21 @@ const HomeScreen = ({ navigation }) => {
       console.log('Réponse de l\'API Withings :', data);
 
       if (data.body) {
-        const accessToken = data.body.access_token; // Stocke l'access_token
-        const refreshToken = data.body.refresh_token; // Stocke le refresh_token
+        const accessToken = data.body.access_token;
+        const refreshToken = data.body.refresh_token;
     
-        // Mettez à jour le profil
         const updatedProfile = {
           ...profile,
           access_token: accessToken,
           refresh_token: refreshToken,
-          isWithingsLinked: true, // Met à jour l'état de liaison
+          isWithingsLinked: true,
         };
     
-        setProfile(updatedProfile); // Mettez à jour l'état du profil
+        setProfile(updatedProfile);
     
-        // Sauvegarder le profil
         await saveProfile(updatedProfile);
       }
 
-      // Vous pouvez mettre à jour l'état ou faire d'autres actions ici
     } catch (error) {
       console.error('Erreur lors de la requête à Withings :', error);
     }
@@ -176,49 +177,41 @@ const HomeScreen = ({ navigation }) => {
     let interval;
 
     if (webModalVisible) {
-      // Démarrer l'intervalle pour vérifier l'URL toutes les x secondes
       interval = setInterval(() => {
-        console.log('URL actuelle :', currentUrl); // Affiche l'URL actuelle dans la console
+        console.log('URL actuelle :', currentUrl);
 
-        // Vérifie si l'URL contient "code="
-        const codeMatch = currentUrl.match(/code=([^&]+)/); // Utilise une expression régulière pour extraire le code
+        const codeMatch = currentUrl.match(/code=([^&]+)/);
         if (codeMatch) {
-          const code = codeMatch[1]; // Le code est dans le premier groupe de capture
-          setExtractedCode(code); // Stocke le code extrait
-          console.log('Code extrait :', code); // Affiche le code extrait dans la console
-          setWebModalVisible(false); // Ferme le modal WebView
-
-          // Appelle la fonction pour lier le compte Withings
+          const code = codeMatch[1];
+          setExtractedCode(code);
+          console.log('Code extrait :', code);
+          setWebModalVisible(false);
           handleLinkWithings(code);
         }
-      }, 5000); // Vérifie toutes les 5 secondes
+      }, 1000);
     }
 
-    // Nettoyer l'intervalle lors du démontage du composant
-    return () => clearInterval(interval);
-  }, [webModalVisible, currentUrl]); // Dépendances : redémarre l'intervalle si l'URL actuelle change
+    return () => {
+      clearInterval(interval);
+    };
+  }, [webModalVisible, currentUrl]);
 
-  // Vérifiez si le compte Withings est lié lors du lancement de l'application
   useEffect(() => {
     if (profile.isWithingsLinked) {
-      // Si le compte est lié, appelez fetchData après un délai de 3 secondes
       const timer = setTimeout(() => {
-        fetchData(); // Appelle fetchData après 3 secondes
-      }, 3000); // 3000 millisecondes = 3 secondes
+        fetchData();
+      }, 3000);
 
-      // Nettoyage du timer lors du démontage du composant
       return () => clearTimeout(timer);
     } else {
-      // Si le compte n'est pas lié, vous pouvez afficher un message ou gérer cela comme vous le souhaitez
       console.log('Le compte Withings n\'est pas lié.');
-      setSteps(0); // Ou toute autre logique que vous souhaitez appliquer
+      setSteps(0);
     }
-  }, [profile.isWithingsLinked]); // Dépendance pour vérifier si le compte est lié
+  }, [profile.isWithingsLinked]);
 
 
   const refreshToken = async () => {
-    // Vérifier si 3 heures se sont écoulées depuis le dernier refresh
-    const threeHoursInMs = 3 * 60 * 60 * 1000; // 3 heures en millisecondes
+    const threeHoursInMs = 3 * 60 * 60 * 1000;
     const now = Date.now();
     
     if (profile.lastRefreshTime && (now - profile.lastRefreshTime) < threeHoursInMs) {
@@ -255,12 +248,11 @@ const HomeScreen = ({ navigation }) => {
         const accessToken = data.body.access_token;
         const refreshToken = data.body.refresh_token;
     
-        // Mettre à jour le profil avec le nouveau timestamp
         const updatedProfile = {
           ...profile,
           access_token: accessToken,
           refresh_token: refreshToken,
-          lastRefreshTime: now, // Ajouter le timestamp du refresh
+          lastRefreshTime: now,
         };
     
         setProfile(updatedProfile);
@@ -274,27 +266,23 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleSaveProfile = async () => {
-    // Validation des champs
     if (!formData.firstName || !formData.lastName || !formData.age || !formData.weight) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
 
-    // Validation de l'âge
     const age = parseInt(formData.age);
     if (isNaN(age) || age < 0 || age > 120) {
       Alert.alert('Erreur', 'Veuillez entrer un âge valide');
       return;
     }
 
-    // Validation du poids
     const weight = parseFloat(formData.weight);
     if (isNaN(weight) || weight < 20 || weight > 300) {
       Alert.alert('Erreur', 'Veuillez entrer un poids valide');
       return;
     }
 
-    // Mise à jour du profil
     const updatedProfile = {
       ...profile,
       firstName: formData.firstName,
@@ -318,22 +306,25 @@ const HomeScreen = ({ navigation }) => {
     <SafeAreaView style={styles.safeContainer}>
       <LinearGradient colors={['#2193b0', '#6dd5ed']} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Text style={styles.welcomeText}>Bon retour sur APA App !</Text>
+          <Text style={styles.welcomeText}>
+            {profile.isFirstVisit ? 'Bienvenue sur APA App !' : 'Bon retour sur APA App !'}
+          </Text>
           <Image source={mascot} style={styles.mascotte} />
 
-          {/* Vérification des données personnelles */}
           {isProfileIncomplete && (
-            <TouchableOpacity
-              style={styles.incompleteProfileButton}
-              onPress={() => setModalVisible(true)}
-            >
-              <Text style={styles.incompleteProfileText}>
-                Complétez vos informations personnelles
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.actionContainer}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => setModalVisible(true)}
+              >
+                <MaterialIcons name="person" size={24} color="#fff" />
+                <Text style={styles.actionButtonText}>
+                  Complétez vos informations personnelles
+                </Text>
+              </TouchableOpacity>
+            </View>
           )}
 
-          {/* Modal pour les informations personnelles */}
           <Modal
             animationType="slide"
             transparent={true}
@@ -429,33 +420,35 @@ const HomeScreen = ({ navigation }) => {
             </KeyboardAvoidingView>
           </Modal>
 
-          {/* Lier le compte Withings */}
           {!profile.isWithingsLinked && !isProfileIncomplete && (
-            <TouchableOpacity
-              style={styles.linkWithingsButton}
-              onPress={() => {
-                setWebUrl('https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id=8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25&state=randomString&scope=user.activity,user.metrics&redirect_uri=https://oauth.pstmn.io/v1/callback');
-                setWebModalVisible(true);
-              }} 
-            >
-              <Text style={styles.linkWithingsText}>Lier son compte Withings</Text>
-            </TouchableOpacity>
+            <View style={styles.actionContainer}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => {
+                  setWebUrl(baseWithingsUrl);
+                  setWebModalVisible(true);
+                }} 
+              >
+                <MaterialIcons name="link" size={24} color="#fff" />
+                <Text style={styles.actionButtonText}>Lier son compte Withings</Text>
+              </TouchableOpacity>
+            </View>
           )}
 
-          {/* Vérification de la présence du score IPAQ */}
           {!isProfileIncomplete && profile.isWithingsLinked && (profile.ipaqScore == null || profile.ipaqScore === '') && (
-            <TouchableOpacity
-              style={styles.questionnaireButton}
-              onPress={() => navigation.navigate('QuestionnaireIPAQ')}
-            >
-              <Text style={styles.questionnaireText}>Remplir le questionnaire IPAQ</Text>
-            </TouchableOpacity>
+            <View style={styles.actionContainer}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => navigation.navigate('QuestionnaireIPAQ')}
+              >
+                <MaterialIcons name="assignment" size={24} color="#fff" />
+                <Text style={styles.actionButtonText}>Remplir le questionnaire IPAQ</Text>
+              </TouchableOpacity>
+            </View>
           )}
 
-          {/* Contenu principal - affiché uniquement quand tout est complété */}
           {!isProfileIncomplete && profile.isWithingsLinked && profile.ipaqScore && (
             <>
-              {/* Boutons de rafraîchissement */}
               <TouchableOpacity
                 style={styles.refreshButton}
                 onPress={fetchData}
@@ -470,7 +463,6 @@ const HomeScreen = ({ navigation }) => {
                 <Text style={styles.refreshButtonText}>Rafresh token</Text>
               </TouchableOpacity>
 
-              {/* Affichage des statistiques */}
               <View style={styles.statsContainer}>
                 <View style={styles.statCard}>
                   <Text style={styles.statTitle}>Nombre de pas</Text>
@@ -493,7 +485,6 @@ const HomeScreen = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
 
-              {/* Phrase motivante et bouton d'activité */}
               <Text style={styles.motivationalText}>
                 Êtes-vous prêt à bouger et faire du sport aujourd'hui ?
               </Text>
@@ -508,7 +499,6 @@ const HomeScreen = ({ navigation }) => {
           )}
         </ScrollView>
         
-        {/* Modal pour afficher le WebView */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -526,16 +516,25 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.webViewTitle}>Connexion Withings</Text>
             </View>
             <WebView 
+              ref={webViewRef}
               source={{ uri: webUrl }} 
               onNavigationStateChange={(navState) => {
                 setCurrentUrl(navState.url);
               }}
               style={styles.webView}
+              incognito={true}
+              cacheEnabled={false}
+              thirdPartyCookiesEnabled={false}
+              sharedCookiesEnabled={false}
+              javaScriptEnabled={true}
+              domStorageEnabled={false}
+              onShouldStartLoadWithRequest={(request) => {
+                return request.url.includes('withings.com') || request.url.includes('oauth.pstmn.io');
+              }}
             />
           </View>
         </Modal>
 
-        {/* Modal pour afficher les détails du streak */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -551,7 +550,7 @@ const HomeScreen = ({ navigation }) => {
               </Text>
               <Pressable
                 style={styles.closeButton}
-                onPress={() => setModalVisible(false)} // Ferme le modal
+                onPress={() => setModalVisible(false)}
               >
                 <Text style={styles.closeButtonText}>Fermer</Text>
               </Pressable>
@@ -850,6 +849,35 @@ const styles = StyleSheet.create({
   },
   webView: {
     flex: 1,
+  },
+  actionContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 15,
+    width: '100%',
+    flex: 1,
+  },
+  actionButton: {
+    backgroundColor: '#2193b0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 32,
+    borderRadius: 25,
+    width: '88%',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 12,
+    textAlign: 'center',
   },
 });
 

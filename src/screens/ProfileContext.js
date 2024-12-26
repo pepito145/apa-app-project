@@ -17,7 +17,9 @@ export const ProfileProvider = ({ children }) => {
     isWithingsLinked: false,
     access_token: '',
     refresh_token: '',
+    isFirstVisit: true,
   });
+  const [isLoading, setIsLoading] = useState(true);
 
   // Charge les données depuis AsyncStorage
   useEffect(() => {
@@ -25,10 +27,13 @@ export const ProfileProvider = ({ children }) => {
       try {
         const savedProfile = await AsyncStorage.getItem('userProfile');
         if (savedProfile) {
-          setProfile(JSON.parse(savedProfile));
+          const parsedProfile = JSON.parse(savedProfile);
+          setProfile(parsedProfile);
         }
       } catch (error) {
         console.error('Erreur lors du chargement du profil :', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     loadProfile();
@@ -50,8 +55,19 @@ export const ProfileProvider = ({ children }) => {
     const updatedProfile = { ...profile, streak: newStreak };
     await saveProfile(updatedProfile);
   };
+
+  // Méthode pour marquer la première visite comme terminée
+  const markFirstVisitComplete = async () => {
+    const updatedProfile = { ...profile, isFirstVisit: false };
+    await saveProfile(updatedProfile);
+  };
+
+  if (isLoading) {
+    return null; // Ou un composant de chargement si vous préférez
+  }
+
   return (
-    <ProfileContext.Provider value={{ profile, setProfile, saveProfile, updateStreak }}>
+    <ProfileContext.Provider value={{ profile, setProfile, saveProfile, updateStreak, markFirstVisitComplete }}>
       {children}
     </ProfileContext.Provider>
   );

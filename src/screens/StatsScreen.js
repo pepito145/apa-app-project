@@ -285,187 +285,207 @@ const StatsScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <LinearGradient colors={['#6dd5ed', '#2193b0']} style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Text style={styles.headerTitle}>Vos Statistiques</Text>
-
-          <Text style={styles.sectionTitle}>Vue d'ensemble</Text>
-          <View style={styles.statsGrid}>
-            <StatCard
-              title="Sessions Totales"
-              value={stats.totalSessions}
-              icon="fitness-center"
-            />
-            <StatCard
-              title="Cette Semaine"
-              value={stats.lastWeekSessions}
-              icon="date-range"
-            />
-            <StatCard
-              title="Série Actuelle"
-              value={stats.streak}
-              icon="local-fire-department"
-            />
-            <StatCard
-              title="Meilleure Série"
-              value={stats.bestStreak}
-              icon="emoji-events"
-            />
-          </View>
-
-          <Text style={styles.sectionTitle}>Santé</Text>
-          <View style={styles.statsGrid}>
-            <StatCard
-              title="BPM Moyen"
-              value={stats.averageHeartRate}
-              icon="favorite"
-              unit=" bpm"
-            />
-            <StatCard
-              title="Pas Quotidiens"
-              value={stats.averageStepsPerDay}
-              icon="directions-walk"
-            />
-            <StatCard
-              title="Distance/Jour"
-              value={stats.averageDistance}
-              icon="place"
-              unit=" km"
-            />
-            <StatCard
-              title="Calories/Jour"
-              value={stats.averageCalories}
-              icon="whatshot"
-              unit=" kcal"
-            />
-          </View>
-
-          <Text style={styles.sectionTitle}>Performance</Text>
-          <View style={styles.statsGrid}>
-            <StatCard
-              title="Exercices Réalisés"
-              value={stats.totalExercises}
-              icon="sports"
-            />
-            <StatCard
-              title="Moyenne par Session"
-              value={stats.averageExercisesPerSession}
-              icon="bar-chart"
-            />
-            <StatCard
-              title="Temps Total"
-              value={stats.totalDuration}
-              icon="timer"
-              unit=" min"
-            />
-            <StatCard
-              title="Taux de Complétion"
-              value={stats.completionRate}
-              icon="pie-chart"
-              unit="%"
-            />
-          </View>
-
-          <Text style={styles.sectionTitle}>Progrès</Text>
-          <View style={styles.statsGrid}>
-            <StatCard
-              title="Difficulté Moyenne"
-              value={stats.averageDifficulty}
-              icon="speed"
-              unit="/5"
-            />
-            <StatCard
-              title="Douleur Moyenne"
-              value={stats.averagePain}
-              icon="healing"
-              unit="/5"
-            />
-          </View>
-
-          <Text style={styles.sectionTitle}>Totaux sur 7 jours</Text>
-          <View style={styles.statsGrid}>
-            <StatCard
-              title="Pas Totaux"
-              value={stats.totalSteps}
-              icon="directions-walk"
-            />
-            <StatCard
-              title="Distance Totale"
-              value={stats.totalDistance}
-              icon="place"
-              unit=" km"
-            />
-            <StatCard
-              title="Calories Totales"
-              value={stats.totalCalories}
-              icon="whatshot"
-              unit=" kcal"
-            />
-          </View>
-
-          <Text style={styles.sectionTitle}>Séries d'activités</Text>
-          <View style={styles.statsGrid}>
-            <StatCard
-              title="Série Actuelle"
-              value={stats.streak}
-              icon="local-fire-department"
-            />
-            <StatCard
-              title="Meilleure Série"
-              value={stats.bestStreak}
-              icon="emoji-events"
-            />
-            <StatCard
-              title="Nombre de Séries"
-              value={stats.totalStreaks}
-              icon="format-list-numbered"
-              description="Séries de 2 jours ou plus"
-            />
-            <StatCard
-              title="Longueur Moyenne"
-              value={stats.averageStreakLength}
-              icon="show-chart"
-              unit=" jours"
-            />
-          </View>
-
-          {stats.lastStreakEnd && (
-            <Text style={styles.streakInfo}>
-              Dernière série terminée le {new Date(stats.lastStreakEnd).toLocaleDateString()}
+      <LinearGradient
+        colors={['#6dd5ed', '#2193b0']}
+        style={styles.container}
+      >
+        {!profile.isWithingsLinked ? (
+          <View style={styles.emptyContainer}>
+            <MaterialIcons name="info" size={80} color="#fff" />
+            <Text style={styles.emptyTitle}>Configuration requise</Text>
+            <Text style={styles.emptyText}>
+              Pour accéder à vos statistiques, vous devez d'abord lier votre compte Withings sur l'écran d'accueil.
             </Text>
-          )}
+            <TouchableOpacity 
+              style={styles.homeButton}
+              onPress={() => navigation.navigate('MainTabs', { screen: 'Accueil' })}
+            >
+              <MaterialIcons name="home" size={24} color="#2193b0" />
+              <Text style={styles.homeButtonText}>Retour à l'accueil</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <Text style={styles.headerTitle}>Vos Statistiques</Text>
 
-          <Text style={styles.sectionTitle}>Dernières Activités</Text>
-          {activitiesHistory.slice(0, 3).map((activity, index) => (
-            <View key={index} style={styles.activityCard}>
-              <View style={styles.activityHeader}>
-                <Text style={styles.activityDate}>{activity.date}</Text>
-                <Text style={styles.activityName}>{activity.name}</Text>
-              </View>
-              <View style={styles.activityDetails}>
-                <Text style={styles.activityDetail}>
-                  Exercices: {activity.exercisesCompleted}/{activity.totalExercises}
-                </Text>
-                <Text style={styles.activityDetail}>
-                  Difficulté: {activity.difficulty}/5
-                </Text>
-              </View>
+            <Text style={styles.sectionTitle}>Vue d'ensemble</Text>
+            <View style={styles.statsGrid}>
+              <StatCard
+                title="Sessions Totales"
+                value={stats.totalSessions}
+                icon="fitness-center"
+              />
+              <StatCard
+                title="Cette Semaine"
+                value={stats.lastWeekSessions}
+                icon="date-range"
+              />
+              <StatCard
+                title="Série Actuelle"
+                value={stats.streak}
+                icon="local-fire-department"
+              />
+              <StatCard
+                title="Meilleure Série"
+                value={stats.bestStreak}
+                icon="emoji-events"
+              />
             </View>
-          ))}
 
-          {stats.lastSyncDate && (
-            <Text style={styles.syncInfo}>
-              Dernière synchronisation: {new Date(stats.lastSyncDate).toLocaleDateString()}
-            </Text>
-          )}
+            <Text style={styles.sectionTitle}>Santé</Text>
+            <View style={styles.statsGrid}>
+              <StatCard
+                title="BPM Moyen"
+                value={stats.averageHeartRate}
+                icon="favorite"
+                unit=" bpm"
+              />
+              <StatCard
+                title="Pas Quotidiens"
+                value={stats.averageStepsPerDay}
+                icon="directions-walk"
+              />
+              <StatCard
+                title="Distance/Jour"
+                value={stats.averageDistance}
+                icon="place"
+                unit=" km"
+              />
+              <StatCard
+                title="Calories/Jour"
+                value={stats.averageCalories}
+                icon="whatshot"
+                unit=" kcal"
+              />
+            </View>
 
-          <TouchableOpacity 
-            style={styles.historyButton}
-            onPress={() => navigation.navigate('ActivitiesHistory')}
-          >
-            <Text style={styles.historyButtonText}>Voir tout l'historique</Text>
-          </TouchableOpacity>
-        </ScrollView>
+            <Text style={styles.sectionTitle}>Performance</Text>
+            <View style={styles.statsGrid}>
+              <StatCard
+                title="Exercices Réalisés"
+                value={stats.totalExercises}
+                icon="sports"
+              />
+              <StatCard
+                title="Moyenne par Session"
+                value={stats.averageExercisesPerSession}
+                icon="bar-chart"
+              />
+              <StatCard
+                title="Temps Total"
+                value={stats.totalDuration}
+                icon="timer"
+                unit=" min"
+              />
+              <StatCard
+                title="Taux de Complétion"
+                value={stats.completionRate}
+                icon="pie-chart"
+                unit="%"
+              />
+            </View>
+
+            <Text style={styles.sectionTitle}>Progrès</Text>
+            <View style={styles.statsGrid}>
+              <StatCard
+                title="Difficulté Moyenne"
+                value={stats.averageDifficulty}
+                icon="speed"
+                unit="/5"
+              />
+              <StatCard
+                title="Douleur Moyenne"
+                value={stats.averagePain}
+                icon="healing"
+                unit="/5"
+              />
+            </View>
+
+            <Text style={styles.sectionTitle}>Totaux sur 7 jours</Text>
+            <View style={styles.statsGrid}>
+              <StatCard
+                title="Pas Totaux"
+                value={stats.totalSteps}
+                icon="directions-walk"
+              />
+              <StatCard
+                title="Distance Totale"
+                value={stats.totalDistance}
+                icon="place"
+                unit=" km"
+              />
+              <StatCard
+                title="Calories Totales"
+                value={stats.totalCalories}
+                icon="whatshot"
+                unit=" kcal"
+              />
+            </View>
+
+            <Text style={styles.sectionTitle}>Séries d'activités</Text>
+            <View style={styles.statsGrid}>
+              <StatCard
+                title="Série Actuelle"
+                value={stats.streak}
+                icon="local-fire-department"
+              />
+              <StatCard
+                title="Meilleure Série"
+                value={stats.bestStreak}
+                icon="emoji-events"
+              />
+              <StatCard
+                title="Nombre de Séries"
+                value={stats.totalStreaks}
+                icon="format-list-numbered"
+                description="Séries de 2 jours ou plus"
+              />
+              <StatCard
+                title="Longueur Moyenne"
+                value={stats.averageStreakLength}
+                icon="show-chart"
+                unit=" jours"
+              />
+            </View>
+
+            {stats.lastStreakEnd && (
+              <Text style={styles.streakInfo}>
+                Dernière série terminée le {new Date(stats.lastStreakEnd).toLocaleDateString()}
+              </Text>
+            )}
+
+            <Text style={styles.sectionTitle}>Dernières Activités</Text>
+            {activitiesHistory.slice(0, 3).map((activity, index) => (
+              <View key={index} style={styles.activityCard}>
+                <View style={styles.activityHeader}>
+                  <Text style={styles.activityDate}>{activity.date}</Text>
+                  <Text style={styles.activityName}>{activity.name}</Text>
+                </View>
+                <View style={styles.activityDetails}>
+                  <Text style={styles.activityDetail}>
+                    Exercices: {activity.exercisesCompleted}/{activity.totalExercises}
+                  </Text>
+                  <Text style={styles.activityDetail}>
+                    Difficulté: {activity.difficulty}/5
+                  </Text>
+                </View>
+              </View>
+            ))}
+
+            {stats.lastSyncDate && (
+              <Text style={styles.syncInfo}>
+                Dernière synchronisation: {new Date(stats.lastSyncDate).toLocaleDateString()}
+              </Text>
+            )}
+
+            <TouchableOpacity 
+              style={styles.historyButton}
+              onPress={() => navigation.navigate('ActivitiesHistory')}
+            >
+              <Text style={styles.historyButtonText}>Voir tout l'historique</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        )}
       </LinearGradient>
     </SafeAreaView>
   );
@@ -605,6 +625,47 @@ const styles = StyleSheet.create({
     marginTop: -4,
     marginBottom: 16,
     fontStyle: 'italic',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    opacity: 0.9,
+    marginBottom: 30,
+    lineHeight: 24,
+  },
+  homeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  homeButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2193b0',
+    marginLeft: 8,
   },
 });
 
