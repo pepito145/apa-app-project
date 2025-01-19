@@ -59,35 +59,42 @@ const EditProfileScreen = ({ navigation }) => {
     );
   };
 
-  const EditableField = ({ label, value, icon, isEditing, tempValue, setTempValue, onEdit, onSave }) => (
-    <View style={styles.field}>
-      <View style={styles.labelContainer}>
-        <MaterialIcons name={icon} size={18} color="#2193b0" />
-        <Text style={styles.label}>{label}</Text>
+  const EditableField = ({ label, value, icon, isEditing, onEdit, onSave }) => {
+    const [localValue, setLocalValue] = useState(value);
+
+    const handleSave = () => {
+      onSave(localValue);  // Sauvegarde avec la valeur locale
+    };
+
+    return (
+      <View style={styles.field}>
+        <View style={styles.labelContainer}>
+          <MaterialIcons name={icon} size={18} color="#2193b0" />
+          <Text style={styles.label}>{label}</Text>
+        </View>
+        {isEditing ? (
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.input}
+              value={localValue}
+              onChangeText={setLocalValue} // Met à jour la valeur locale
+              keyboardType={label.includes('Âge') || label.includes('Poids') ? 'numeric' : 'default'}
+              autoFocus
+              onSubmitEditing={handleSave} // Sauvegarde quand l'utilisateur valide
+              onBlur={handleSave} // Sauvegarde quand l'utilisateur quitte l'input
+            />
+          </View>
+        ) : (
+          <View style={styles.valueRow}>
+            <Text style={styles.value}>{value}</Text>
+            <TouchableOpacity style={styles.editButton} onPress={() => onEdit()}>
+              <MaterialIcons name="edit" size={18} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-      {isEditing ? (
-        <View style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            value={tempValue}
-            onChangeText={setTempValue}
-            keyboardType={label.includes('Age') || label.includes('Poids') ? 'numeric' : 'default'}
-            autoFocus
-          />
-          <TouchableOpacity style={styles.saveButton} onPress={onSave}>
-            <MaterialIcons name="check" size={18} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.valueRow}>
-          <Text style={styles.value}>{value}</Text>
-          <TouchableOpacity style={styles.editButton} onPress={onEdit}>
-            <MaterialIcons name="edit" size={18} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
-  );
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -99,10 +106,8 @@ const EditProfileScreen = ({ navigation }) => {
               value={profile.firstName}
               icon="person"
               isEditing={editingField === 'firstName'}
-              tempValue={tempValue}
-              setTempValue={setTempValue}
               onEdit={() => startEditing('firstName')}
-              onSave={() => saveField('firstName')}
+              onSave={(newValue) => saveField('firstName', newValue)}
             />
 
             <EditableField
@@ -110,10 +115,8 @@ const EditProfileScreen = ({ navigation }) => {
               value={profile.lastName}
               icon="person-outline"
               isEditing={editingField === 'lastName'}
-              tempValue={tempValue}
-              setTempValue={setTempValue}
               onEdit={() => startEditing('lastName')}
-              onSave={() => saveField('lastName')}
+              onSave={(newValue) => saveField('lastName', newValue)}
             />
 
             <View style={styles.field}>
@@ -151,10 +154,8 @@ const EditProfileScreen = ({ navigation }) => {
               value={`${profile.age} ans`}
               icon="cake"
               isEditing={editingField === 'age'}
-              tempValue={tempValue}
-              setTempValue={setTempValue}
               onEdit={() => startEditing('age')}
-              onSave={() => saveField('age')}
+              onSave={(newValue) => saveField('age', newValue)}
             />
 
             <EditableField
@@ -162,10 +163,8 @@ const EditProfileScreen = ({ navigation }) => {
               value={profile.weight}
               icon="fitness-center"
               isEditing={editingField === 'weight'}
-              tempValue={tempValue}
-              setTempValue={setTempValue}
               onEdit={() => startEditing('weight')}
-              onSave={() => saveField('weight')}
+              onSave={(newValue) => saveField('weight', newValue)}
             />
 
             <View style={styles.field}>
