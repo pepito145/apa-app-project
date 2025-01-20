@@ -306,10 +306,6 @@ const HomeScreen = ({ navigation }) => {
     <SafeAreaView style={styles.safeContainer}>
       <LinearGradient colors={['#2193b0', '#6dd5ed']} style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <Text style={styles.welcomeText}>
-            {profile.isFirstVisit ? 'Bienvenue sur APA App !' : 'Bon retour sur APA App !'}
-          </Text>
-          <Image source={mascot} style={styles.mascotte} />
 
           {isProfileIncomplete && (
             <View style={styles.actionContainer}>
@@ -456,13 +452,6 @@ const HomeScreen = ({ navigation }) => {
                 <Text style={styles.refreshButtonText}>Rafraîchir les données</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.refreshButton}
-                onPress={refreshToken}
-              >
-                <Text style={styles.refreshButtonText}>Rafresh token</Text>
-              </TouchableOpacity>
-
               <View style={styles.statsContainer}>
                 <View style={styles.statCard}>
                   <Text style={styles.statTitle}>Nombre de pas</Text>
@@ -470,12 +459,13 @@ const HomeScreen = ({ navigation }) => {
                     {loading ? 'Chargement...' : stepsError ? 'N/A' : steps.toLocaleString()}
                   </Text>
                 </View>
-                <View style={styles.statCard}>
-                  <Text style={styles.statTitle}>Fréquence Cardiaque moyenne</Text>
-                  <Text style={styles.statValue}>
-                    {loading ? 'Chargement...' : heartRateError ? 'N/A' : `${heartRateAverage} BPM`}
-                  </Text>
-                </View>
+                <TouchableOpacity
+                  style={styles.statCard}
+                  onPress={() => navigation.navigate('XPDetails')}
+                >
+                  <Text style={styles.statTitle}>XP 🏆</Text>
+                  <Text style={styles.statValue}>{profile.XP}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.statCard}
                   onPress={() => navigation.navigate('StreakDetails')}
@@ -485,15 +475,20 @@ const HomeScreen = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
 
+              <Text style={styles.welcomeText}>
+            {profile.isFirstVisit ? 'Bonjour ! Bienvenue sur APA App !' : 'Bonjour ! Bon retour sur APA App ☺️'}
+          </Text>
+          <Image source={mascot} style={styles.mascotte} />
+              
               <Text style={styles.motivationalText}>
-                Êtes-vous prêt à bouger et faire du sport aujourd'hui ?
+                Êtes-vous prêt à bouger et faire une activité aujourd'hui ?
               </Text>
 
               <TouchableOpacity
                 style={styles.activityButton}
                 onPress={() => navigation.navigate('Activités')}
               >
-                <Text style={styles.activityText}>C'est parti !</Text>
+                <Text style={styles.activityText}>C'est parti ! 🎉</Text>
               </TouchableOpacity>
             </>
           )}

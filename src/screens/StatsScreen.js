@@ -14,6 +14,7 @@ const StatsScreen = ({ navigation }) => {
     averagePain: 0,
     completionRate: 0,
     streak: profile.streak || 0,
+    XP : profile.XP || 0,
     totalExercises: 0,
     totalDuration: 0,
     averageExercisesPerSession: 0,
@@ -116,6 +117,7 @@ const StatsScreen = ({ navigation }) => {
       totalSessions,
       lastWeekSessions,
       streak: profile.streak || 0,
+      XP: profile.XP || 0,
       bestStreak: profile.bestStreak || NaN,
       averageDifficulty: (totalDifficulty / totalSessions).toFixed(1),
       averagePain: (totalPain / totalSessions).toFixed(1),
@@ -324,6 +326,11 @@ const StatsScreen = ({ navigation }) => {
                 title="Série Actuelle"
                 value={stats.streak}
                 icon="local-fire-department"
+              />
+              <StatCard
+                title="XP"
+                value={stats.XP}
+                icon="_"
               />
               <StatCard
                 title="Meilleure Série"
@@ -619,6 +626,14 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   streakInfo: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.7)',
+    textAlign: 'center',
+    marginTop: -4,
+    marginBottom: 16,
+    fontStyle: 'italic',
+  },
+  XPInfo: {
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.7)',
     textAlign: 'center',

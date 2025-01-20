@@ -14,6 +14,7 @@ export const ProfileProvider = ({ children }) => {
     weight: '',
     ipaqScore: '',
     streak: 0,
+    XP: 0,
     isWithingsLinked: false,
     access_token: '',
     refresh_token: '',
@@ -56,6 +57,13 @@ export const ProfileProvider = ({ children }) => {
     await saveProfile(updatedProfile);
   };
 
+  // Méthode pour mettre à jour les XPs
+  const updateXP = async (newXP) => {
+    const updatedProfile = { ...profile, XP: newXP };
+    await saveProfile(updatedProfile);
+  };
+
+
   // Méthode pour marquer la première visite comme terminée
   const markFirstVisitComplete = async () => {
     const updatedProfile = { ...profile, isFirstVisit: false };
@@ -67,7 +75,7 @@ export const ProfileProvider = ({ children }) => {
   }
 
   return (
-    <ProfileContext.Provider value={{ profile, setProfile, saveProfile, updateStreak, markFirstVisitComplete }}>
+    <ProfileContext.Provider value={{ profile, setProfile, saveProfile, updateStreak, updateXP, markFirstVisitComplete }}>
       {children}
     </ProfileContext.Provider>
   );
