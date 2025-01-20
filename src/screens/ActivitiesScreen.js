@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   speechBubbleTail: {
     position: 'absolute', // Positionnement absolu pour placer la flèche
-    top: '50%', // Aligne la flèche au centre vertical de la bulle
+    top: '30%', // Aligne la flèche au centre vertical de la bulle
     left: -10, // Positionne la flèche sur la gauche de la bulle
     width: 0,
     height: 0,
