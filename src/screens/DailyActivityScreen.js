@@ -179,15 +179,29 @@ const DailyActivityScreen = ({ navigation, route }) => {
       </View>
       
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.skipButton} onPress={handleSkipExercise}>
-          <MaterialIcons name="skip-next" size={24} color="#fff" />
-          <Text style={styles.buttonText}>Passer</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.completeButton} onPress={handleExerciseFinished}>
-          <MaterialIcons name="check-circle" size={24} color="#fff" />
-          <Text style={styles.buttonText}>Terminé</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.skipButton} onPress={handleSkipExercise}>
+        <MaterialIcons name="skip-next" size={24} color="#fff" />
+        <Text style={styles.buttonText}>Passer</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.completeButton} onPress={handleExerciseFinished}>
+        <MaterialIcons name="check-circle" size={24} color="#fff" />
+        <Text style={styles.buttonText}>Terminé</Text>
+      </TouchableOpacity>
+    </View>
+
+    {/* Conteneur séparé pour le bouton "Quitter" */}
+    <View style={styles.quitButtonContainer}>
+      <TouchableOpacity
+        style={styles.quitButton}
+        onPress={() => navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs', params: { screen: 'Accueil', refresh: true } }],
+        })}
+      >
+        <MaterialIcons name="exit-to-app" size={24} color="#fff" />
+        <Text style={styles.quitButtonText}>Quitter</Text>
+      </TouchableOpacity>
+    </View>
     </View>
   );
 
@@ -337,13 +351,13 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: '#fff',
   },
+  
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    marginTop: 'auto',
+    flexDirection: 'row', // Les boutons "Passer" et "Terminer" restent côte à côte
+    justifyContent: 'space-between', // Distribution équitable des boutons
+    marginTop: 20, // Espace au-dessus du conteneur
   },
+  
   skipButton: {
     backgroundColor: '#ff5047',
     flexDirection: 'row',
@@ -469,6 +483,28 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+
+  quitButtonContainer: {
+    marginTop: 20, // Espace entre "Passer/Terminer" et "Quitter"
+    alignItems: 'center', // Centre le bouton "Quitter"
+  },
+  quitButton: {
+    backgroundColor: '#f44336',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+  },
+  quitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  
+  
 });
 
 export default DailyActivityScreen;
