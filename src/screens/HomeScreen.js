@@ -309,23 +309,6 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.welcomeText}>
             {profile.isFirstVisit ? 'Bienvenue sur APA App !' : 'Bon retour sur APA App !'}
           </Text>
-          
-          <View style={styles.mascotContainer}>
-            <Image source={mascot} style={styles.mascotte} />
-              <View style={styles.speechBubble}>
-            <Text style={styles.speechText}>
-              Êtes-vous prêt à bouger et faire du sport aujourd'hui ?
-            </Text>
-            <TouchableOpacity
-              style={styles.activityButtonInBubble}
-              onPress={() => navigation.navigate('Activités')}
-              >
-              <Text style={styles.activityText}>C'est parti !</Text>
-            </TouchableOpacity>
-            <View style={styles.speechBubbleTail} />
-            </View>
-          </View>
-
 
           {isProfileIncomplete && (
             <View style={styles.actionContainer}>
@@ -501,7 +484,22 @@ const HomeScreen = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
 
-              
+              <View style={styles.mascotContainer}>
+                <Image source={mascot} style={styles.mascotte} />
+                <View style={styles.speechBubble}>
+                  <Text style={styles.speechText}>
+                    Êtes-vous prêt à bouger et faire du sport aujourd'hui ?
+                  </Text>
+                  <TouchableOpacity
+                    style={styles.activityButtonInBubble}
+                    onPress={() => navigation.navigate('Activités')}
+                    >
+                    <Text style={styles.activityText}>C'est parti !</Text>
+                  </TouchableOpacity>
+                  <View style={styles.speechBubbleTail} />
+                </View>
+              </View>
+
             </>
           )}
         </ScrollView>
@@ -593,65 +591,12 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
   },
-  
-
-  mascotContainer: {
-    flexDirection: 'row', // Place la mascotte et la bulle horizontalement
-    alignItems: 'center', // Aligne verticalement la mascotte et la bulle
-    marginBottom: 20,
-  },
   mascotte: {
-    width: 100, // Taille de la mascotte
+    width: 100,
     height: 100,
-    marginRight: 10, // Espace entre la mascotte et la bulle
-  },
-  speechBubble: {
-    position: 'relative', // Nécessaire pour positionner la flèche
-    backgroundColor: '#ffffff', // Couleur de la bulle
-    borderRadius: 15, // Coins arrondis
-    padding: 10, // Espacement interne
-    maxWidth: 230, // Largeur maximum de la bulle
-    shadowColor: '#000', // Ombre pour la bulle
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2, // Ombre pour Android
-  },
-  speechText: {
-    fontSize: 16, // Taille du texte
-    color: '#666', // Couleur du texte
-    fontWeight:'bold',
-  },
-  speechBubbleTail: {
-    position: 'absolute',
-    top: '50%', // Position verticale de la flèche
-    left: -10, // Position horizontale de la flèche
-    width: 0,
-    height: 0,
-    borderLeftWidth: 10,
-    borderRightWidth: 10,
-    borderTopWidth: 10,
-    borderStyle: 'solid',
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: '#ffffff', // Même couleur que la bulle
-    transform: [{ translateY: -5 }], // Ajustement pour centrer la flèche verticalement
-  },
-
-  activityButtonInBubble: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    marginBottom: 20,
     alignSelf: 'center',
-    marginTop: 10, // Espace entre le texte de la bulle et le bouton
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2, // Ombre pour Android
   },
-  
   statsContainer: {
     width: '100%',
     marginBottom: 20,
@@ -939,6 +884,64 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     textAlign: 'center',
   },
+
+  mascotContainer: {
+    flexDirection: 'row', // Place la mascotte et la bulle horizontalement
+    alignItems: 'center', // Aligne verticalement la mascotte et la bulle
+    marginBottom: 20,
+  },
+  mascotte: {
+    width: 100, // Taille de la mascotte
+    height: 100,
+    marginRight: 0, // Espace entre la mascotte et la bulle
+  },
+  speechBubble: {
+    position: 'relative', // Nécessaire pour positionner la flèche
+    backgroundColor: '#ffffff', // Couleur de la bulle
+    borderRadius: 15, // Coins arrondis
+    padding: 10, // Espacement interne
+    maxWidth: 250, // Largeur maximum de la bulle
+    shadowColor: '#000', // Ombre pour la bulle
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2, // Ombre pour Android
+  },
+  speechText: {
+    fontSize: 16, // Taille du texte
+    color: '#666', // Couleur du texte
+    fontWeight: 'bold'
+  },
+  speechBubbleTail: {
+    position: 'absolute',
+    top: '55%', // Position verticale de la flèche
+    left: -10, // Position horizontale de la flèche
+    width: 0,
+    height: 0,
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderTopWidth: 10,
+    borderStyle: 'solid',
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: '#ffffff', // Même couleur que la bulle
+    transform: [{ translateY: -5 }], // Ajustement pour centrer la flèche verticalement
+  },
+
+  activityButtonInBubble: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignSelf: 'center',
+    marginTop: 10, // Espace entre le texte de la bulle et le bouton
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2, // Ombre pour Android
+  },
+  
   
 });
 
