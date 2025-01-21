@@ -12,7 +12,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 import { Circle, G, Svg } from 'react-native-svg';
 
-const CircularProgress = ({ steps = 2500, goal = 5000, radius = 50 }) => {
+const CircularProgress = ({ steps = 2500, goal = 5000, radius = 50, unit = "pas" }) => {
   const strokeWidth = 8;
   const normalizedRadius = radius - strokeWidth / 2;
   const circumference = 2 * Math.PI * normalizedRadius;
@@ -46,7 +46,7 @@ const CircularProgress = ({ steps = 2500, goal = 5000, radius = 50 }) => {
         </G>
       </Svg>
       <Text style={styles.percentageText}>{`${percentage.toFixed(0)}%`}</Text>
-      <Text style={styles.stepsText}>{`${steps} / ${goal} pas`}</Text>
+      <Text style={styles.stepsText}>{`${steps} / ${goal} ${unit}`}</Text>
     </View>
   );
 };
@@ -497,31 +497,19 @@ const HomeScreen = ({ navigation }) => {
                 <Text style={styles.refreshButtonText}>Rafraîchir les données</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.refreshButton}
-                onPress={refreshToken}
-              >
-                <Text style={styles.refreshButtonText}>Rafresh token</Text>
-              </TouchableOpacity>
-
-              <View style={styles.statsContainer}>
+              <View style={styles.statsRow}>
                 <View style={styles.statCard}>
-                  <Text style={styles.statTitle}>Nombre de pas</Text>
-                  <CircularProgress steps={steps} goal={5000} />
-                  <Text style={styles.statValue}>
-                    {loading ? 'Chargement...' : stepsError ? 'N/A' : steps.toLocaleString()}
-                  </Text>
+                <Text style={styles.statTitle}>Nombre de pas</Text>
+                <CircularProgress steps={steps} goal={5000} radius={30} unit='pas' />
                 </View>
                 <View style={styles.statCard}>
-                  <Text style={styles.statTitle}>Fréquence Cardiaque moyenne</Text>
-                  <Text style={styles.statValue}>
-                    {loading ? 'Chargement...' : heartRateError ? 'N/A' : `${heartRateAverage} BPM`}
-                  </Text>
+                  <Text style={styles.statTitle1}> EXP</Text>
+                  <CircularProgress steps={profile.XP} goal={12000} radius={30} unit='EXP' />
                 </View>
                 <TouchableOpacity
                   style={styles.statCard}
                   onPress={() => navigation.navigate('StreakDetails')}
-                >
+                  >
                   <Text style={styles.statTitle}>Streak 🔥</Text>
                   <Text style={styles.statValue}>{profile.streak}</Text>
                 </TouchableOpacity>
@@ -640,15 +628,19 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignSelf: 'center',
   },
-  statsContainer: {
-    width: '100%',
-    marginBottom: 20,
+  
+  statsRow: {
+    flexDirection: 'row', // Aligne les cartes horizontalement
+    justifyContent: 'space-between', // Ajoute de l'espace entre les cartes
+    paddingHorizontal: 10, // Espace des bords de l'écran
+    marginTop: 20, // Espacement au-dessus
   },
   statCard: {
+    flex: 1, // Chaque carte occupe un espace égal
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: 12,
     padding: 16,
-    marginVertical: 6,
+    marginHorizontal: 5, // Espace entre les cartes
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -661,12 +653,23 @@ const styles = StyleSheet.create({
     color: '#2193b0',
     fontWeight: '600',
     marginBottom: 6,
+    textAlign: 'center',
+  },
+
+  statTitle1: {
+    fontSize: 16,
+    color: '#2193b0',
+    fontWeight: '600',
+    marginBottom: 26,
+    textAlign: 'center',
   },
   statValue: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
+    textAlign: 'center',
   },
+
   incompleteProfileButton: {
     backgroundColor: '#ff9500',
     borderRadius: 10,
@@ -931,6 +934,7 @@ const styles = StyleSheet.create({
   mascotContainer: {
     flexDirection: 'row', // Place la mascotte et la bulle horizontalement
     alignItems: 'center', // Aligne verticalement la mascotte et la bulle
+    marginTop: 40,
     marginBottom: 20,
   },
   mascotte: {
@@ -994,6 +998,7 @@ const styles = StyleSheet.create({
   percentageText: {
     position: 'absolute',
     fontSize: 18,
+    top: '18%',
     fontWeight: 'bold',
     color: '#4CAF50',
   },
@@ -1002,6 +1007,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 10,
+    textAlign: 'center',
   },
 
 });
