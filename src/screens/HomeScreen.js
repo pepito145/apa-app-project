@@ -9,6 +9,48 @@ import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 
+
+import { Circle, G, Svg } from 'react-native-svg';
+
+const CircularProgress = ({ steps = 2500, goal = 5000, radius = 50 }) => {
+  const strokeWidth = 8;
+  const normalizedRadius = radius - strokeWidth / 2;
+  const circumference = 2 * Math.PI * normalizedRadius;
+  const percentage = Math.min((steps / goal) * 100, 100); // Limite à 100 %
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <View style={styles.container}>
+      <Svg height={radius * 2} width={radius * 2}>
+        <G rotation="-90" origin={`${radius}, ${radius}`}>
+          {/* Background Circle */}
+          <Circle
+            stroke="#d3d3d3"
+            fill="transparent"
+            strokeWidth={strokeWidth}
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
+          />
+          {/* Progress Circle */}
+          <Circle
+            stroke="#4CAF50"
+            fill="transparent"
+            strokeWidth={strokeWidth}
+            strokeDasharray={`${circumference} ${circumference}`}
+            strokeDashoffset={strokeDashoffset}
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
+          />
+        </G>
+      </Svg>
+      <Text style={styles.percentageText}>{`${percentage.toFixed(0)}%`}</Text>
+      <Text style={styles.stepsText}>{`${steps} / ${goal} pas`}</Text>
+    </View>
+  );
+};
+
 const HomeScreen = ({ navigation }) => {
   const { profile, setProfile, saveProfile, markFirstVisitComplete } = useContext(ProfileContext);
   const [modalVisible, setModalVisible] = useState(false);
@@ -465,6 +507,7 @@ const HomeScreen = ({ navigation }) => {
               <View style={styles.statsContainer}>
                 <View style={styles.statCard}>
                   <Text style={styles.statTitle}>Nombre de pas</Text>
+                  <CircularProgress steps={steps} goal={5000} />
                   <Text style={styles.statValue}>
                     {loading ? 'Chargement...' : stepsError ? 'N/A' : steps.toLocaleString()}
                   </Text>
@@ -942,7 +985,25 @@ const styles = StyleSheet.create({
     elevation: 2, // Ombre pour Android
   },
   
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 20,
+  },
   
+  percentageText: {
+    position: 'absolute',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+    
+  stepsText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 10,
+  },
+
 });
 
 export default HomeScreen;
