@@ -503,8 +503,8 @@ const HomeScreen = ({ navigation }) => {
                 <CircularProgress steps={steps} goal={5000} radius={30} unit='pas' />
                 </View>
                 <View style={styles.statCard}>
-                  <Text style={styles.statTitle1}> EXP</Text>
-                  <CircularProgress steps={profile.XP} goal={12000} radius={30} unit='EXP' />
+                  <Text style={styles.statTitle1}> XP 🏆</Text>
+                  <CircularProgress steps={profile.XP} goal={12000} radius={30} unit='XP' />
                 </View>
                 <TouchableOpacity
                   style={styles.statCard}
@@ -525,7 +525,7 @@ const HomeScreen = ({ navigation }) => {
                     style={styles.activityButtonInBubble}
                     onPress={() => navigation.navigate('Activités')}
                     >
-                    <Text style={styles.activityText}>C'est parti !</Text>
+                    <Text style={styles.activityText}>C'est parti ! 🎉</Text>
                   </TouchableOpacity>
                   <View style={styles.speechBubbleTail} />
                 </View>

@@ -227,7 +227,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
       <MaterialIcons name="emoji-events" size={80} color="#FFD700" />
       <Text style={styles.congratsTitle}>Bravo !</Text>
       <Text style={styles.congratsText}>Exercice complété avec succès</Text>
-      <Text style={styles.xpText}>+10 XP</Text>
+      <Text style={styles.xpText}>+200 XP</Text>
       <TouchableOpacity style={styles.nextButton} onPress={handleNextExercise}>
         <Text style={styles.buttonText}>Exercice suivant</Text>
         <MaterialIcons name="arrow-forward" size={24} color="#fff" />
