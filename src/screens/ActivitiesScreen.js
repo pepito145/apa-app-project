@@ -15,7 +15,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProfileContext } from './ProfileContext';
 import { useFocusEffect } from '@react-navigation/native';
-import mascot from '../../assets/logo-test.png';
+import mascot from '../../assets/mascotte_haltère.png';
 import exerciseBank from '../data/exerciseBank';
 
 const { width } = Dimensions.get('window');
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   },
   mascotte: {
     width: 100,
-    height: 100,
+    height: 120,
     marginBottom: 20,
     alignSelf: 'flex-start',
     marginRight: 20,

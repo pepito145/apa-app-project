@@ -21,6 +21,8 @@ const DailyActivityScreen = ({ navigation, route }) => {
   const [painRating, setPainRating] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(true);
   const { width, height } = useWindowDimensions();
+  const [showMidwayScreen, setShowMidwayScreen] = useState(false);
+
 
   // Empêcher le retour en arrière
   useEffect(() => {
@@ -52,9 +54,16 @@ const DailyActivityScreen = ({ navigation, route }) => {
   };
 
   const handleExerciseFinished = () => {
-    setShowCongrats(true);
-    setCompletedExercises(prev => prev + 1);
+    const nextCompleted = completedExercises + 1;
+    setCompletedExercises(nextCompleted);
+
+    if (nextCompleted === Math.ceil(exercises.length / 2)) {
+        setShowMidwayScreen(true); // Afficher la page mi-parcours
+    } else {
+        setShowCongrats(true); // Afficher le message de félicitations normal
+    }
   };
+
 
   const handleNextExercise = () => {
     if (currentExercise < exercises.length - 1) {
@@ -144,8 +153,9 @@ const DailyActivityScreen = ({ navigation, route }) => {
       console.error('Erreur lors de la sauvegarde:', error);
       Alert.alert('Erreur', 'Une erreur est survenue lors de la sauvegarde.');
     }
-  };
 
+
+  };
   const renderStars = (rating, setRating) => {
     return [...Array(5)].map((_, index) => (
       <TouchableOpacity key={index} onPress={() => setRating(index + 1)}>
@@ -226,7 +236,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
     <View style={styles.congratsContainer}>
       <MaterialIcons name="emoji-events" size={80} color="#FFD700" />
       <Text style={styles.congratsTitle}>Bravo !</Text>
-      <Text style={styles.congratsText}>Exercice complété avec succès</Text>
+      <Text style={styles.congratsText}>Exercice complété avec succès  🎉</Text>
       <Text style={styles.xpText}>+200 XP</Text>
       <TouchableOpacity style={styles.nextButton} onPress={handleNextExercise}>
         <Text style={styles.buttonText}>Exercice suivant</Text>
@@ -273,19 +283,39 @@ const DailyActivityScreen = ({ navigation, route }) => {
     </View>
   );
 
+  const renderMidwayScreen = () => (
+    <View style={styles.midwayContainer}>
+        <Text style={styles.midwayTitle}>Super ! Tu es à mi-parcours 🎉</Text>
+        <Image
+            source={require('../../assets/mascotte_haltère.png')} // Remplacez par le chemin de votre image
+            style={styles.mascotImage}
+        />
+        <TouchableOpacity
+            style={styles.nextButton}
+            onPress={() => {
+              setShowMidwayScreen(false); // Fermer la page mi-parcours
+              setCurrentExercise((prev) => prev + 1); // Passer à l'exercice suivant
+          }} // Revenir aux exercices
+        >
+            <Text style={styles.buttonText}>Continuer</Text>
+        </TouchableOpacity>
+    </View>
+  );
+
+
   return (
     <SafeAreaView style={[styles.safeContainer, { backgroundColor: '#6dd5ed' }]}>
-      <LinearGradient
-        colors={['#6dd5ed', '#2193b0']}
-        style={styles.container}
-      >
-        {!isFeedbackPhase ? (
-          !showCongrats ? renderExerciseScreen() : renderCongratsScreen()
+      <LinearGradient colors={['#6dd5ed', '#2193b0']} style={styles.container}>
+        {showMidwayScreen ? (
+            renderMidwayScreen() // Afficher la page mi-parcours
+        ) : !isFeedbackPhase ? (
+            !showCongrats ? renderExerciseScreen() : renderCongratsScreen()
         ) : (
-          renderFeedbackScreen()
+            renderFeedbackScreen()
         )}
-      </LinearGradient>
-      <View style={[styles.bottomSafeArea, { backgroundColor: '#2193b0' }]} />
+    </LinearGradient>
+
+    <View style={[styles.bottomSafeArea, { backgroundColor: '#2193b0' }]} />
     </SafeAreaView>
   );
 };
@@ -512,12 +542,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  midwayContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: 'rgba(68, 53, 53, 0)',
+  },
+  midwayTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  mascotImage: {
+    width: 150,
+    height: 180,
+    marginBottom: 20,
+  },
 
-quitIcon: {
+
+  quitIcon: {
     fontSize: 24,
     color: '#fff', // Couleur blanche pour la croix
     fontWeight: 'bold',
-},
+  },
   
   
 });
