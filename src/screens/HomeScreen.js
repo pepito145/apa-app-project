@@ -525,7 +525,7 @@ const HomeScreen = ({ navigation }) => {
                     style={styles.activityButtonInBubble}
                     onPress={() => navigation.navigate('Activités')}
                     >
-                    <Text style={styles.activityText}>C'est parti !</Text>
+                    <Text style={styles.activityText}>C'est parti ! 🎉</Text>
                   </TouchableOpacity>
                   <View style={styles.speechBubbleTail} />
                 </View>
