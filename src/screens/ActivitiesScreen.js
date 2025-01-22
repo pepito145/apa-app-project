@@ -186,7 +186,7 @@ const ActivitiesScreen = ({ navigation }) => {
                 />
                 {bubbleState === 'initial' ? (
                   <View style={styles.speechBubble}>
-                    <Text style={styles.speechText}>Bonjour ! Es-tu prêt à faire du sport ?</Text>
+                    <Text style={styles.speechText}>Une petite séance de sport, ça te tente ?</Text>
                     <View style={styles.buttonContainer1}>
                       <TouchableOpacity style={styles.yesButton} onPress={handleAccept}>
                         <Text style={styles.buttonText}>Oui</Text>
@@ -330,6 +330,7 @@ const styles = StyleSheet.create({
   speechText: {
     fontSize: 16,
     color: '#666',
+    textAlign: 'center',
   },
   buttonContainer1: {
     flexDirection: 'row',

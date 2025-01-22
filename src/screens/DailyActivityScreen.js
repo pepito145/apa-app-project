@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProfileContext } from './ProfileContext';
+import { useWindowDimensions } from 'react-native';
 
 const DailyActivityScreen = ({ navigation, route }) => {
   const { level, session, levelTitle } = route.params;
@@ -19,6 +20,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
   const [difficultyRating, setDifficultyRating] = useState(0);
   const [painRating, setPainRating] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(true);
+  const { width, height } = useWindowDimensions();
 
   // Empêcher le retour en arrière
   useEffect(() => {
@@ -174,6 +176,34 @@ const DailyActivityScreen = ({ navigation, route }) => {
       </View>
       <Text style={styles.progress}>Exercice {currentExercise + 1}/{exercises.length}</Text>
 
+      <TouchableOpacity
+          style={styles.quitCircleButton}
+            onPress={() => {
+                Alert.alert(
+                  'Quitter la séance',
+                  'Es-tu sûr de vouloir quitter la séance ? 🥲',
+                  [
+                      {
+                        text: 'Non',
+                        onPress: () => console.log('Séance poursuivie'),
+                        style: 'cancel', // Style du bouton "Non"
+                      },
+                      {
+                              text: 'Oui',
+                              onPress: () => navigation.reset({
+                              index: 0,
+                              routes: [{ name: 'MainTabs', params: { screen: 'Accueil', refresh: true } }],
+                          }),
+                      },
+                  ],
+                { cancelable: true } // Permet de fermer l'alerte en cliquant à l'extérieur
+              );
+          }}
+      >
+          <Text style={styles.quitIcon}>×</Text>
+      </TouchableOpacity>
+
+
       <View style={styles.imageContainer}>
         <Image source={exercise.image} style={styles.exerciseImage} resizeMode="contain" />
       </View>
@@ -188,20 +218,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
         <Text style={styles.buttonText}>Terminé</Text>
       </TouchableOpacity>
     </View>
-
-    {/* Conteneur séparé pour le bouton "Quitter" */}
-    <View style={styles.quitButtonContainer}>
-      <TouchableOpacity
-        style={styles.quitButton}
-        onPress={() => navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs', params: { screen: 'Accueil', refresh: true } }],
-        })}
-      >
-        <MaterialIcons name="exit-to-app" size={24} color="#fff" />
-        <Text style={styles.quitButtonText}>Quitter</Text>
-      </TouchableOpacity>
-    </View>
+    
     </View>
   );
 
@@ -484,25 +501,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 
-  quitButtonContainer: {
-    marginTop: 20, // Espace entre "Passer/Terminer" et "Quitter"
-    alignItems: 'center', // Centre le bouton "Quitter"
-  },
-  quitButton: {
-    backgroundColor: '#f44336',
-    flexDirection: 'row',
-    alignItems: 'center',
+  quitCircleButton: {
+    position: 'absolute',
+    top: '18%', // Utilisation de pourcentages directement
+    right: '6%',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.31)', // Cercle transparent
     justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 25,
+    alignItems: 'center',
   },
-  quitButtonText: {
-    color: '#fff',
-    fontSize: 16,
+
+quitIcon: {
+    fontSize: 24,
+    color: '#fff', // Couleur blanche pour la croix
     fontWeight: 'bold',
-    marginLeft: 8,
-  },
+},
   
   
 });
