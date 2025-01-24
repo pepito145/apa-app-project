@@ -287,7 +287,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
     <View style={styles.midwayContainer}>
         <Text style={styles.midwayTitle}>Super ! Tu es à mi-parcours 🎉</Text>
         <Image
-            source={require('../../assets/mascotte_haltère.png')} // Remplacez par le chemin de votre image
+            source={require('../../assets/mascotte_contente.png')} // Remplacez par le chemin de votre image
             style={styles.mascotImage}
         />
         <TouchableOpacity
