@@ -343,10 +343,14 @@ const HomeScreen = ({ navigation }) => {
       Alert.alert('Erreur', 'Une erreur est survenue lors de l\'enregistrement');
     }
   };
-
+  //6dd5ed
+  //2193b0
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <LinearGradient colors={['#2193b0', '#6dd5ed']} style={styles.container}>
+      <LinearGradient 
+        colors={['#6dd5ed', '#2193b0']} 
+        style={[styles.container, { height: '100%' }]}
+      >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={styles.welcomeText}>
             {profile.isFirstVisit ? 'Bienvenue sur APA App !' : 'Bon retour sur APA App !'}
@@ -571,29 +575,6 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </Modal>
 
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Comment est calculé le streak ?</Text>
-              <Text style={styles.modalText}>
-                Le streak est le nombre de jours consécutifs pendant lesquels vous avez atteint votre objectif quotidien d'activité physique.
-                Continuez à bouger tous les jours pour maintenir votre streak !
-              </Text>
-              <Pressable
-                style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.closeButtonText}>Fermer</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
-
       </LinearGradient>
     </SafeAreaView>
   );
@@ -602,7 +583,7 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
-    backgroundColor: '#2193b0',
+    backgroundColor: '#6dd5ed',
   },
   container: {
     flex: 1,
