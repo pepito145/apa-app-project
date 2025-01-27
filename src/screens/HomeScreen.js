@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { WebView } from 'react-native-webview';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, Pressable, SafeAreaView, BackHandler, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Modal, Pressable, SafeAreaView, BackHandler, TextInput, Alert, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ProfileContext } from './ProfileContext';
 import mascot from '../../assets/logo-test.png';
@@ -11,6 +11,8 @@ import * as WebBrowser from 'expo-web-browser';
 
 
 import { Circle, G, Svg } from 'react-native-svg';
+
+const { width, height } = Dimensions.get('window');
 
 const CircularProgress = ({ steps = 2500, goal = 5000, radius = 50, unit = "pas" }) => {
   const strokeWidth = 8;
@@ -594,7 +596,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   welcomeText: {
-    fontSize: 24,
+    fontSize: width > 600 ? 32 : 24,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#ffffff',
@@ -604,36 +606,33 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   mascotte: {
-    width: 100,
-    height: 100,
+    width: width * 0.25,
+    height: width * 0.25,
     marginBottom: 20,
     alignSelf: 'center',
   },
   
   statsRow: {
-    flexDirection: 'row', // Aligne les cartes horizontalement
-    justifyContent: 'space-between', // Ajoute de l'espace entre les cartes
-    paddingHorizontal: 10, // Espace des bords de l'écran
-    marginTop: 20, // Espacement au-dessus
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: width * 0.02,
+    marginTop: height * 0.02,
   },
   statCard: {
-    flex: 1, // Chaque carte occupe un espace égal
+    width: width > 600 ? width * 0.22 : width * 0.28,
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: 12,
-    padding: 16,
-    marginHorizontal: 5, // Espace entre les cartes
+    padding: width * 0.02,
+    marginHorizontal: width * 0.01,
+    marginBottom: height * 0.015,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
   },
   statTitle: {
-    fontSize: 16,
+    fontSize: width > 600 ? 16 : 14,
     color: '#2193b0',
     fontWeight: '600',
-    marginBottom: 6,
+    marginBottom: 4,
     textAlign: 'center',
   },
 
@@ -645,7 +644,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   statValue: {
-    fontSize: 18,
+    fontSize: width > 600 ? 18 : 16,
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'center',
@@ -885,19 +884,18 @@ const styles = StyleSheet.create({
   actionContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 15,
+    paddingVertical: height * 0.02,
     width: '100%',
-    flex: 1,
   },
   actionButton: {
+    width: width > 600 ? '60%' : '88%',
+    paddingVertical: height * 0.02,
+    paddingHorizontal: width * 0.06,
     backgroundColor: '#2193b0',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 32,
     borderRadius: 25,
-    width: '88%',
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -913,37 +911,28 @@ const styles = StyleSheet.create({
   },
 
   mascotContainer: {
-    flexDirection: 'row', // Place la mascotte et la bulle horizontalement
-    alignItems: 'center', // Aligne verticalement la mascotte et la bulle
-    marginTop: 40,
-    marginBottom: 20,
-  },
-  mascotte: {
-    width: 100, // Taille de la mascotte
-    height: 100,
-    marginRight: 0, // Espace entre la mascotte et la bulle
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: height * 0.04,
+    marginBottom: height * 0.02,
+    paddingHorizontal: width * 0.04,
   },
   speechBubble: {
-    position: 'relative', // Nécessaire pour positionner la flèche
-    backgroundColor: '#ffffff', // Couleur de la bulle
-    borderRadius: 15, // Coins arrondis
-    padding: 10, // Espacement interne
-    maxWidth: 250, // Largeur maximum de la bulle
-    shadowColor: '#000', // Ombre pour la bulle
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2, // Ombre pour Android
+    position: 'relative',
+    backgroundColor: '#ffffff',
+    borderRadius: 15,
+    padding: width * 0.03,
+    maxWidth: width > 600 ? width * 0.5 : width * 0.6,
   },
   speechText: {
-    fontSize: 16, // Taille du texte
-    color: '#666', // Couleur du texte
+    fontSize: 16,
+    color: '#666',
     fontWeight: 'bold'
   },
   speechBubbleTail: {
     position: 'absolute',
-    top: '55%', // Position verticale de la flèche
-    left: -10, // Position horizontale de la flèche
+    top: '55%',
+    left: -10,
     width: 0,
     height: 0,
     borderLeftWidth: 10,
@@ -952,8 +941,8 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderTopColor: '#ffffff', // Même couleur que la bulle
-    transform: [{ translateY: -5 }], // Ajustement pour centrer la flèche verticalement
+    borderTopColor: '#ffffff',
+    transform: [{ translateY: -5 }],
   },
 
   activityButtonInBubble: {
@@ -962,12 +951,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     alignSelf: 'center',
-    marginTop: 10, // Espace entre le texte de la bulle et le bouton
+    marginTop: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 2, // Ombre pour Android
+    elevation: 2,
   },
   
   container: {

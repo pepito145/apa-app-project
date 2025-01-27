@@ -18,8 +18,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import mascot from '../../assets/mascotte_haltère.png';
 import exerciseBank from '../data/exerciseBank';
 
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = width * 0.9;
+const { width, height } = Dimensions.get('window');
+const CARD_WIDTH = width > 600 ? width * 0.7 : width * 0.9;
 
 // Composant principal
 const ActivitiesScreen = ({ navigation }) => {
@@ -273,38 +273,41 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    alignItems: 'center',
   },
   header: {
     marginBottom: 30,
   },
   headerTitle: {
-    fontSize: 32,
+    fontSize: width > 600 ? 32 : 24,
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: 8,
+    marginBottom: height * 0.02,
+    textAlign: 'center',
   },
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: width > 600 ? 18 : 16,
     color: '#fff',
     opacity: 0.9,
+    textAlign: 'center',
   },
   mascotte: {
-    width: 100,
-    height: 120,
-    marginBottom: 20,
-    alignSelf: 'flex-start',
-    marginRight: 20,
+    width: width * 0.25,
+    height: width * 0.3,
+    marginRight: width * 0.05,
   },
   mascotContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: height * 0.02,
+    paddingHorizontal: width * 0.04,
+    width: '100%',
   },
   speechBubble: {
     backgroundColor: '#ffffff',
     borderRadius: 15,
-    padding: 10,
-    maxWidth: 200,
+    padding: width * 0.03,
+    maxWidth: width > 600 ? width * 0.4 : width * 0.5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -328,7 +331,7 @@ const styles = StyleSheet.create({
   },
   
   speechText: {
-    fontSize: 16,
+    fontSize: width > 600 ? 18 : 16,
     color: '#666',
     textAlign: 'center',
   },
@@ -358,15 +361,15 @@ const styles = StyleSheet.create({
     textAlign: 'center', // Centre le texte
   },
   buttonText: {
+    fontSize: width > 600 ? 18 : 16,
     color: '#fff',
-    fontSize: 16,
     fontWeight: 'bold',
   },
   sessionCard: {
     width: CARD_WIDTH,
     backgroundColor: '#fff',
     borderRadius: 20,
-    padding: 20,
+    padding: width * 0.05,
     alignSelf: 'center',
     elevation: 4,
     shadowColor: '#000',
@@ -392,16 +395,17 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   buttonContainer: {
-    marginTop: 'auto',
+    marginTop: height * 0.02,
+    width: '100%',
   },
   acceptButton: {
     backgroundColor: '#4CAF50',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 15,
+    paddingVertical: height * 0.02,
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: height * 0.015,
   },
   rejectButton: {
     backgroundColor: 'rgba(33, 147, 176, 0.1)',
@@ -415,30 +419,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: width * 0.05,
   },
   emptyTitle: {
-    fontSize: 24,
+    fontSize: width > 600 ? 32 : 24,
     fontWeight: 'bold',
     color: '#fff',
-    marginTop: 20,
-    marginBottom: 10,
+    marginTop: height * 0.02,
+    marginBottom: height * 0.01,
     textAlign: 'center',
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: width > 600 ? 20 : 16,
     color: '#fff',
     textAlign: 'center',
     opacity: 0.9,
-    marginBottom: 30,
-    lineHeight: 24,
+    marginBottom: height * 0.03,
+    lineHeight: width > 600 ? 32 : 24,
+    maxWidth: width * 0.8,
   },
   homeButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: height * 0.015,
+    paddingHorizontal: width * 0.05,
     borderRadius: 25,
     elevation: 3,
     shadowColor: '#000',
@@ -447,7 +452,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   homeButtonText: {
-    fontSize: 16,
+    fontSize: width > 600 ? 18 : 16,
     fontWeight: 'bold',
     color: '#2193b0',
     marginLeft: 8,
