@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, SafeAreaView, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProfileContext } from './ProfileContext';
 import { useWindowDimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 const DailyActivityScreen = ({ navigation, route }) => {
   const { level, session, levelTitle } = route.params;
@@ -20,7 +22,6 @@ const DailyActivityScreen = ({ navigation, route }) => {
   const [difficultyRating, setDifficultyRating] = useState(0);
   const [painRating, setPainRating] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(true);
-  const { width, height } = useWindowDimensions();
   const [showMidwayScreen, setShowMidwayScreen] = useState(false);
 
 
@@ -403,6 +404,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // Les boutons "Passer" et "Terminer" restent côte à côte
     justifyContent: 'space-between', // Distribution équitable des boutons
     marginTop: 20, // Espace au-dessus du conteneur
+    marginBottom: height * 0.025,
+
   },
   
   skipButton: {
@@ -529,6 +532,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: height * 0.025,
   },
 
   quitCircleButton: {
