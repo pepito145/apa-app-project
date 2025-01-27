@@ -364,7 +364,7 @@ const HomeScreen = ({ navigation }) => {
                 style={styles.actionButton}
                 onPress={() => setModalVisible(true)}
               >
-                <MaterialIcons name="person" size={24} color="#fff" />
+                <MaterialIcons name="person" size={width > 600 ? 28 : 24} color="#fff" />
                 <Text style={styles.actionButtonText}>
                   Complétez vos informations personnelles
                 </Text>
@@ -474,9 +474,9 @@ const HomeScreen = ({ navigation }) => {
                 onPress={() => {
                   setWebUrl(baseWithingsUrl);
                   setWebModalVisible(true);
-                }} 
+                }}
               >
-                <MaterialIcons name="link" size={24} color="#fff" />
+                <MaterialIcons name="link" size={width > 600 ? 28 : 24} color="#fff" />
                 <Text style={styles.actionButtonText}>Lier son compte Withings</Text>
               </TouchableOpacity>
             </View>
@@ -488,7 +488,7 @@ const HomeScreen = ({ navigation }) => {
                 style={styles.actionButton}
                 onPress={() => navigation.navigate('QuestionnaireIPAQ')}
               >
-                <MaterialIcons name="assignment" size={24} color="#fff" />
+                <MaterialIcons name="assignment" size={width > 600 ? 28 : 24} color="#fff" />
                 <Text style={styles.actionButtonText}>Remplir le questionnaire IPAQ</Text>
               </TouchableOpacity>
             </View>
@@ -882,20 +882,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   actionContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: height * 0.02,
+    paddingVertical: height * 0.04,
     width: '100%',
+    marginTop: height * 0.1,
   },
   actionButton: {
-    width: width > 600 ? '60%' : '88%',
-    paddingVertical: height * 0.02,
-    paddingHorizontal: width * 0.06,
+    width: width > 600 ? '70%' : '85%',
     backgroundColor: '#2193b0',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: height * 0.025,
+    paddingHorizontal: width * 0.06,
     borderRadius: 25,
+    marginBottom: height * 0.125,
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -904,7 +907,7 @@ const styles = StyleSheet.create({
   },
   actionButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: width > 600 ? 22 : 18,
     fontWeight: 'bold',
     marginLeft: 12,
     textAlign: 'center',
