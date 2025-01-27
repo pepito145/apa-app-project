@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthScreen from './src/screens/AuthScreen';
 import AppNavigator from './navigation/AppNavigator';
@@ -60,6 +60,11 @@ export default function App() {
 
   return (
     <ProfileProvider>
+      <StatusBar 
+        backgroundColor="#6dd5ed"
+        barStyle="dark-content"
+        translucent={false}
+      />
       {isLoggedIn ? (
         <AppNavigator onLogout={handleLogout} />
       ) : (
