@@ -121,7 +121,7 @@ const HomeScreen = ({ navigation }) => {
         setSteps(stepsData.body.activities.length > 0 ? stepsData.body.activities[0].steps : 0);
         console.log("Requête steps réussie")
       } else {
-        setStepsError(true);
+        setSteps('N/A');
         console.log("Erreur requête steps")
       }
 
@@ -153,21 +153,21 @@ const HomeScreen = ({ navigation }) => {
             setHeartRateAverage(Math.round(averageBPM));
             console.log("BPM trouvé :", averageBPM);
           } else {
-            setHeartRateAverage(0);
+            setHeartRateAverage('N/A');
             console.log("Pas de BPM dans les données");
           }
         } else {
-          setHeartRateAverage(0);
+          setHeartRateAverage('N/A');
           console.log("Pas de séries dans les données");
         }
       } else {
-        setHeartRateError(true);
+        setHeartRateAverage('N/A');
         console.log("Erreur requête BPM");
       }
     } catch (error) {
       console.error('Erreur API :', error);
-      setStepsError(true);
-      setHeartRateError(true);
+      setSteps('N/A');
+      setHeartRateAverage('N/A');
     } finally {
       setLoading(false);
     }
@@ -239,20 +239,6 @@ const HomeScreen = ({ navigation }) => {
       clearInterval(interval);
     };
   }, [webModalVisible, currentUrl]);
-
-  useEffect(() => {
-    if (profile.isWithingsLinked) {
-      const timer = setTimeout(() => {
-        fetchData();
-      }, 3000);
-
-      return () => clearTimeout(timer);
-    } else {
-      console.log('Le compte Withings n\'est pas lié.');
-      setSteps(0);
-    }
-  }, [profile.isWithingsLinked]);
-
 
   const refreshToken = async () => {
     const threeHoursInMs = 3 * 60 * 60 * 1000;
@@ -345,8 +331,22 @@ const HomeScreen = ({ navigation }) => {
       Alert.alert('Erreur', 'Une erreur est survenue lors de l\'enregistrement');
     }
   };
-  //6dd5ed
-  //2193b0
+
+  const handleStepsNA = () => {
+    if (steps === 'N/A') {
+      Alert.alert(
+        'Données non disponibles',
+        'Les données ne sont pas accessibles. Essayez de rafraîchir votre token puis vos données.',
+        [
+          {
+            text: 'OK',
+            style: 'default'
+          }
+        ]
+      );
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <LinearGradient 
@@ -496,17 +496,37 @@ const HomeScreen = ({ navigation }) => {
 
           {!isProfileIncomplete && profile.isWithingsLinked && profile.ipaqScore && (
             <>
-              <TouchableOpacity
-                style={styles.refreshButton}
-                onPress={fetchData}
-              >
-                <Text style={styles.refreshButtonText}>Rafraîchir les données</Text>
-              </TouchableOpacity>
+              <View style={styles.refreshButtonsContainer}>
+                <TouchableOpacity
+                  style={styles.refreshButton}
+                  onPress={fetchData}
+                >
+                  <Text style={styles.refreshButtonText}>Rafraîchir les données</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.refreshButton,
+                    profile.lastRefreshTime && 
+                    (Date.now() - profile.lastRefreshTime < 3 * 60 * 60 * 1000) && 
+                    styles.refreshButtonDisabled
+                  ]}
+                  onPress={refreshToken}
+                  disabled={profile.lastRefreshTime && (Date.now() - profile.lastRefreshTime < 3 * 60 * 60 * 1000)}
+                >
+                  <Text style={styles.refreshButtonText}>Rafraîchir le token</Text>
+                </TouchableOpacity>
+              </View>
 
               <View style={styles.statsRow}>
                 <View style={styles.statCard}>
-                <Text style={styles.statTitle}>Nombre de pas</Text>
-                <CircularProgress steps={steps} goal={5000} radius={30} unit='pas' />
+                  <Text style={styles.statTitle}>Nombre de pas</Text>
+                  <TouchableOpacity 
+                    onPress={handleStepsNA}
+                    disabled={steps !== 'N/A'}
+                  >
+                    <CircularProgress steps={steps === 'N/A' ? 0 : steps} goal={5000} radius={30} unit={steps === 'N/A' ? 'N/A' : 'pas'} />
+                  </TouchableOpacity>
                 </View>
                 <View style={styles.statCard}>
                   <Text style={styles.statTitle1}> XP 🏆</Text>
@@ -515,9 +535,12 @@ const HomeScreen = ({ navigation }) => {
                 <TouchableOpacity
                   style={styles.statCard}
                   onPress={() => navigation.navigate('StreakDetails')}
-                  >
+                >
                   <Text style={styles.statTitle}>Streak 🔥</Text>
-                  <Text style={styles.statValue}>{profile.streak}</Text>
+                  <View style={styles.streakContainer}>
+                    <Text style={styles.streakValue}>{profile.streak}</Text>
+                    <Text style={styles.streakUnit}>jours</Text>
+                  </View>
                 </TouchableOpacity>
               </View>
 
@@ -627,6 +650,8 @@ const styles = StyleSheet.create({
     marginHorizontal: width * 0.01,
     marginBottom: height * 0.015,
     alignItems: 'center',
+    minHeight: width * 0.28,
+    justifyContent: 'center',
   },
   statTitle: {
     fontSize: width > 600 ? 16 : 14,
@@ -643,11 +668,22 @@ const styles = StyleSheet.create({
     marginBottom: 26,
     textAlign: 'center',
   },
-  statValue: {
-    fontSize: width > 600 ? 18 : 16,
+  streakContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    marginTop: 4,
+  },
+  streakValue: {
+    fontSize: width > 600 ? 32 : 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#2193b0',
     textAlign: 'center',
+  },
+  streakUnit: {
+    fontSize: width > 600 ? 14 : 12,
+    color: '#666',
+    marginTop: 2,
   },
 
   incompleteProfileButton: {
@@ -704,12 +740,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  refreshButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: width * 0.02,
+    marginBottom: 10,
+  },
   refreshButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 10,
     padding: 10,
-    width: '100%',
-    marginBottom: 10,
+    width: '48%',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
@@ -981,6 +1022,10 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 10,
     textAlign: 'center',
+  },
+
+  refreshButtonDisabled: {
+    opacity: 0.5,
   },
 
 });
