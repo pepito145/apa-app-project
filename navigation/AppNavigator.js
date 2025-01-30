@@ -14,6 +14,8 @@ import ProfileScreen from '../src/screens/ProfileScreen';
 import DailyActivityScreen from '../src/screens/DailyActivityScreen';
 import ActivitiesHistory from '../src/screens/ActivitiesHistory';
 import StreakDetailsScreen from '../src/screens/StreakDetailsScreen';
+import StepsDetailsScreen from '../src/screens/StepsDetailsScreen';
+import XPDetailsScreen from '../src/screens/XPDetailsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -139,6 +141,24 @@ const AppNavigator = ({ onLogout }) => {
           component={StreakDetailsScreen}
           options={{ 
             title: 'Fonctionnement des streaks', 
+            headerShown: true,
+            headerBackTitle: 'Retour'
+          }}
+        />
+        <Stack.Screen
+          name="StepsDetails"
+          component={StepsDetailsScreen}
+          options={{ 
+            title: 'Suivi des pas', 
+            headerShown: true,
+            headerBackTitle: 'Retour'
+          }}
+        />
+        <Stack.Screen
+          name="XPDetails"
+          component={XPDetailsScreen}
+          options={{ 
+            title: 'Système d\'XP', 
             headerShown: true,
             headerBackTitle: 'Retour'
           }}

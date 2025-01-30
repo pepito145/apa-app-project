@@ -54,7 +54,7 @@ const CircularProgress = ({ steps = 2500, goal = 5000, radius = 50, unit = "pas"
 };
 
 const HomeScreen = ({ navigation }) => {
-  const { profile, setProfile, saveProfile, markFirstVisitComplete } = useContext(ProfileContext);
+  const { profile, setProfile, saveProfile, markFirstVisitComplete, checkStepsXP } = useContext(ProfileContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [webModalVisible, setWebModalVisible] = useState(false);
   const [webUrl, setWebUrl] = useState('');
@@ -118,7 +118,9 @@ const HomeScreen = ({ navigation }) => {
       const stepsData = await stepsResponse.json();
 
       if (stepsData.status === 0) {
-        setSteps(stepsData.body.activities.length > 0 ? stepsData.body.activities[0].steps : 0);
+        const currentSteps = stepsData.body.activities.length > 0 ? stepsData.body.activities[0].steps : 0;
+        setSteps(currentSteps);
+        await checkStepsXP(currentSteps);
         console.log("Requête steps réussie")
       } else {
         setSteps('N/A');
@@ -519,19 +521,26 @@ const HomeScreen = ({ navigation }) => {
               </View>
 
               <View style={styles.statsRow}>
-                <View style={styles.statCard}>
+                <TouchableOpacity 
+                  style={styles.statCard}
+                  onPress={() => navigation.navigate('StepsDetails')}
+                  disabled={steps === 'N/A'}
+                >
                   <Text style={styles.statTitle}>Nombre de pas</Text>
-                  <TouchableOpacity 
-                    onPress={handleStepsNA}
-                    disabled={steps !== 'N/A'}
-                  >
-                    <CircularProgress steps={steps === 'N/A' ? 0 : steps} goal={5000} radius={30} unit={steps === 'N/A' ? 'N/A' : 'pas'} />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.statCard}>
+                  <CircularProgress 
+                    steps={steps === 'N/A' ? 0 : steps} 
+                    goal={profile.stepsGoal} 
+                    radius={30} 
+                    unit={steps === 'N/A' ? 'N/A' : 'pas'} 
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.statCard}
+                  onPress={() => navigation.navigate('XPDetails')}
+                >
                   <Text style={styles.statTitle1}> XP 🏆</Text>
                   <CircularProgress steps={profile.XP} goal={12000} radius={30} unit='XP' />
-                </View>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.statCard}
                   onPress={() => navigation.navigate('StreakDetails')}
@@ -540,6 +549,12 @@ const HomeScreen = ({ navigation }) => {
                   <View style={styles.streakContainer}>
                     <Text style={styles.streakValue}>{profile.streak}</Text>
                     <Text style={styles.streakUnit}>jours</Text>
+                    {profile.isStreakPaused && (
+                      <View style={styles.pauseIndicator}>
+                        <MaterialIcons name="pause" size={16} color="#FF9800" />
+                        <Text style={styles.pauseText}>En pause</Text>
+                      </View>
+                    )}
                   </View>
                 </TouchableOpacity>
               </View>
@@ -1026,6 +1041,22 @@ const styles = StyleSheet.create({
 
   refreshButtonDisabled: {
     opacity: 0.5,
+  },
+
+  pauseIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 4,
+  },
+  pauseText: {
+    color: '#FF9800',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 4,
   },
 
 });
