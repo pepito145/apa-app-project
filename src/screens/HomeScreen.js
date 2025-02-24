@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
-
+import { useFocusEffect } from '@react-navigation/native';
 
 import { Circle, G, Svg } from 'react-native-svg';
 
@@ -53,8 +53,8 @@ const CircularProgress = ({ steps = 2500, goal = 5000, radius = 50, unit = "pas"
   );
 };
 
-const HomeScreen = ({ navigation }) => {
-  const { profile, setProfile, saveProfile, markFirstVisitComplete, checkStepsXP } = useContext(ProfileContext);
+const HomeScreen = ({ navigation, route }) => {
+  const { profile, setProfile, saveProfile, markFirstVisitComplete, checkStepsXP, calculateLevel, LEVEL_DATA } = useContext(ProfileContext);
   const [modalVisible, setModalVisible] = useState(false);
   const [webModalVisible, setWebModalVisible] = useState(false);
   const [webUrl, setWebUrl] = useState('');
@@ -96,6 +96,41 @@ const HomeScreen = ({ navigation }) => {
       markFirstVisitComplete();
     }
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const refresh = route.params?.refresh;
+      if (refresh) {
+        const loadProfile = async () => {
+          try {
+            const savedProfile = await AsyncStorage.getItem('userProfile');
+            if (savedProfile) {
+              const parsedProfile = JSON.parse(savedProfile);
+              setProfile(parsedProfile);
+            }
+          } catch (error) {
+            console.error('Erreur lors du rechargement du profil:', error);
+          }
+        };
+        loadProfile();
+      }
+    }, [route.params?.refresh])
+  );
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const savedProfile = await AsyncStorage.getItem('userProfile');
+        if (savedProfile) {
+          const parsedProfile = JSON.parse(savedProfile);
+          setProfile(parsedProfile);
+        }
+      } catch (error) {
+        console.error('Erreur lors du rechargement du profil:', error);
+      }
+    };
+    loadProfile();
+  }, [profile.XP]);
 
   const fetchData = async () => {
     try {
@@ -349,6 +384,13 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const getProgressToNextLevel = (currentXP) => {
+    const level = calculateLevel(currentXP);
+    const nextLevelXP = LEVEL_DATA.getXPForLevel(level + 1);
+    const progress = (currentXP % nextLevelXP) / nextLevelXP * 100;
+    return progress;
+  };
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <LinearGradient 
@@ -523,23 +565,18 @@ const HomeScreen = ({ navigation }) => {
               <View style={styles.statsRow}>
                 <TouchableOpacity 
                   style={styles.statCard}
-                  onPress={() => navigation.navigate('StepsDetails')}
-                  disabled={steps === 'N/A'}
-                >
-                  <Text style={styles.statTitle}>Nombre de pas</Text>
-                  <CircularProgress 
-                    steps={steps === 'N/A' ? 0 : steps} 
-                    goal={profile.stepsGoal} 
-                    radius={30} 
-                    unit={steps === 'N/A' ? 'N/A' : 'pas'} 
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.statCard}
                   onPress={() => navigation.navigate('XPDetails')}
                 >
-                  <Text style={styles.statTitle1}> XP 🏆</Text>
-                  <CircularProgress steps={profile.XP} goal={12000} radius={30} unit='XP' />
+                  <Text style={styles.statTitle}>Niveau {calculateLevel(profile.XP || 0)}</Text>
+                  <CircularProgress 
+                    steps={profile.XP || 0} 
+                    goal={LEVEL_DATA.getXPForLevel(calculateLevel(profile.XP || 0) + 1)} 
+                    radius={30}
+                    unit="XP"
+                  />
+                  <Text style={styles.levelTitle}>
+                    {LEVEL_DATA.getTitleAndRewards(calculateLevel(profile.XP || 0)).title}
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.statCard}
@@ -675,13 +712,11 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     textAlign: 'center',
   },
-
-  statTitle1: {
-    fontSize: 16,
-    color: '#2193b0',
-    fontWeight: '600',
-    marginBottom: 26,
+  levelTitle: {
+    fontSize: 12,
+    color: '#666',
     textAlign: 'center',
+    marginTop: 4,
   },
   streakContainer: {
     alignItems: 'center',

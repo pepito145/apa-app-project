@@ -11,7 +11,7 @@ const { width, height } = Dimensions.get('window');
 const DailyActivityScreen = ({ navigation, route }) => {
   const { level, session, levelTitle } = route.params;
   const exercises = session.exercises || [];
-  const { profile, updateStreak } = useContext(ProfileContext);
+  const { profile, updateStreak, addXP } = useContext(ProfileContext);
 
   // États
   const [completedExercises, setCompletedExercises] = useState(0);
@@ -101,6 +101,15 @@ const DailyActivityScreen = ({ navigation, route }) => {
   const handleSubmitFeedback = async () => {
     try {
       const minutesElapsed = Math.round(elapsedTime / 60);
+      
+      // Calcul de l'XP totale
+      const durationXP = Math.floor(minutesElapsed / 10) * 15;
+      const exercisesXP = Math.floor((completedExercises / exercises.length) * 100);
+      const completionXP = completedExercises === exercises.length ? 50 : 0;
+      const totalXP = durationXP + exercisesXP + completionXP;
+
+      console.log('Debug totalXP avant addXP:', totalXP);
+
       const currentDate = new Date().toLocaleDateString('fr-FR', {
         day: '2-digit',
         month: 'short',
@@ -111,19 +120,16 @@ const DailyActivityScreen = ({ navigation, route }) => {
       const nextRecommendation = calculateNextSession(difficultyRating, painRating, level);
       await AsyncStorage.setItem('recommendedLevel', nextRecommendation.level);
 
-      // Mise à jour du profil
+      // Mise à jour du profil avec toutes les modifications en une seule fois
       const updatedProfile = {
         ...profile,
         lastSessionFeedback: {
           difficulty: difficultyRating,
           pain: painRating,
           date: currentDate
-        }
+        },
+        streak: profile.streak + 1
       };
-      await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-
-      // Incrémenter le streak
-      await updateStreak(profile.streak + 1);
 
       // Sauvegarder l'activité
       const newActivity = {
@@ -142,20 +148,40 @@ const DailyActivityScreen = ({ navigation, route }) => {
       activities.unshift(newActivity);
       await AsyncStorage.setItem('activitiesHistory', JSON.stringify(activities));
 
+      // Ajouter l'XP et sauvegarder le profil en une seule opération
+      const xpAdded = await addXP(totalXP);
+
+      if (!xpAdded) {
+        throw new Error('Échec de l\'ajout d\'XP');
+      }
+
       Alert.alert(
         'Séance terminée !',
-        'Félicitations pour avoir complété votre séance !',
-        [{ text: 'OK', onPress: () => navigation.reset({
-          index: 0,
-          routes: [{ name: 'MainTabs', params: { screen: 'Accueil', refresh: true } }],
-        })}]
+        `Félicitations ! Vous avez gagné de l'XP :\n` +
+        `• ${durationXP} XP (${minutesElapsed} minutes d'activité)\n` +
+        `• ${exercisesXP} XP (${Math.floor((completedExercises / exercises.length) * 100)}% des exercices)\n` +
+        `${completionXP > 0 ? `• ${completionXP} XP (session complétée)\n` : ''}` +
+        `\nTotal : ${totalXP} XP`,
+        [{ 
+          text: 'Super !', 
+          onPress: () => {
+            navigation.reset({
+              index: 0,
+              routes: [{ 
+                name: 'MainTabs', 
+                params: { 
+                  screen: 'Accueil',
+                  params: { refresh: Date.now() }
+                } 
+              }],
+            });
+          }
+        }]
       );
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
-      Alert.alert('Erreur', 'Une erreur est survenue lors de la sauvegarde.');
+      console.error('Erreur:', error);
+      Alert.alert('Erreur', 'Une erreur est survenue lors de l\'ajout d\'XP.');
     }
-
-
   };
   const renderStars = (rating, setRating) => {
     return [...Array(5)].map((_, index) => (
@@ -238,7 +264,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
       <MaterialIcons name="emoji-events" size={80} color="#FFD700" />
       <Text style={styles.congratsTitle}>Bravo !</Text>
       <Text style={styles.congratsText}>Exercice complété avec succès  🎉</Text>
-      <Text style={styles.xpText}>+200 XP</Text>
+      <Text style={styles.xpText}>XP gagné!</Text>
       <TouchableOpacity style={styles.nextButton} onPress={handleNextExercise}>
         <Text style={styles.buttonText}>Exercice suivant</Text>
         <MaterialIcons name="arrow-forward" size={24} color="#fff" />

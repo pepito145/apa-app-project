@@ -1,13 +1,48 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import React, { useContext, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { ProfileContext } from './ProfileContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
 const XPDetailsScreen = () => {
-  const { profile } = useContext(ProfileContext);
+  const { profile, setProfile, calculateLevel, LEVEL_DATA, addXP } = useContext(ProfileContext);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Recharger les données quand l'écran devient actif
+      const loadProfile = async () => {
+        try {
+          const savedProfile = await AsyncStorage.getItem('userProfile');
+          if (savedProfile) {
+            const parsedProfile = JSON.parse(savedProfile);
+            setProfile(parsedProfile);
+          }
+        } catch (error) {
+          console.error('Erreur lors du rechargement du profil:', error);
+        }
+      };
+      loadProfile();
+    }, [])
+  );
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const savedProfile = await AsyncStorage.getItem('userProfile');
+        if (savedProfile) {
+          const parsedProfile = JSON.parse(savedProfile);
+          setProfile(parsedProfile);
+        }
+      } catch (error) {
+        console.error('Erreur lors du rechargement du profil:', error);
+      }
+    };
+    loadProfile();
+  }, [profile.XP]); // Se déclenche quand l'XP change
 
   const xpSources = [
     {
@@ -32,73 +67,102 @@ const XPDetailsScreen = () => {
     }
   ];
 
-  return (
-    <LinearGradient 
-      colors={['#6dd5ed', '#2193b0']}
-      style={styles.container}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* En-tête avec l'XP actuel */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Votre Progression</Text>
-          <View style={styles.xpDisplay}>
-            <MaterialIcons name="stars" size={40} color="#FFD700" />
-            <Text style={styles.xpNumber}>{profile.XP || 0}</Text>
-            <Text style={styles.xpLabel}>XP</Text>
-          </View>
-        </View>
+  // Fonction pour ajouter/retirer de l'XP (pour tests)
+  const modifyXP = async (amount) => {
+    await addXP(amount);
+  };
 
-        {/* Section "Qu'est-ce que l'XP ?" */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <MaterialIcons name="info-outline" size={24} color="#fff" />
-            <Text style={styles.sectionTitle}>Qu'est-ce que l'XP ?</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.explanationText}>
-              Les points d'expérience (XP) reflètent votre progression globale dans votre parcours de remise en forme. 
-              Ils représentent votre engagement et votre constance dans la pratique d'activités physiques.
+  // Fonction pour réinitialiser l'XP
+  const resetXP = async () => {
+    const updatedProfile = {
+      ...profile,
+      XP: 0,
+      level: 1
+    };
+    await saveProfile(updatedProfile);
+    setProfile(updatedProfile);
+  };
+
+  // Calcul de la progression vers le prochain niveau
+  const getProgressToNextLevel = () => {
+    const currentLevel = calculateLevel(profile.XP);
+    const currentLevelXP = LEVEL_DATA.getXPForLevel(currentLevel);
+    const nextLevelXP = LEVEL_DATA.getXPForLevel(currentLevel + 1);
+    const xpInCurrentLevel = profile.XP - currentLevelXP;
+    const xpNeededForNextLevel = nextLevelXP - currentLevelXP;
+    return (xpInCurrentLevel / xpNeededForNextLevel) * 100;
+  };
+
+  return (
+    <LinearGradient colors={['#6dd5ed', '#2193b0']} style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Niveau {calculateLevel(profile.XP)}</Text>
+          <Text style={styles.subtitle}>
+            {LEVEL_DATA.getTitleAndRewards(calculateLevel(profile.XP)).title}
+          </Text>
+          
+          <View style={styles.levelDisplay}>
+            <View style={styles.progressBarContainer}>
+              <View 
+                style={[styles.progressBar, { width: `${getProgressToNextLevel()}%` }]} 
+              />
+            </View>
+            <Text style={styles.xpProgress}>
+              {profile.XP} / {LEVEL_DATA.getXPForLevel(calculateLevel(profile.XP) + 1)} XP
             </Text>
           </View>
+
+          {/* Boutons de test XP */}
+          <View style={styles.xpButtons}>
+            <TouchableOpacity 
+              style={[styles.xpButton, styles.addButton]}
+              onPress={() => modifyXP(100)}
+            >
+              <Text style={styles.buttonText}>+100 XP</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.xpButton, styles.removeButton]}
+              onPress={() => modifyXP(-100)}
+            >
+              <Text style={styles.buttonText}>-100 XP</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.xpButton, styles.resetButton]}
+              onPress={resetXP}
+            >
+              <Text style={styles.buttonText}>Réinitialiser</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Section "Comment gagner de l'XP" */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <MaterialIcons name="emoji-events" size={24} color="#fff" />
-            <Text style={styles.sectionTitle}>Comment gagner de l'XP ?</Text>
-          </View>
+          <Text style={styles.sectionTitle}>Progression des niveaux</Text>
+          <Text style={styles.description}>
+            Chaque niveau nécessite plus d'XP que le précédent. Continuez à être actif pour progresser !
+          </Text>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Sources d'XP</Text>
           {xpSources.map((source, index) => (
-            <View key={index} style={[styles.card, styles.xpCard]}>
-              <View style={styles.xpCardHeader}>
-                <View style={styles.xpCardTitleContainer}>
-                  <MaterialIcons name={source.icon} size={24} color="#2193b0" />
-                  <Text style={styles.xpCardTitle}>{source.title}</Text>
-                </View>
-                <Text style={styles.xpAmount}>{source.xp}</Text>
+            <View key={index} style={styles.sourceCard}>
+              <MaterialIcons name={source.icon} size={24} color="#2193b0" />
+              <View style={styles.sourceInfo}>
+                <Text style={styles.sourceTitle}>{source.title}</Text>
+                <Text style={styles.sourceDescription}>{source.description}</Text>
               </View>
-              <Text style={styles.xpCardDescription}>{source.description}</Text>
             </View>
           ))}
         </View>
 
-        {/* Section "Pourquoi c'est important" */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <MaterialIcons name="psychology" size={24} color="#fff" />
-            <Text style={styles.sectionTitle}>Pourquoi c'est important ?</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.explanationText}>
-              Le système d'XP est conçu pour :
-            </Text>
-            <View style={styles.bulletPoints}>
-              <Text style={styles.bulletPoint}>• Maintenir votre motivation au quotidien</Text>
-              <Text style={styles.bulletPoint}>• Visualiser vos progrès à long terme</Text>
-              <Text style={styles.bulletPoint}>• Récompenser votre régularité</Text>
-              <Text style={styles.bulletPoint}>• Encourager une pratique variée</Text>
+          <Text style={styles.sectionTitle}>Récompenses débloquées</Text>
+          {Object.entries(LEVEL_DATA.getTitleAndRewards(calculateLevel(profile.XP))).map(([key, value], index) => (
+            <View key={index} style={styles.rewardCard}>
+              <Text style={styles.rewardTitle}>{value}</Text>
             </View>
-          </View>
+          ))}
         </View>
       </ScrollView>
     </LinearGradient>
@@ -122,86 +186,99 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 20,
   },
-  xpDisplay: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 20,
-    padding: 20,
-    width: '100%',
-  },
-  xpNumber: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginTop: 10,
-  },
-  xpLabel: {
+  subtitle: {
     fontSize: 18,
     color: '#fff',
     opacity: 0.9,
   },
+  levelDisplay: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  progressBarContainer: {
+    height: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 10,
+    width: '100%',
+    marginBottom: 10,
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#4CAF50',
+    borderRadius: 10,
+  },
+  xpProgress: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  xpButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginTop: 20,
+  },
+  xpButton: {
+    padding: 10,
+    borderRadius: 8,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  addButton: {
+    backgroundColor: '#4CAF50',
+  },
+  removeButton: {
+    backgroundColor: '#f44336',
+  },
+  resetButton: {
+    backgroundColor: '#FF9800',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   section: {
     marginBottom: 25,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 16,
+    color: '#fff',
+    lineHeight: 24,
+  },
+  sourceCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  sourceInfo: {
     marginLeft: 10,
   },
-  card: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 10,
-  },
-  explanationText: {
-    fontSize: 16,
-    color: '#333',
-    lineHeight: 24,
-  },
-  bulletPoints: {
-    marginTop: 10,
-  },
-  bulletPoint: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 5,
-    lineHeight: 24,
-  },
-  xpCard: {
-    marginBottom: 10,
-  },
-  xpCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  xpCardTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  xpCardTitle: {
+  sourceTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2193b0',
-    marginLeft: 10,
+    color: '#fff',
   },
-  xpAmount: {
+  sourceDescription: {
+    fontSize: 14,
+    color: '#fff',
+    opacity: 0.9,
+  },
+  rewardCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+  },
+  rewardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#4CAF50',
-  },
-  xpCardDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
+    color: '#fff',
   },
 });
 
