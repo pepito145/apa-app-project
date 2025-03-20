@@ -131,7 +131,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
         streak: profile.streak + 1
       };
 
-      // Sauvegarder l'activité
+      // Sauvegarder l'activité (en local sans passer par le backend pour le moment)
       const newActivity = {
         date: currentDate,
         name: `${levelTitle} - ${session.title}`,
@@ -154,6 +154,8 @@ const DailyActivityScreen = ({ navigation, route }) => {
       if (!xpAdded) {
         throw new Error('Échec de l\'ajout d\'XP');
       }
+
+      await sendSessionDataToBackend();
 
       Alert.alert(
         'Séance terminée !',
@@ -183,6 +185,39 @@ const DailyActivityScreen = ({ navigation, route }) => {
       Alert.alert('Erreur', 'Une erreur est survenue lors de l\'ajout d\'XP.');
     }
   };
+
+  //ENVOI AU BACKEND DE LA SEANCE
+  const sendSessionDataToBackend = async () => {
+    const sessionId = session.id; // Assuming session has an id property
+    const email = profile.email; // Assuming profile has an email property
+    const payload = {
+      email,
+      painlevel: painRating,
+      difficulty: difficultyRating,
+      totalExercises: completedExercises,
+      time: elapsedTime,
+      id: sessionId
+    };
+
+    try {
+      const response = await fetch('https://your-backend-url.com/api/get_seance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send session data');
+      }
+
+      console.log('Session data sent successfully');
+    } catch (error) {
+      console.error('Error sending session data:', error);
+    }
+  };
+
   const renderStars = (rating, setRating) => {
     return [...Array(5)].map((_, index) => (
       <TouchableOpacity key={index} onPress={() => setRating(index + 1)}>
