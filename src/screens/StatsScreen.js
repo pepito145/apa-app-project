@@ -453,7 +453,6 @@ const StatsScreen = ({ navigation }) => {
                 Dernière série terminée le {new Date(stats.lastStreakEnd).toLocaleDateString()}
               </Text>
             )}
-
             <Text style={styles.sectionTitle}>Dernières Activités</Text>
             {activitiesHistory.slice(0, 3).map((activity, index) => (
               <View key={index} style={styles.activityCard}>

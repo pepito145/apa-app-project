@@ -6,9 +6,8 @@ import logo from '../../assets/logo-test.png';
 
 const { width, height } = Dimensions.get('window');
 
-const api = axios.create({
-  baseURL: 'http://10.0.2.2:8000/api', // Utilisez l'IP correcte pour le backend
-});
+import api from '../../api';
+
 
 const AuthScreen = ({ onLogin }) => {
   const [currentScreen, setCurrentScreen] = useState('welcome'); // État pour gérer la page active
