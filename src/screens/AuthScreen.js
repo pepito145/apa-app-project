@@ -71,7 +71,6 @@ const AuthScreen = ({ onLogin }) => {
       if (response.data.token) {
         const token = response.data.token;
         console.log('Connexion réussie avec token :', response.data.token);
-        await AsyncStorage.setItem('access_token', response.data.token);
         await AsyncStorage.setItem('email', email);
         setToken(token);
 

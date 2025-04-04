@@ -157,6 +157,34 @@ export const ProfileProvider = ({ children }) => {
       setProfile(finalProfile);
       
       console.log('Profil sauvegardé avec succès. XP actuel:', finalProfile.XP);
+      let email = await AsyncStorage.getItem('email');
+
+      // ===== 🔽 POST 到后端 /update_profil/ 接口 =====
+      const {
+        firstName,
+        lastName,
+        age,
+        weight,
+        gender,
+        XP,
+        level
+      } = finalProfile;
+      const payload = {
+        firstName,
+        lastName,
+        age,
+        weight,
+        gender,
+        email,
+        XP,
+        level
+      };
+      await api.post('/update_profil/', payload);
+
+
+
+
+
     } catch (error) {
       console.error('Erreur lors de la sauvegarde du profil :', error);
     }
