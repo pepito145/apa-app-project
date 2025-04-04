@@ -1,12 +1,32 @@
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
+import api from '../../api';
 
 // Crée un contexte
 export const ProfileContext = createContext();
 
-// Context:
+//charger le profil
 export const ProfileProvider = ({ children }) => {
+  const loadProfileFromBackend = async () => {
+    try {
+      
+      let email = await AsyncStorage.getItem('email');
+
+      
+      console.log("email_encoded: ",email);
+      const response = await api.get('get_profil/', {
+        params: { email }
+      });
+      await saveProfile(response.data); 
+    } catch (error) {
+      console.error('Erreur lors du chargement du profil depuis le backend :', error);
+    }
+  };
+
+
+// Context:
+
   const [profile, setProfile] = useState({
     firstName: '',
     lastName: '',
@@ -245,6 +265,7 @@ export const ProfileProvider = ({ children }) => {
       addActivityXP,
       addQuestionnaireXP,
       calculateLevel,
+      loadProfileFromBackend, //nouveau
       LEVEL_DATA,
     }}>
       {children}

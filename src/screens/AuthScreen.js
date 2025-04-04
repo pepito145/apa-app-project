@@ -3,10 +3,20 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Dimensions,
 import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
 import logo from '../../assets/logo-test.png'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 const { width, height } = Dimensions.get('window');
 
-import api from '../../api';
+
+
+
+import api, { setToken } from '../../api';
+import { useContext } from "react";
+import { ProfileContext } from './ProfileContext';
+
+
 
 
 const AuthScreen = ({ onLogin }) => {
@@ -16,6 +26,12 @@ const AuthScreen = ({ onLogin }) => {
   const [firstname, setFirstname] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+
+
+  const { loadProfileFromBackend } = useContext(ProfileContext);
+
+
 
   const resetForm = () => {
     setEmail('');
@@ -47,9 +63,24 @@ const AuthScreen = ({ onLogin }) => {
     }
 
     try {
+      await AsyncStorage.removeItem('access_token');
+      console.log("start login");
+      console.log(email);
+      console.log(password);
       const response = await api.post('/login/', { email, password });
       if (response.data.token) {
+        const token = response.data.token;
         console.log('Connexion réussie avec token :', response.data.token);
+        await AsyncStorage.setItem('access_token', response.data.token);
+        await AsyncStorage.setItem('email', email);
+        setToken(token);
+
+
+        //load profil
+        await loadProfileFromBackend();
+
+
+
         onLogin(response.data.token); // Passe le token à App.js
       } else {
         alert('Erreur : Token manquant');
