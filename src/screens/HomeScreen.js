@@ -248,6 +248,7 @@ const HomeScreen = ({ navigation, route }) => {
 
 
   //get code from withings, obsolete
+  /*
   const handleLinkWithings = async (code) => {
     const url = 'https://wbsapi.withings.net/v2/oauth2';
     const params = new URLSearchParams({
@@ -290,7 +291,7 @@ const HomeScreen = ({ navigation, route }) => {
     } catch (error) {
       console.error('Erreur lors de la requête à Withings :', error);
     }
-  };
+  };*/
 
 
 
@@ -628,6 +629,9 @@ const HomeScreen = ({ navigation, route }) => {
                   <Text style={styles.refreshButtonText}>Rafraîchir les données</Text>
                 </TouchableOpacity>
 
+
+
+                {/* Deprecated: This token refresh button is no longer used.
                 <TouchableOpacity
                   style={[
                     styles.refreshButton,
@@ -640,6 +644,7 @@ const HomeScreen = ({ navigation, route }) => {
                 >
                   <Text style={styles.refreshButtonText}>Rafraîchir le token</Text>
                 </TouchableOpacity>
+                */}
               </View>
 
               <View style={styles.statsRow}>

@@ -5,6 +5,11 @@ import { ProfileContext } from './ProfileContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 
+import api from '../../api';
+
+
+
+
 const StatsScreen = ({ navigation }) => {
   const { profile } = useContext(ProfileContext);
   const [activitiesHistory, setActivitiesHistory] = useState([]);
@@ -130,6 +135,8 @@ const StatsScreen = ({ navigation }) => {
 
   const loadHealthData = async () => {
     try {
+
+      /*
       if (!profile.access_token) {
         console.log('Pas de token Withings disponible');
         const lastData = await AsyncStorage.getItem('lastProcessedWithingsData');
@@ -139,35 +146,23 @@ const StatsScreen = ({ navigation }) => {
         }
         return;
       }
-
+      */
       const today = new Date();
-      const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const oneWeekAgo = new Date(today.getTime() - 1000 *7 * 24 * 60 * 60 * 1000);
       
       const startdateymd = oneWeekAgo.toISOString().split('T')[0];
       const enddateymd = today.toISOString().split('T')[0];
-
+      const email = await AsyncStorage.getItem('email');
       // Récupération des activités (BPM, pas, distance, calories)
-      const activityResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${profile.access_token}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `action=getactivity&startdateymd=${startdateymd}&enddateymd=${enddateymd}&data_fields=steps,distance,calories,hr_average`,
+      const activityResponse = await api.post('load_health_data/', {
+        email: email,
+        startdateymd: startdateymd,
+        enddateymd: enddateymd,
       });
-
-      if (!activityResponse.ok) {
-        throw new Error('Erreur lors de la récupération des données Withings');
-      }
-
-      const activityData = await activityResponse.json();
-
-      if (activityData.status !== 0) {
-        throw new Error('Erreur dans la réponse Withings');
-      }
+      const activityData = activityResponse.data.data;
 
       const measurements = [];
-
+      
       // Traiter les données d'activité
       if (activityData.body && activityData.body.activities) {
         activityData.body.activities.forEach(activity => {
@@ -218,7 +213,7 @@ const StatsScreen = ({ navigation }) => {
 
     const measurements = data.measurements;
     const today = new Date();
-    const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const oneWeekAgo = new Date(today.getTime() -1000* 7 * 24 * 60 * 60 * 1000);
 
     // Filtrer les mesures des 7 derniers jours
     const recentMeasurements = measurements.filter(m => {

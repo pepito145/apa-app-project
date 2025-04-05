@@ -14,7 +14,7 @@ export const ProfileProvider = ({ children }) => {
       let email = await AsyncStorage.getItem('email');
 
       
-      console.log("email_encoded: ",email);
+      console.log("email: ",email);
       const response = await api.get('get_profil/', {
         params: { email }
       });
