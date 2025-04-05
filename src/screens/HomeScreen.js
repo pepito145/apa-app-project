@@ -167,6 +167,8 @@ const HomeScreen = ({ navigation, route }) => {
     loadProfile();
   }, [profile.XP]);
 
+
+  /*  update 
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -243,7 +245,7 @@ const HomeScreen = ({ navigation, route }) => {
     } finally {
       setLoading(false);
     }
-  };
+  };*/
 
 
 
@@ -621,6 +623,7 @@ const HomeScreen = ({ navigation, route }) => {
 
           {!isProfileIncomplete && profile.isWithingsLinked && profile.ipaqScore && (
             <>
+            {/* Deprecated: This token refresh button is no longer used.
               <View style={styles.refreshButtonsContainer}>
                 <TouchableOpacity
                   style={styles.refreshButton}
@@ -631,7 +634,7 @@ const HomeScreen = ({ navigation, route }) => {
 
 
 
-                {/* Deprecated: This token refresh button is no longer used.
+                
                 <TouchableOpacity
                   style={[
                     styles.refreshButton,
@@ -644,8 +647,8 @@ const HomeScreen = ({ navigation, route }) => {
                 >
                   <Text style={styles.refreshButtonText}>Rafraîchir le token</Text>
                 </TouchableOpacity>
-                */}
-              </View>
+                
+              </View>*/}
 
               <View style={styles.statsRow}>
                 <TouchableOpacity 

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ProfileContext } from './ProfileContext';
@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import api from '../../api';
-
+import { useFocusEffect } from '@react-navigation/native';
 
 
 
@@ -40,10 +40,13 @@ const StatsScreen = ({ navigation }) => {
     lastStreakEnd: null,
   });
 
-  useEffect(() => {
-    loadActivitiesHistory();
-    loadHealthData();
-  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadActivitiesHistory();
+      loadHealthData();
+    }, []) 
+  );
 
   const loadActivitiesHistory = async () => {
     try {
@@ -148,7 +151,7 @@ const StatsScreen = ({ navigation }) => {
       }
       */
       const today = new Date();
-      const oneWeekAgo = new Date(today.getTime() - 1000 *7 * 24 * 60 * 60 * 1000);
+      const oneWeekAgo = new Date(today.getTime() -  7 * 24 * 60 * 60 * 1000);
       
       const startdateymd = oneWeekAgo.toISOString().split('T')[0];
       const enddateymd = today.toISOString().split('T')[0];
