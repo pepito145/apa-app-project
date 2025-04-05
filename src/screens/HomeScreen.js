@@ -90,7 +90,7 @@ const HomeScreen = ({ navigation, route }) => {
   const webViewRef = useRef(null);
 
 
-
+//constructeur du lien vers api withings auth
   const buildWithingsUrl = async () => {
     console.log("⚠️ buildWithingsUrl called");
     try {
@@ -245,6 +245,9 @@ const HomeScreen = ({ navigation, route }) => {
     }
   };
 
+
+
+  //get code from withings, obsolete
   const handleLinkWithings = async (code) => {
     const url = 'https://wbsapi.withings.net/v2/oauth2';
     const params = new URLSearchParams({
@@ -289,6 +292,10 @@ const HomeScreen = ({ navigation, route }) => {
     }
   };
 
+
+
+
+  //lien vers withings auth
   useEffect(() => {
     let interval;
   
@@ -345,7 +352,7 @@ const HomeScreen = ({ navigation, route }) => {
 
 
 
-/*
+/*  refreshtoken, obsolete
   const refreshToken = async () => {
     const threeHoursInMs = 3 * 60 * 60 * 1000;
     const now = Date.now();
