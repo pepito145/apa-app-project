@@ -179,7 +179,7 @@ export const ProfileProvider = ({ children }) => {
         XP,
         level
       };
-      await api.post('/update_profil/', payload);
+      await api.post('update_profil/', payload);
 
 
 

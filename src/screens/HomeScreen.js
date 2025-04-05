@@ -9,7 +9,7 @@ import { Picker } from '@react-native-picker/picker';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import { useFocusEffect } from '@react-navigation/native';
-
+import api from '../../api';
 import { Circle, G, Svg } from 'react-native-svg';
 
 const { width, height } = Dimensions.get('window');
@@ -89,7 +89,42 @@ const HomeScreen = ({ navigation, route }) => {
 
   const webViewRef = useRef(null);
 
-  const baseWithingsUrl = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id=8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25&state=randomString&scope=user.activity,user.metrics&redirect_uri=https://oauth.pstmn.io/v1/callback';
+
+
+  const buildWithingsUrl = async () => {
+    console.log("⚠️ buildWithingsUrl called");
+    try {
+      let email = await AsyncStorage.getItem('email');
+      
+      // 请求后端获取 client_id
+      const response = await api.post('client_id/', { email });
+      const clientId = response.data.client_id;
+  
+      if (!clientId) {
+        throw new Error('client_id non reçu du serveur');
+      }
+  
+      // 构建完整的 redirect_uri
+      const redirectUri = encodeURIComponent(api.defaults.baseURL + 'get_code/');
+      email = encodeURIComponent(email);
+      // 构建完整的 Withings OAuth URL
+      const withingsUrl = `https://account.withings.com/oauth2_user/authorize2` +
+        `?response_type=code` +
+        `&client_id=${clientId}` +
+        `&state=${clientId}` +
+        `&scope=user.activity,user.metrics` +
+        `&redirect_uri=${redirectUri}`;
+  
+      return withingsUrl;
+  
+    } catch (error) {
+      console.error('Erreur lors de la génération URL:', error);
+      throw error;
+    }
+  };
+
+
+
 
   useEffect(() => {
     if (profile.isFirstVisit) {
@@ -262,20 +297,39 @@ const HomeScreen = ({ navigation, route }) => {
         console.log('URL actuelle :', currentUrl);
 
         const codeMatch = currentUrl.match(/code=([^&]+)/);
-        if (codeMatch) {
+        //if (codeMatch) {
+        if (currentUrl.includes('/api/get_code')) {
           const code = codeMatch[1];
+          fetch(currentUrl, {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            }
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log("✅ Réponse backend :", data);
           setExtractedCode(code);
-          console.log('Code extrait :', code);
+
+          console.log('✅ Redirection vers le backend détectée');
           setWebModalVisible(false);
-          handleLinkWithings(code);
+          Alert.alert("Succès", "Compte Withings lié avec succès !");
+        });
+          clearInterval(interval); // 停止轮询
         }
-      }, 1000);
+      }, 500);
     }
 
     return () => {
       clearInterval(interval);
     };
   }, [webModalVisible, currentUrl]);
+
+
+
+
+
+
 
   const refreshToken = async () => {
     const threeHoursInMs = 3 * 60 * 60 * 1000;
@@ -515,9 +569,13 @@ const HomeScreen = ({ navigation, route }) => {
             <View style={styles.actionContainer}>
               <TouchableOpacity
                 style={styles.actionButton}
-                onPress={() => {
-                  setWebUrl(baseWithingsUrl);
-                  setWebModalVisible(true);
+                onPress={async () => {
+                  try {
+                    const url = await buildWithingsUrl();
+                    console.log("url_lier_withings: ", url)
+                    setWebUrl(url);
+                    setWebModalVisible(true);} 
+                  catch (error){}
                 }}
               >
                 <MaterialIcons name="link" size={width > 600 ? 28 : 24} color="#fff" />
