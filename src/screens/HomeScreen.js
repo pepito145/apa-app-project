@@ -291,46 +291,61 @@ const HomeScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     let interval;
-
+  
     if (webModalVisible) {
-      interval = setInterval(() => {
+      interval = setInterval(async () => {
         console.log('URL actuelle :', currentUrl);
-
+  
         const codeMatch = currentUrl.match(/code=([^&]+)/);
-        //if (codeMatch) {
-        if (currentUrl.includes('/api/get_code')) {
+  
+        if (currentUrl.includes('/api/get_code') && codeMatch) {
           const code = codeMatch[1];
-          fetch(currentUrl, {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-            }
-          })
-            .then(response => response.json())
-            .then(data => {
-              console.log("✅ Réponse backend :", data);
-          setExtractedCode(code);
-
-          console.log('✅ Redirection vers le backend détectée');
-          setWebModalVisible(false);
-          Alert.alert("Succès", "Compte Withings lié avec succès !");
-        });
+  
+          try {
+            const response = await fetch(currentUrl, {
+              method: 'GET',
+              headers: {
+                Accept: 'application/json',
+              }
+            });
+  
+            const data = await response.json();
+            console.log("✅ Réponse backend :", data);
+  
+            setExtractedCode(code);
+  
+            const updatedProfile = {
+              ...profile,
+              isWithingsLinked: true
+            };
+  
+            await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+            setProfile(updatedProfile); //更新内存中的状态
+  
+            console.log('✅ Redirection vers le backend détectée');
+            setWebModalVisible(false);
+            Alert.alert("Succès", "Compte Withings lié avec succès !");
+          } catch (err) {
+            console.error("❌ Erreur pendant la liaison Withings :", err);
+            Alert.alert("Erreur", "Échec de la liaison Withings.");
+          }
+  
           clearInterval(interval); // 停止轮询
         }
       }, 500);
     }
-
+  
     return () => {
       clearInterval(interval);
     };
   }, [webModalVisible, currentUrl]);
+  
 
 
 
 
 
-
-
+/*
   const refreshToken = async () => {
     const threeHoursInMs = 3 * 60 * 60 * 1000;
     const now = Date.now();
@@ -385,7 +400,7 @@ const HomeScreen = ({ navigation, route }) => {
       Alert.alert('Erreur', 'Une erreur est survenue lors du rafraîchissement du token.');
     }
   };
-
+*/
   const handleSaveProfile = async () => {
     if (!formData.firstName || !formData.lastName || !formData.age || !formData.weight) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
