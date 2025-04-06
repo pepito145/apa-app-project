@@ -42,7 +42,7 @@ export const ActivityProvider = ({ children }) => {
 
 
 
-  const addActivityFromSession = async (session, difficulty, pain, completedExercises, elapsedTime) => {
+  const addActivityFromSession = async (session, difficulty, pain, completedExercises, elapsedTime, start_time ) => {
     try {
       const email = await AsyncStorage.getItem('email');
       const minutesElapsed = Math.round(elapsedTime / 60);
@@ -57,6 +57,7 @@ export const ActivityProvider = ({ children }) => {
         name: `Séance - ${session.title}`,
         date: currentDate,
         time: timestamp,
+        start_time: start_time,
         duration: `${minutesElapsed} min`,
         calories: `${Math.round(minutesElapsed * 5)} kcal`,
         exercisesCompleted: completedExercises,
@@ -76,6 +77,7 @@ export const ActivityProvider = ({ children }) => {
         duration: elapsedTime,
         frontend_id: session.id,
         time: newActivity.time,
+        start_time: start_time,
       };
   
       try {
@@ -160,6 +162,12 @@ export const ActivityProvider = ({ children }) => {
       
         if (!exists) {
           syncedActivities.unshift(backendItem);
+        }
+        else {
+            if ((backendItem.activities || []).length > 0 && (!exists.activities || exists.activities.length === 0)) {
+                console.log('🔁 Updating activities of existing seance');
+                exists.activities = backendItem.activities;
+              }
         }
       }
 

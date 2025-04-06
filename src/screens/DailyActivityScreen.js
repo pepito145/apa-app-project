@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, SafeAreaView, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -26,6 +26,8 @@ const DailyActivityScreen = ({ navigation, route }) => {
   const [showMidwayScreen, setShowMidwayScreen] = useState(false);
 
 
+
+
   // Empêcher le retour en arrière
   useEffect(() => {
     navigation.setOptions({
@@ -35,13 +37,15 @@ const DailyActivityScreen = ({ navigation, route }) => {
   }, []);
 
   // Timer
+  const startTimeRef = useRef(null);
   useEffect(() => {
-    const startTime = Date.now();
-    let interval;
     
+    //const startTime = Date.now();
+    let interval;
     if (isTimerActive) {
+      startTimeRef.current = Date.now(); 
       interval = setInterval(() => {
-        setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+        setElapsedTime(Math.floor((Date.now() - startTimeRef.current) / 1000));
       }, 1000);
     }
     
@@ -129,10 +133,11 @@ const DailyActivityScreen = ({ navigation, route }) => {
         difficultyRating,
         painRating,
         completedExercises,
-        elapsedTime
+        elapsedTime,
       });
       // 更新活动记录（调用 context）
-      await addActivityFromSession(session, difficultyRating, painRating, completedExercises, elapsedTime);
+      const start_time = new Date(startTimeRef.current).toISOString();
+      await addActivityFromSession(session, difficultyRating, painRating, completedExercises, elapsedTime, start_time);
 
 
 
