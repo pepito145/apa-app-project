@@ -160,7 +160,16 @@ const SettingsScreen = ({ navigation, onLogout }) => {
         {
           text: 'Déconnecter',
           style: 'destructive',
-          onPress: () => {
+          onPress: async () => {
+
+
+          // 1. 清空 AsyncStorage 中的相关数据
+          try {
+            await AsyncStorage.removeItem('activitiesHistory');
+          } catch (error) {
+            console.error('❌ Erreur lors du nettoyage de AsyncStorage :', error);
+          }
+
             setProfile({
               firstName: '',
               lastName: '',

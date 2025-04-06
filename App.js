@@ -6,6 +6,11 @@ import AppNavigator from './navigation/AppNavigator';
 import { ProfileProvider } from './src/screens/ProfileContext'; // Import du contexte
 import * as ScreenOrientation from 'expo-screen-orientation';
 
+import { ActivityProvider } from './src/screens/ActivityContext';
+
+
+
+
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -60,16 +65,18 @@ export default function App() {
 
   return (
     <ProfileProvider>
-      <StatusBar 
-        backgroundColor="#6dd5ed"
-        barStyle="dark-content"
-        translucent={false}
-      />
-      {isLoggedIn ? (
-        <AppNavigator onLogout={handleLogout} />
-      ) : (
-        <AuthScreen onLogin={handleLogin} />
-      )}
+      <ActivityProvider>
+        <StatusBar 
+          backgroundColor="#6dd5ed"
+          barStyle="dark-content"
+          translucent={false}
+        />
+        {isLoggedIn ? (
+          <AppNavigator onLogout={handleLogout} />
+        ) : (
+          <AuthScreen onLogin={handleLogin} />
+        )}
+      </ActivityProvider>
     </ProfileProvider>
   );
 }

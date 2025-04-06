@@ -7,6 +7,7 @@ import { ProfileContext } from './ProfileContext';
 import { useWindowDimensions } from 'react-native';
 import api from '../../api';
 const { width, height } = Dimensions.get('window');
+import { useActivity } from './ActivityContext';
 
 const DailyActivityScreen = ({ navigation, route }) => {
   const { level, session, levelTitle } = route.params;
@@ -98,7 +99,10 @@ const DailyActivityScreen = ({ navigation, route }) => {
     return { level: nextLevel };
   };
 
+  const { addActivityFromSession } = useActivity();
+  const { setProfile } = useContext(ProfileContext);
   const handleSubmitFeedback = async () => {
+    
     try {
       const minutesElapsed = Math.round(elapsedTime / 60);
       
@@ -120,6 +124,19 @@ const DailyActivityScreen = ({ navigation, route }) => {
       const nextRecommendation = calculateNextSession(difficultyRating, painRating, level);
       await AsyncStorage.setItem('recommendedLevel', nextRecommendation.level);
 
+      console.log('[DEBUG] 添加活动参数：', {
+        session,
+        difficultyRating,
+        painRating,
+        completedExercises,
+        elapsedTime
+      });
+      // 更新活动记录（调用 context）
+      await addActivityFromSession(session, difficultyRating, painRating, completedExercises, elapsedTime);
+
+
+
+
       // Mise à jour du profil avec toutes les modifications en une seule fois
       const updatedProfile = {
         ...profile,
@@ -130,7 +147,10 @@ const DailyActivityScreen = ({ navigation, route }) => {
         },
         streak: profile.streak + 1
       };
+      setProfile(updatedProfile);
 
+
+      /*
       // Sauvegarder l'activité (en local sans passer par le backend pour le moment)
       const newActivity = {
         date: currentDate,
@@ -143,6 +163,23 @@ const DailyActivityScreen = ({ navigation, route }) => {
         difficulty: difficultyRating
       };
 
+        // 先尝试上传
+      let uploadSuccess = false;
+      try {
+        await sendSessionDataToBackend(); // 如果没报错就视为成功
+        uploadSuccess = true;
+      } catch (uploadError) {
+        console.error('Erreur upload:', uploadError);
+      }
+
+      // 标记上传状态
+      if (!uploadSuccess) {
+        newActivity.upload = false;
+      }
+
+
+
+
       const existingHistory = await AsyncStorage.getItem('activitiesHistory');
       const activities = existingHistory ? JSON.parse(existingHistory) : [];
       activities.unshift(newActivity);
@@ -154,8 +191,8 @@ const DailyActivityScreen = ({ navigation, route }) => {
       if (!xpAdded) {
         throw new Error('Échec de l\'ajout d\'XP');
       }
-
-      await sendSessionDataToBackend();
+      */
+      
 
       Alert.alert(
         'Séance terminée !',
@@ -186,7 +223,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
     }
   };
 
-  //ENVOI AU BACKEND DE LA SEANCE
+  /*ENVOI AU BACKEND DE LA SEANCE   No longer used, 
   const sendSessionDataToBackend = async () => {
     const sessionId = session.id; // Assuming session has an id property
     const email = await AsyncStorage.getItem('email');
@@ -206,7 +243,12 @@ const DailyActivityScreen = ({ navigation, route }) => {
     } catch (error) {
       console.error('Error sending session data:', error);
     }
-  };
+  };*/
+
+
+
+
+
 
   const renderStars = (rating, setRating) => {
     return [...Array(5)].map((_, index) => (

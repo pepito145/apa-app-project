@@ -1,16 +1,21 @@
 import React, { useState, useEffect} from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useActivity } from './ActivityContext';
+
+
 
 const ActivitiesHistory = ({ navigation }) => {
-
+  const { activities, syncActivities } = useActivity();
   // Données fictives pour les activités
+  /*replaced by useActivity
   const defaultActivities = [];
-
-  const [activities, setActivities] = useState([]);
+  const [activities, setActivities] = useState([]); */
 
   useEffect(() => {
+    /* No longer use
     const loadActivities = async () => {
+      
       try {
         const savedActivities = await AsyncStorage.getItem('activitiesHistory');
         if (savedActivities) {
@@ -20,12 +25,12 @@ const ActivitiesHistory = ({ navigation }) => {
       } catch (error) {
         console.error('Erreur lors du chargement de l\'historique:', error);
       }
-    };
+    };*/
 
-    loadActivities();
+    syncActivities();
 
     const unsubscribe = navigation.addListener('focus', () => {
-      loadActivities();
+      syncActivities();
     });
 
     return unsubscribe;

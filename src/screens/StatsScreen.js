@@ -7,12 +7,18 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 import api from '../../api';
 import { useFocusEffect } from '@react-navigation/native';
-
+import { useActivity, clearAllActivities  } from './ActivityContext';
 
 
 const StatsScreen = ({ navigation }) => {
   const { profile } = useContext(ProfileContext);
-  const [activitiesHistory, setActivitiesHistory] = useState([]);
+  
+  //replaced by activitycontext
+  //const [activitiesHistory, setActivitiesHistory] = useState([]);
+  const { activities, syncActivities } = useActivity();
+  
+  
+  
   const [stats, setStats] = useState({
     totalSessions: 0,
     averageDifficulty: 0,
@@ -40,14 +46,25 @@ const StatsScreen = ({ navigation }) => {
     lastStreakEnd: null,
   });
 
-
   useFocusEffect(
     React.useCallback(() => {
-      loadActivitiesHistory();
-      loadHealthData();
-    }, []) 
+      syncActivities();
+    }, [])
   );
 
+  useEffect(() => {
+    if (activities.length > 0) {
+      calculateStats(activities); 
+    }
+  }, [activities]);
+
+  
+  useFocusEffect(
+  React.useCallback(() => {
+    loadHealthData();
+  }, []) 
+);
+/*Replaced by syncActivities
   const loadActivitiesHistory = async () => {
     try {
       const history = await AsyncStorage.getItem('activitiesHistory');
@@ -59,7 +76,7 @@ const StatsScreen = ({ navigation }) => {
     } catch (error) {
       console.error('Erreur lors du chargement de l\'historique:', error);
     }
-  };
+  };*/
 
   const calculateStats = (history) => {
     if (!history || history.length === 0) {
@@ -283,6 +300,9 @@ const StatsScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
+      <TouchableOpacity onPress={clearAllActivities}>
+  <Text> Effacer les activités</Text>
+</TouchableOpacity>
       <LinearGradient
         colors={['#6dd5ed', '#2193b0']}
         style={styles.container}
@@ -452,7 +472,7 @@ const StatsScreen = ({ navigation }) => {
               </Text>
             )}
             <Text style={styles.sectionTitle}>Dernières Activités</Text>
-            {activitiesHistory.slice(0, 3).map((activity, index) => (
+            {activities.slice(0, 3).map((activity, index) => (
               <View key={index} style={styles.activityCard}>
                 <View style={styles.activityHeader}>
                   <Text style={styles.activityDate}>{activity.date}</Text>

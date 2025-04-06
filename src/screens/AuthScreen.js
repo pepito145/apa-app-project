@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Dimensions, Image } from 'react-native';
 import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient'; // Nécessaire : expo install expo-linear-gradient
 import logo from '../../assets/logo-test.png'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,9 +11,8 @@ const { width, height } = Dimensions.get('window');
 
 
 import api, { setToken } from '../../api';
-import { useContext } from "react";
 import { ProfileContext } from './ProfileContext';
-
+import { useActivity } from './ActivityContext';
 
 
 
@@ -30,7 +27,7 @@ const AuthScreen = ({ onLogin }) => {
 
 
   const { loadProfileFromBackend } = useContext(ProfileContext);
-
+  const { syncActivities } = useActivity();
 
 
   const resetForm = () => {
@@ -78,7 +75,8 @@ const AuthScreen = ({ onLogin }) => {
         //load profil
         await loadProfileFromBackend();
 
-
+        //load activity
+        await syncActivities();
 
         onLogin(response.data.token); // Passe le token à App.js
       } else {
