@@ -74,7 +74,7 @@ const AuthScreen = ({ onLogin }) => {
 
         //load profil
         await loadProfileFromBackend();
-
+        
         //load activity
         await syncActivities();
 

@@ -1,8 +1,8 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect, useCallback} from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useActivity } from './ActivityContext';
-
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const ActivitiesHistory = ({ navigation }) => {
@@ -12,7 +12,7 @@ const ActivitiesHistory = ({ navigation }) => {
   const defaultActivities = [];
   const [activities, setActivities] = useState([]); */
 
-  useEffect(() => {
+  //useEffect(() => {
     /* No longer use
     const loadActivities = async () => {
       
@@ -26,16 +26,11 @@ const ActivitiesHistory = ({ navigation }) => {
         console.error('Erreur lors du chargement de l\'historique:', error);
       }
     };*/
-
-    syncActivities();
-
-    const unsubscribe = navigation.addListener('focus', () => {
-      syncActivities();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
+    useFocusEffect(
+      useCallback(() => {
+        syncActivities();
+      }, [])
+    );
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -49,7 +44,15 @@ const ActivitiesHistory = ({ navigation }) => {
             <Text style={styles.name}>{activity.name}</Text>
             <View style={styles.detailsRow}>
               <Text style={styles.details}>{activity.duration}</Text>
-              <Text style={styles.details}>{activity.calories}</Text>
+              {activity.calories != null && (
+                <Text style={styles.details}>calories: {activity.calories}</Text>
+              )}
+              {activity.hr_average != null && (
+                <Text style={styles.details}>bpm: {activity.hr_average}</Text>
+              )}
+              {activity.intensity != null && (
+                <Text style={styles.details}>intensity: {activity.intensity}</Text>
+              )}
             </View>
             <Text style={styles.exercises}>
               {activity.exercisesCompleted} exercices sur {activity.totalExercises} réalisés

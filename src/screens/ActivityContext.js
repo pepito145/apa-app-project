@@ -7,6 +7,7 @@ export const ActivityContext = createContext();
 export const ActivityProvider = ({ children }) => {
   const [activities, setActivities] = useState([]);
 
+  //    REPLACED BY syncActivites
   const loadActivitiesFromBackend = async () => {
     try {
       const email = await AsyncStorage.getItem('email');
@@ -37,6 +38,12 @@ export const ActivityProvider = ({ children }) => {
       painLevel: seance.painLevel,
       time: seance.time,
       upload: true,
+      intensity: seance.intensity,
+      hr_average: seance.hr_average,
+      hr_max: seance.hr_max,
+      hr_min: seance.hr_min,
+      calories: seance.calories,
+      should_update: seance.should_update,
     }));
   };
 
@@ -59,7 +66,7 @@ export const ActivityProvider = ({ children }) => {
         time: timestamp,
         start_time: start_time,
         duration: `${minutesElapsed} min`,
-        calories: `${Math.round(minutesElapsed * 5)} kcal`,
+
         exercisesCompleted: completedExercises,
         totalExercises: session.exercises?.length || completedExercises,
         painLevel: pain,
@@ -107,7 +114,7 @@ export const ActivityProvider = ({ children }) => {
     }
   };
 
-
+  // [Unused]
   const loadActivitiesFromStorage = async () => {
     try {
       const stored = await AsyncStorage.getItem('activitiesHistory');
@@ -119,6 +126,8 @@ export const ActivityProvider = ({ children }) => {
     }
   };
 
+
+  
   const syncActivities = async () => {
     try {
       const email = await AsyncStorage.getItem('email');
@@ -149,14 +158,14 @@ export const ActivityProvider = ({ children }) => {
       }
 
       const response = await api.post('request_activity/',  { email });
-      console.log('👉 response.data:', response.data);
+      console.log('👉 request_activity response:', response.data);
       const backendActivities = transformBackendActivities(response.data.activities);
 
       for (let backendItem of backendActivities) {
-        const exists = syncedActivities.some(item => {
+        const exists = syncedActivities.find(item => {
           const t1 = new Date(item.time).getTime();
           const t2 = new Date(backendItem.time).getTime();
-          console.log(`🕒 Comparaison des timestamps:\n→ local: ${item.time} (${t1})\n→ backend: ${backendItem.time} (${t2})`);
+          //console.log(`🕒 Comparaison des timestamps:\n→ local: ${item.time} (${t1})\n→ backend: ${backendItem.time} (${t2})`);
           return t1 === t2;
         });
       
@@ -164,9 +173,13 @@ export const ActivityProvider = ({ children }) => {
           syncedActivities.unshift(backendItem);
         }
         else {
-            if ((backendItem.activities || []).length > 0 && (!exists.activities || exists.activities.length === 0)) {
+            console.log("should_update: ",backendItem)
+            if (backendItem.should_update){
                 console.log('🔁 Updating activities of existing seance');
-                exists.activities = backendItem.activities;
+                console.log('📦 backendItem.activities:', backendItem);
+                console.log("更新前 syncedActivities：", JSON.stringify(syncedActivities, null, 2));
+                Object.assign(exists, backendItem);
+                console.log("更新后 syncedActivities：", JSON.stringify(syncedActivities, null, 2));
               }
         }
       }

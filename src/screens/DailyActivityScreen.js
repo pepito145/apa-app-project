@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, SafeAreaView, D
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ProfileContext } from './ProfileContext';
+import { ProfileContext } from './ProfileContext'; 
 import { useWindowDimensions } from 'react-native';
 import api from '../../api';
 const { width, height } = Dimensions.get('window');
