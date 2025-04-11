@@ -32,7 +32,7 @@ export const ActivityProvider = ({ children }) => {
         month: 'short',
         year: 'numeric'
       }),
-      exercisesCompleted: seance.totalExercises, // 假设都完成了
+      exercisesCompleted: seance.totalExercises,
       totalExercises: seance.totalExercises,
       difficulty: seance.difficulty,
       painLevel: seance.painLevel,
@@ -180,6 +180,8 @@ export const ActivityProvider = ({ children }) => {
                 console.log("更新前 syncedActivities：", JSON.stringify(syncedActivities, null, 2));
                 Object.assign(exists, backendItem);
                 console.log("更新后 syncedActivities：", JSON.stringify(syncedActivities, null, 2));
+                console.log("开始更新下一等级")
+                calculate_new__next_level(backendItem.avg_max,backendItem.time,backendItem.difficulty);
               }
         }
       }
@@ -190,6 +192,96 @@ export const ActivityProvider = ({ children }) => {
       console.error('Erreur de synchronisation des activités:', e);
     }
   };
+
+
+
+  const calculate_new__next_level = async (avg_max, time, difficulty) => { 
+    try {
+      // 从 AsyncStorage 获取 profile
+      const profileStr = await AsyncStorage.getItem('userProfile');
+      const profile = profileStr ? JSON.parse(profileStr) : null;
+  
+      if (!profile || !profile.lastSessionFeedback || !profile.lastSessionFeedback.date) {
+        console.log(profile.lastSessionFeedback);
+        console.warn('⚠️ 日期信息缺失，跳过计算。');
+        return { intensityRating: 1, metValue: 3.0 };
+      }
+  
+      const sessionDate = new Date(profile.lastSessionFeedback.date);
+      const backendTime = new Date(time);
+  
+      // 如果不是同一天，直接跳过计算
+      //if (sessionDate.toDateString() !== backendTime.toDateString()) {
+      //  console.log('⏩ 非当天活动，跳过 fc_max 计算。');
+      //  return { intensityRating: 1, metValue: 3.0 };
+      //}
+  
+      // 获取年龄
+    // 从 AsyncStorage 获取 profile
+
+      if (!profile || !profile.age) {
+        console.warn('⚠️ 年龄信息缺失，跳过计算。');
+        return { intensityRating: 1, metValue: 3.0 };
+      }
+
+      const age = profile.age;
+  
+      // 计算最大心率
+      const fc_max = 220 - age;
+      const actual_fc = fc_max * (avg_max / 100);
+  
+      let intensityRating = 1;
+      if (actual_fc >= 180) {
+        intensityRating = 5;
+      } else if (actual_fc >= 150) {
+        intensityRating = 4;
+      } else if (actual_fc >= 120) {
+        intensityRating = 3;
+      } else if (actual_fc >= 90) {
+        intensityRating = 2;
+      }
+  
+      const METs = {
+        1: 3.0,
+        2: 4.0,
+        3: 5.0,
+        4: 6.0,
+        5: 7.0
+      };
+  
+      // 获取 last_level 和 backendItem.difficulty
+      const lastLevel = await AsyncStorage.getItem('last_level');
+  
+      // 判断 intensityRating 和 difficulty 是否都为 1 或 2
+      if ((intensityRating === 1 || intensityRating === 2) && (difficulty === 1 || difficulty === 2)) {
+        if (lastLevel === 'niveau1' || lastLevel === 'niveau2') {
+          const nextLevel = lastLevel === 'niveau1' ? 'niveau2' : 'niveau3';
+          await AsyncStorage.setItem('recommendedLevel', nextLevel);
+          console.log(`升一级：新的推荐级别是 ${nextLevel}`);
+        }
+      }
+      // 判断 intensityRating 和 difficulty 是否都为 4 或 5
+      else if ((intensityRating === 4 || intensityRating === 5) && (difficulty === 4 || difficulty === 5)) {
+        if (lastLevel === 'niveau2' || lastLevel === 'niveau3') {
+          const nextLevel = lastLevel === 'niveau2' ? 'niveau1' : 'niveau2';
+          await AsyncStorage.setItem('recommendedLevel', nextLevel);
+          console.log(`降一级：新的推荐级别是 ${nextLevel}`);
+        }
+      }
+  
+      return {
+        intensityRating,
+        metValue: METs[intensityRating]
+      };
+  
+    } catch (err) {
+      console.error('❌ 错误: calculate_new__next_level 出错', err);
+      return { intensityRating: 1, metValue: 3.0 };
+    }
+  };
+
+
+
   const clearAllActivities = async () => {
     try {
       await AsyncStorage.removeItem('activitiesHistory');

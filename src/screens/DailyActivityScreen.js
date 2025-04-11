@@ -108,6 +108,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
   const handleSubmitFeedback = async () => {
     
     try {
+      console.log("elapsedTime: ", elapsedTime);
       const minutesElapsed = Math.round(elapsedTime / 60);
       
       // Calcul de l'XP totale
@@ -126,9 +127,11 @@ const DailyActivityScreen = ({ navigation, route }) => {
 
       // Calcul du prochain niveau
       const nextRecommendation = calculateNextSession(difficultyRating, painRating, level);
+      const last_level = await AsyncStorage.getItem('recommendedLevel');;
+      await AsyncStorage.setItem('last_level', last_level);
       await AsyncStorage.setItem('recommendedLevel', nextRecommendation.level);
 
-      console.log('[DEBUG] 添加活动参数：', {
+      console.log('添加活动参数：', {
         session,
         difficultyRating,
         painRating,
@@ -146,6 +149,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
       const updatedProfile = {
         ...profile,
         lastSessionFeedback: {
+
           difficulty: difficultyRating,
           pain: painRating,
           date: currentDate
@@ -153,6 +157,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
         streak: profile.streak + 1
       };
       setProfile(updatedProfile);
+      await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));
 
 
       /*

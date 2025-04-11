@@ -33,7 +33,7 @@ export const ProfileProvider = ({ children }) => {
     gender: '',
     age: '',
     weight: '',
-    ipaqScore: '',
+    ipaqScore: 0,
     streak: 0,
     isWithingsLinked: false,
     access_token: '',
@@ -45,6 +45,7 @@ export const ProfileProvider = ({ children }) => {
     level: 1,
     lastDailyXPDate: null,
     lastStepsXPDate: null,
+    last_level: null,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -167,7 +168,8 @@ export const ProfileProvider = ({ children }) => {
         weight,
         gender,
         XP,
-        level
+        level,
+        ipaqScore,
       } = finalProfile;
       const payload = {
         firstName,
@@ -177,7 +179,8 @@ export const ProfileProvider = ({ children }) => {
         gender,
         email,
         XP,
-        level
+        level,
+        ipaqScore,
       };
       await api.post('update_profil/', payload);
 

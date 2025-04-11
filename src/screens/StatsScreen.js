@@ -300,9 +300,9 @@ const StatsScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-       {/*<TouchableOpacity onPress={clearAllActivities}>
+       {<TouchableOpacity onPress={clearAllActivities}>
             <Text> Effacer les activités</Text>
-          </TouchableOpacity>*/}
+          </TouchableOpacity>}
       <LinearGradient
         colors={['#6dd5ed', '#2193b0']}
         style={styles.container}

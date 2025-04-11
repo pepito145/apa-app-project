@@ -29,7 +29,7 @@ const ActivitiesScreen = ({ navigation }) => {
   const [selectedSession, setSelectedSession] = useState(null);
 
   const getRecommendedLevel = (ipaqScore) => {
-    if (ipaqScore <= 600) return 'niveau1';
+    if (ipaqScore <= 800) return 'niveau1';
     if (ipaqScore <= 1500) return 'niveau2';
     return 'niveau3';
   };
@@ -65,7 +65,9 @@ const ActivitiesScreen = ({ navigation }) => {
           if (!savedRecommendedLevel && profile.ipaqScore) {
             await AsyncStorage.setItem('recommendedLevel', recLevel);
           }
-
+          console.log("savedRecommendedLevel：", savedRecommendedLevel);
+          console.log("ipaqScore", profile.ipaqScore);
+          console.log("活动难度：", recLevel);
           setRecommendedLevel(recLevel);
 
           const savedSession = await AsyncStorage.getItem('currentSession');
