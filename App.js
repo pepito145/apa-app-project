@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext  } from 'react';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthScreen from './src/screens/AuthScreen';
@@ -7,8 +7,6 @@ import { ProfileProvider } from './src/screens/ProfileContext'; // Import du con
 import * as ScreenOrientation from 'expo-screen-orientation';
 
 import { ActivityProvider } from './src/screens/ActivityContext';
-
-
 
 
 export default function App() {

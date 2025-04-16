@@ -11,7 +11,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useFocusEffect } from '@react-navigation/native';
 import api from '../../api';
 import { Circle, G, Svg } from 'react-native-svg';
-
+import { useCallback } from 'react';
 const { width, height } = Dimensions.get('window');
 
 const CircularProgress = ({ steps = 2500, goal = 5000, radius = 50, unit = "pas" }) => {
@@ -62,22 +62,18 @@ const HomeScreen = ({ navigation, route }) => {
   const [extractedCode, setExtractedCode] = useState('');
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
     age: '',
     weight: '',
     gender: ''
   });
 
   const isFormValid = () => {
-    return formData.firstName.trim() !== '' &&
-           formData.lastName.trim() !== '' &&
-           formData.age.trim() !== '' &&
+    return formData.age.trim() !== '' &&
            formData.weight.trim() !== '' &&
            formData.gender !== '';
   };
 
-  const isProfileIncomplete = !profile.firstName || !profile.lastName || !profile.gender || !profile.age || !profile.weight;
+  const isProfileIncomplete = !profile.gender || !profile.age || !profile.weight;
 
   const [steps, setSteps] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -97,7 +93,7 @@ const HomeScreen = ({ navigation, route }) => {
       let email = await AsyncStorage.getItem('email');
       
       // 请求后端获取 client_id
-      const response = await api.post('client_id/', { email });
+      const response = await api.post('client_id/', { "email":email });
       const clientId = response.data.client_id;
   
       if (!clientId) {
@@ -152,148 +148,22 @@ const HomeScreen = ({ navigation, route }) => {
     }, [route.params?.refresh])
   );
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const savedProfile = await AsyncStorage.getItem('userProfile');
-        if (savedProfile) {
-          const parsedProfile = JSON.parse(savedProfile);
-          setProfile(parsedProfile);
-        }
-      } catch (error) {
-        console.error('Erreur lors du rechargement du profil:', error);
-      }
-    };
-    loadProfile();
-  }, [profile.XP]);
-
-
-  /*  update 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      setStepsError(false);
-      setHeartRateError(false);
-
-      const today = new Date();
-      const formattedDate = today.toISOString().split('T')[0];
-
-      const stepsResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${profile.access_token}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `action=getactivity&startdateymd=${formattedDate}&enddateymd=${formattedDate}`,
-      });
-
-      const stepsData = await stepsResponse.json();
-
-      if (stepsData.status === 0) {
-        const currentSteps = stepsData.body.activities.length > 0 ? stepsData.body.activities[0].steps : 0;
-        setSteps(currentSteps);
-        await checkStepsXP(currentSteps);
-        console.log("Requête steps réussie")
-      } else {
-        setSteps('N/A');
-        console.log("Erreur requête steps")
-      }
-
-      const now = new Date();
-      const currentTimestamp = Math.floor(now.getTime() / 1000);
-      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const midnightTimestamp = Math.floor(midnight.getTime() / 1000);
-
-      const bpmResponse = await fetch('https://wbsapi.withings.net/v2/measure', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${profile.access_token}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `action=getintradayactivity&startdate=${midnightTimestamp}&enddate=${currentTimestamp}`,
-      });
-
-      const bpmData = await bpmResponse.json();
-
-      if (bpmData.status === 0) {
-        if (bpmData.body.series) {
-          const seriesArray = Object.values(bpmData.body.series);
-          const heartRates = seriesArray
-            .filter(item => item.heart_rate != null)
-            .map(item => item.heart_rate);
-
-          if (heartRates.length > 0) {
-            const averageBPM = heartRates.reduce((sum, rate) => sum + rate, 0) / heartRates.length;
-            setHeartRateAverage(Math.round(averageBPM));
-            console.log("BPM trouvé :", averageBPM);
-          } else {
-            setHeartRateAverage('N/A');
-            console.log("Pas de BPM dans les données");
+  useFocusEffect(
+    useCallback(() => {
+      const loadProfile = async () => {
+        try {
+          const savedProfile = await AsyncStorage.getItem('userProfile');
+          if (savedProfile) {
+            const parsedProfile = JSON.parse(savedProfile);
+            setProfile(parsedProfile);
           }
-        } else {
-          setHeartRateAverage('N/A');
-          console.log("Pas de séries dans les données");
+        } catch (error) {
+          console.error('Erreur lors du rechargement du profil:', error);
         }
-      } else {
-        setHeartRateAverage('N/A');
-        console.log("Erreur requête BPM");
-      }
-    } catch (error) {
-      console.error('Erreur API :', error);
-      setSteps('N/A');
-      setHeartRateAverage('N/A');
-    } finally {
-      setLoading(false);
-    }
-  };*/
-
-
-
-  //get code from withings, obsolete
-  /*
-  const handleLinkWithings = async (code) => {
-    const url = 'https://wbsapi.withings.net/v2/oauth2';
-    const params = new URLSearchParams({
-      action: 'requesttoken',
-      grant_type: 'authorization_code',
-      client_id: '8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25',
-      client_secret: '77f0088525010a3bd6ab17df6d34c0423aa4c16ced8ede88e00b8a26d9da288b',
-      code: code,
-      redirect_uri: 'https://oauth.pstmn.io/v1/callback',
-    });
-  
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params.toString(),
-      });
-  
-      const data = await response.json();
-      console.log('Réponse de l\'API Withings :', data);
-
-      if (data.body) {
-        const accessToken = data.body.access_token;
-        const refreshToken = data.body.refresh_token;
-    
-        const updatedProfile = {
-          ...profile,
-          access_token: accessToken,
-          refresh_token: refreshToken,
-          isWithingsLinked: true,
-        };
-    
-        setProfile(updatedProfile);
-    
-        await saveProfile(updatedProfile);
-      }
-
-    } catch (error) {
-      console.error('Erreur lors de la requête à Withings :', error);
-    }
-  };*/
+      };
+      loadProfile();
+    }, [])
+  );
 
 
 
@@ -355,64 +225,8 @@ const HomeScreen = ({ navigation, route }) => {
 
 
 
-/*  refreshtoken, obsolete
-  const refreshToken = async () => {
-    const threeHoursInMs = 3 * 60 * 60 * 1000;
-    const now = Date.now();
-    
-    if (profile.lastRefreshTime && (now - profile.lastRefreshTime) < threeHoursInMs) {
-      const timeLeft = Math.ceil((threeHoursInMs - (now - profile.lastRefreshTime)) / (60 * 1000));
-      Alert.alert(
-        'Refresh non autorisé',
-        `Vous devez attendre ${timeLeft} minutes avant de pouvoir rafraîchir le token.`
-      );
-      return;
-    }
-
-    const url = 'https://wbsapi.withings.net/v2/oauth2';
-    const params = new URLSearchParams({
-      action: 'requesttoken',
-      grant_type: 'refresh_token',
-      client_id: '8c470e0841b5b9219c53916974da08e69fa7334d5b51a2e607078404619cbf25',
-      client_secret: '77f0088525010a3bd6ab17df6d34c0423aa4c16ced8ede88e00b8a26d9da288b',
-      refresh_token: profile.refresh_token,
-    });
-
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params.toString(),
-      });
-
-      const data = await response.json();
-      console.log('Réponse de l\'API Withings pour le refresh token :', data);
-
-      if (data.body) {
-        const accessToken = data.body.access_token;
-        const refreshToken = data.body.refresh_token;
-    
-        const updatedProfile = {
-          ...profile,
-          access_token: accessToken,
-          refresh_token: refreshToken,
-          lastRefreshTime: now,
-        };
-    
-        setProfile(updatedProfile);
-        await saveProfile(updatedProfile);
-        Alert.alert('Succès', 'Le token a été rafraîchi avec succès.');
-      }
-    } catch (error) {
-      console.error('Erreur lors de la requête pour rafraîchir le token :', error);
-      Alert.alert('Erreur', 'Une erreur est survenue lors du rafraîchissement du token.');
-    }
-  };
-*/
   const handleSaveProfile = async () => {
-    if (!formData.firstName || !formData.lastName || !formData.age || !formData.weight) {
+    if ( !formData.age || !formData.weight) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
@@ -431,8 +245,6 @@ const HomeScreen = ({ navigation, route }) => {
 
     const updatedProfile = {
       ...profile,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
       age: formData.age,
       weight: formData.weight,
       gender: formData.gender
@@ -509,20 +321,6 @@ const HomeScreen = ({ navigation, route }) => {
 
                   <Text style={styles.modalTitle}>Vos informations</Text>
                   
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Prénom"
-                    value={formData.firstName}
-                    onChangeText={(text) => setFormData({...formData, firstName: text})}
-                  />
-
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Nom"
-                    value={formData.lastName}
-                    onChangeText={(text) => setFormData({...formData, lastName: text})}
-                  />
-
                   <TextInput
                     style={styles.input}
                     placeholder="Âge"
@@ -623,32 +421,7 @@ const HomeScreen = ({ navigation, route }) => {
 
           {!isProfileIncomplete && profile.isWithingsLinked && profile.ipaqScore && (
             <>
-            {/* Deprecated: This token refresh button is no longer used.
-              <View style={styles.refreshButtonsContainer}>
-                <TouchableOpacity
-                  style={styles.refreshButton}
-                  onPress={fetchData}
-                >
-                  <Text style={styles.refreshButtonText}>Rafraîchir les données</Text>
-                </TouchableOpacity>
-
-
-
-                
-                <TouchableOpacity
-                  style={[
-                    styles.refreshButton,
-                    profile.lastRefreshTime && 
-                    (Date.now() - profile.lastRefreshTime < 3 * 60 * 60 * 1000) && 
-                    styles.refreshButtonDisabled
-                  ]}
-                  onPress={refreshToken}
-                  disabled={profile.lastRefreshTime && (Date.now() - profile.lastRefreshTime < 3 * 60 * 60 * 1000)}
-                >
-                  <Text style={styles.refreshButtonText}>Rafraîchir le token</Text>
-                </TouchableOpacity>
-                
-              </View>*/}
+            
 
               <View style={styles.statsRow}>
                 <TouchableOpacity 

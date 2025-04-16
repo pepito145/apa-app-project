@@ -9,7 +9,6 @@ import api from '../../api';
 import { useFocusEffect } from '@react-navigation/native';
 import { useActivity, clearAllActivities  } from './ActivityContext';
 
-
 const StatsScreen = ({ navigation }) => {
   const { profile } = useContext(ProfileContext);
   
@@ -64,19 +63,7 @@ const StatsScreen = ({ navigation }) => {
     loadHealthData();
   }, []) 
 );
-/*Replaced by syncActivities
-  const loadActivitiesHistory = async () => {
-    try {
-      const history = await AsyncStorage.getItem('activitiesHistory');
-      if (history) {
-        const parsedHistory = JSON.parse(history);
-        setActivitiesHistory(parsedHistory);
-        calculateStats(parsedHistory);
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement de l\'historique:', error);
-    }
-  };*/
+
 
   const calculateStats = (history) => {
     if (!history || history.length === 0) {
@@ -156,17 +143,7 @@ const StatsScreen = ({ navigation }) => {
   const loadHealthData = async () => {
     try {
 
-      /*
-      if (!profile.access_token) {
-        console.log('Pas de token Withings disponible');
-        const lastData = await AsyncStorage.getItem('lastProcessedWithingsData');
-        if (lastData) {
-          const parsedData = JSON.parse(lastData);
-          calculateHealthStats(parsedData);
-        }
-        return;
-      }
-      */
+
       const today = new Date();
       const oneWeekAgo = new Date(today.getTime() -  7 * 24 * 60 * 60 * 1000);
       
@@ -233,7 +210,7 @@ const StatsScreen = ({ navigation }) => {
 
     const measurements = data.measurements;
     const today = new Date();
-    const oneWeekAgo = new Date(today.getTime() -1000* 7 * 24 * 60 * 60 * 1000);
+    const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
     // Filtrer les mesures des 7 derniers jours
     const recentMeasurements = measurements.filter(m => {
@@ -298,11 +275,17 @@ const StatsScreen = ({ navigation }) => {
     </View>
   );
 
+  const { printAllAsyncStorage } = useContext(ProfileContext);
+
+
   return (
     <SafeAreaView style={styles.safeContainer}>
-       {<TouchableOpacity onPress={clearAllActivities}>
+        {<TouchableOpacity onPress={clearAllActivities}>
             <Text> Effacer les activités</Text>
           </TouchableOpacity>}
+        {<TouchableOpacity onPress={printAllAsyncStorage}>
+          <Text> afficher asyncstorage</Text>
+        </TouchableOpacity>}
       <LinearGradient
         colors={['#6dd5ed', '#2193b0']}
         style={styles.container}

@@ -110,9 +110,8 @@ const SettingsScreen = ({ navigation, onLogout }) => {
                         ipaqScore: null,
                         isWithingsLinked: false,
                         streak: 0,
-                        access_token: '',
-                        refresh_token: '',
                         lastRefreshTime: null,
+                        XP: 0,
                       });
 
                       // Annuler toutes les notifications programmées
@@ -151,6 +150,7 @@ const SettingsScreen = ({ navigation, onLogout }) => {
     );
   };
 
+  const { printAllAsyncStorage } = useContext(ProfileContext);
   const handleLogout = () => {
     Alert.alert(
       'Déconnexion',
@@ -161,28 +161,17 @@ const SettingsScreen = ({ navigation, onLogout }) => {
           text: 'Déconnecter',
           style: 'destructive',
           onPress: async () => {
-
-
-          // 1. 清空 AsyncStorage 中的相关数据
-          try {
-            await AsyncStorage.removeItem('activitiesHistory');
-          } catch (error) {
-            console.error('❌ Erreur lors du nettoyage de AsyncStorage :', error);
-          }
-
-            setProfile({
-              firstName: '',
-              lastName: '',
-              gender: '',
-              age: '',
-              weight: '',
-              ipaqScore: null,
-              isWithingsLinked: false,
-              streak: 0,
-              access_token: '',
-              refresh_token: '',
-            });
-            onLogout();
+            try {
+              //console.log("🧹 清 asyncStorage 之前");
+              //await printAllAsyncStorage();
+              await AsyncStorage.clear();
+              //console.log("✅ 清 asyncStorage 之后");
+              //await printAllAsyncStorage();
+  
+              onLogout();
+            } catch (error) {
+              console.error('❌ 出错了 during logout:', error);
+            }
           },
         },
       ]

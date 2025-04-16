@@ -21,12 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.pepito145.apaappproject",
-      "permissions": [],
-      //"androidStatusBar": {
-        //"backgroundColor": "#6dd5ed",
-        //"barStyle": "dark-content",
-        //"translucent": false
-      //}
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/favicon.png"

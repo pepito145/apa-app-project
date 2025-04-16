@@ -119,11 +119,25 @@ const DailyActivityScreen = ({ navigation, route }) => {
 
       console.log('Debug totalXP avant addXP:', totalXP);
 
+
+    
+
+
+
+
+
       const currentDate = new Date().toLocaleDateString('fr-FR', {
         day: '2-digit',
         month: 'short',
         year: 'numeric'
       });
+
+
+      
+
+
+
+
 
       // Calcul du prochain niveau
       const nextRecommendation = calculateNextSession(difficultyRating, painRating, level);
@@ -138,6 +152,13 @@ const DailyActivityScreen = ({ navigation, route }) => {
         completedExercises,
         elapsedTime,
       });
+
+
+
+
+
+
+
       // 更新活动记录（调用 context）
       const start_time = new Date(startTimeRef.current).toISOString();
       await addActivityFromSession(session, difficultyRating, painRating, completedExercises, elapsedTime, start_time);
@@ -159,49 +180,8 @@ const DailyActivityScreen = ({ navigation, route }) => {
       setProfile(updatedProfile);
       await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));
 
-
-      /*
-      // Sauvegarder l'activité (en local sans passer par le backend pour le moment)
-      const newActivity = {
-        date: currentDate,
-        name: `${levelTitle} - ${session.title}`,
-        duration: `${minutesElapsed} min`,
-        calories: `${Math.round(minutesElapsed * 5)} kcal`,
-        exercisesCompleted: completedExercises,
-        totalExercises: exercises.length,
-        painLevel: painRating,
-        difficulty: difficultyRating
-      };
-
-        // 先尝试上传
-      let uploadSuccess = false;
-      try {
-        await sendSessionDataToBackend(); // 如果没报错就视为成功
-        uploadSuccess = true;
-      } catch (uploadError) {
-        console.error('Erreur upload:', uploadError);
-      }
-
-      // 标记上传状态
-      if (!uploadSuccess) {
-        newActivity.upload = false;
-      }
-
-
-
-
-      const existingHistory = await AsyncStorage.getItem('activitiesHistory');
-      const activities = existingHistory ? JSON.parse(existingHistory) : [];
-      activities.unshift(newActivity);
-      await AsyncStorage.setItem('activitiesHistory', JSON.stringify(activities));
-
-      // Ajouter l'XP et sauvegarder le profil en une seule opération
-      const xpAdded = await addXP(totalXP);
-
-      if (!xpAdded) {
-        throw new Error('Échec de l\'ajout d\'XP');
-      }
-      */
+      addXP(totalXP);
+     
       
 
       Alert.alert(
@@ -233,27 +213,6 @@ const DailyActivityScreen = ({ navigation, route }) => {
     }
   };
 
-  /*ENVOI AU BACKEND DE LA SEANCE   No longer used, 
-  const sendSessionDataToBackend = async () => {
-    const sessionId = session.id; // Assuming session has an id property
-    const email = await AsyncStorage.getItem('email');
-    const time = Math.floor(Date.now() / 1000);
-    const payload = {
-      email: email,
-      painLevel: painRating,
-      difficulty: difficultyRating,
-      totalExercises: completedExercises,
-      duration: elapsedTime,
-      frontend_id: sessionId,
-      time: time,
-    };
-    try {
-      const response = await api.post('get_seance/', payload);
-      console.log('✅ Session data sent successfully');
-    } catch (error) {
-      console.error('Error sending session data:', error);
-    }
-  };*/
 
 
 

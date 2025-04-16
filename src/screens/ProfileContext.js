@@ -36,8 +36,6 @@ export const ProfileProvider = ({ children }) => {
     ipaqScore: 0,
     streak: 0,
     isWithingsLinked: false,
-    access_token: '',
-    refresh_token: '',
     isFirstVisit: true,
     stepsGoal: 5000,
     isStreakPaused: false,
@@ -232,20 +230,19 @@ export const ProfileProvider = ({ children }) => {
   // Simplifier addXP pour utiliser saveProfile
   const addXP = async (amount) => {
     try {
-      const currentXP = Number(profile.XP) || 0;
-      const xpToAdd = Number(amount);
-      const newXP = currentXP + xpToAdd;
-
+      const savedProfile = await AsyncStorage.getItem('userProfile');
+      const currentProfile = savedProfile ? JSON.parse(savedProfile) : profile;
+      const currentXP = Number(currentProfile.XP) || 0;
+      const newXP = currentXP + amount;
+  
       const updatedProfile = {
-        ...profile,
+        ...currentProfile,
         XP: newXP
       };
-
+  
       await saveProfile(updatedProfile);
-      return true;
     } catch (error) {
-      console.error('Erreur lors de l\'ajout d\'XP:', error);
-      return false;
+      console.error('Erreur dans addXP (avec AsyncStorage):', error);
     }
   };
 
@@ -277,6 +274,34 @@ export const ProfileProvider = ({ children }) => {
     await addXP(200);
   };
 
+
+
+
+
+  const printAllAsyncStorage = async () => {
+    try {
+      const allKeys = await AsyncStorage.getAllKeys();
+      const allItems = await AsyncStorage.multiGet(allKeys);
+  
+      console.log('📦 Tous les éléments dans AsyncStorage :');
+      allItems.forEach(([key, value]) => {
+        console.log(`🔑 ${key} =>`, value);
+      });
+    } catch (error) {
+      console.error('❌ Erreur lors de la lecture de AsyncStorage :', error);
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+
   if (isLoading) {
     return null; // Ou un composant de chargement si vous préférez
   }
@@ -297,6 +322,7 @@ export const ProfileProvider = ({ children }) => {
       addQuestionnaireXP,
       calculateLevel,
       loadProfileFromBackend, //nouveau
+      printAllAsyncStorage,
       LEVEL_DATA,
     }}>
       {children}

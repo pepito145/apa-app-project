@@ -26,7 +26,7 @@ export const ActivityProvider = ({ children }) => {
 
   const transformBackendActivities = (seances) => {
     return (seances || []).map(seance => ({
-      name: `Séance ${seance.seance_id}`,
+      name: `Séance ${seance.private_id}`,
       date: new Date(seance.time).toLocaleDateString('fr-FR', {
         day: '2-digit',
         month: 'short',
@@ -61,7 +61,7 @@ export const ActivityProvider = ({ children }) => {
       const timestamp = new Date().toISOString(); 
   
       const newActivity = {
-        name: `Séance - ${session.title}`,
+        name: null,
         date: currentDate,
         time: timestamp,
         start_time: start_time,
@@ -90,7 +90,10 @@ export const ActivityProvider = ({ children }) => {
       try {
         console.log("try upload");
         console.log(newActivity.time);
-        await api.post('get_seance/', payload);
+        const response = await api.post('get_seance/', payload);
+        const data = response.data;
+        newActivity.private_id = data.private_id; 
+        newActivity.name = `Séance ${data.private_id}`; 
         newActivity.upload = true;
       } catch (err) {
         console.warn('❌ Upload failed, saving locally');
@@ -148,24 +151,35 @@ export const ActivityProvider = ({ children }) => {
               duration: parseInt(activity.duration) * 60 || 0,
               frontend_id: activity.frontend_id || '',
               time: activity.time,
+              start_time: activity.start_time,
             };
-            await api.post('get_seance/', payload);
+            const response = await api.post('get_seance/', payload);
+            const data = response.data;
             activity.upload = true;
+            activity.private_id = data.private_id; 
           } catch (uploadError) {
             console.warn('⚠️ Upload failed for activity:', activity);
           }
         }
       }
+      const payload = new URLSearchParams();
+      payload.append('email', email);
 
-      const response = await api.post('request_activity/',  { email });
+      const response = await api.post('request_activity/', payload, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+
       console.log('👉 request_activity response:', response.data);
       const backendActivities = transformBackendActivities(response.data.activities);
-
+      console.log('👉 backendActivities:', backendActivities);
       for (let backendItem of backendActivities) {
+        console.log('👉 backendItem:', backendItem);
         const exists = syncedActivities.find(item => {
           const t1 = new Date(item.time).getTime();
           const t2 = new Date(backendItem.time).getTime();
-          //console.log(`🕒 Comparaison des timestamps:\n→ local: ${item.time} (${t1})\n→ backend: ${backendItem.time} (${t2})`);
+          console.log(`🕒 Comparaison des timestamps:\n→ local: ${item.time} (${t1})\n→ backend: ${backendItem.time} (${t2})`);
           return t1 === t2;
         });
       

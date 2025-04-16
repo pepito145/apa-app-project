@@ -225,6 +225,7 @@ const IPAQForm = ({ navigation }) => {
       <Text style={styles.subtitle}>
         Ce questionnaire évalue votre niveau d'activité physique des 7 derniers jours pour mieux adapter vos exercices.
       </Text>
+      
       <TouchableOpacity style={styles.primaryButton} onPress={() => setCurrentBlock(1)}>
         <Text style={styles.buttonText}>Commencer</Text>
       </TouchableOpacity>
@@ -264,14 +265,16 @@ const IPAQForm = ({ navigation }) => {
       <View style={styles.buttonContainer}>
         {currentBlock > 1 && (
           <TouchableOpacity style={styles.secondaryButton} onPress={previousBlock}>
+            <View style={styles.row}>
             <MaterialIcons name="arrow-back" size={24} color="#666" />
             <Text style={styles.secondaryButtonText}>Retour</Text>
+            </View>
           </TouchableOpacity>
         )}
         <TouchableOpacity
           style={[styles.primaryButton, currentBlock === 1 && styles.fullWidthButton]}
           onPress={currentBlock < blocks.length ? nextBlock : submitForm}
-        >
+        ><View style={styles.row}>
           <Text style={styles.buttonText}>
             {currentBlock < blocks.length ? 'Continuer' : 'Terminer'}
           </Text>
@@ -279,7 +282,7 @@ const IPAQForm = ({ navigation }) => {
             name={currentBlock < blocks.length ? "arrow-forward" : "check"} 
             size={24} 
             color="#fff" 
-          />
+          /></View>
         </TouchableOpacity>
       </View>
     </ScrollView>

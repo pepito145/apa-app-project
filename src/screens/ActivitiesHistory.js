@@ -55,7 +55,7 @@ const ActivitiesHistory = ({ navigation }) => {
               )}
             </View>
             <Text style={styles.exercises}>
-              {activity.exercisesCompleted} exercices sur {activity.totalExercises} réalisés
+              {activity.exercisesCompleted} exercices sur 6 réalisés
             </Text>
             <View style={styles.additionalDetailsRow}>
               <Text style={styles.additionalDetails}>
