@@ -8,7 +8,8 @@ import {
   SafeAreaView, 
   Dimensions, 
   ScrollView, 
-  Image 
+  Image,
+  Modal,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -21,12 +22,46 @@ import exerciseBank from '../data/exerciseBank';
 const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = width > 600 ? width * 0.7 : width * 0.9;
 
+
+
+
+
 // Composant principal
 const ActivitiesScreen = ({ navigation }) => {
   const { profile } = useContext(ProfileContext);
   const [recommendedLevel, setRecommendedLevel] = useState(null);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [selectedSession, setSelectedSession] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+
+  const showInfoBeforeStart = () => {
+    setModalVisible(true);
+  };
+  
+  const proceedToActivity = () => {
+    setModalVisible(false);
+
+    if (selectedLevel && selectedSession && exerciseBank.levels[selectedLevel]) {
+      const selectedSessionData = exerciseBank.levels[selectedLevel].sessions.find(
+        session => session.id === selectedSession
+      );
+      if (selectedSessionData) {
+        navigation.navigate('DailyActivity', {
+          level: selectedLevel,
+          session: selectedSessionData,
+          levelTitle: exerciseBank.levels[selectedLevel].metadata.title
+        });
+      } else {
+        alert('Une erreur est survenue lors de la sélection de la session.');
+      }
+    }
+  };
+  
+
+
+
+
 
   const getRecommendedLevel = (ipaqScore) => {
     if (ipaqScore <= 800) return 'niveau1';
@@ -67,7 +102,7 @@ const ActivitiesScreen = ({ navigation }) => {
           }
           console.log("savedRecommendedLevel：", savedRecommendedLevel);
           console.log("ipaqScore", profile.ipaqScore);
-          console.log("活动难度：", recLevel);
+          console.log("difficulté：", recLevel);
           setRecommendedLevel(recLevel);
 
           const savedSession = await AsyncStorage.getItem('currentSession');
@@ -190,7 +225,7 @@ const ActivitiesScreen = ({ navigation }) => {
                   <View style={styles.speechBubble}>
                     <Text style={styles.speechText}>Une petite séance de sport, ça te tente ?</Text>
                     <View style={styles.buttonContainer1}>
-                      <TouchableOpacity style={styles.yesButton} onPress={handleAccept}>
+                      <TouchableOpacity style={styles.yesButton} onPress={showInfoBeforeStart}>
                         <Text style={styles.buttonText}>Oui</Text>
                       </TouchableOpacity>
                       <TouchableOpacity style={styles.noButton} onPress={handleNoPress}>
@@ -237,7 +272,7 @@ const ActivitiesScreen = ({ navigation }) => {
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity 
                     style={styles.acceptButton}
-                    onPress={handleAccept}
+                    onPress={showInfoBeforeStart}
                   >
                     <MaterialIcons name="play-arrow" size={24} color="#fff" />
                     <Text style={styles.buttonText}>Commencer</Text>
@@ -255,7 +290,37 @@ const ActivitiesScreen = ({ navigation }) => {
             </View>
           ) : null}
         </ScrollView>
-      </LinearGradient>
+      
+    
+
+
+    <Modal
+      visible={modalVisible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={() => setModalVisible(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Veuillez démarrer l'activité sur votre montre ⌚</Text>
+          <Text style={styles.modalText}>Pour démarrer l’activité :</Text>
+<Text style={styles.modalText}>• Mettez votre montre.</Text>
+<Text style={styles.modalText}>• Appuyez longuement pour accéder au menu des activités.</Text>
+<Text style={styles.modalText}>• Appuyez une fois pour sélectionner "Musculation".</Text>
+<Text style={styles.modalText}>• Appuyez longuement à nouveau pour démarrer l’activité.</Text>
+
+          <TouchableOpacity style={styles.modalButton} onPress={proceedToActivity}>
+            <Text style={styles.modalButtonText}>Je suis prêt !</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+
+
+
+
+
+    </LinearGradient>
     </SafeAreaView>
   );
 };
@@ -459,6 +524,49 @@ const styles = StyleSheet.create({
     color: '#2193b0',
     marginLeft: 8,
   },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center'
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20
+  },
+  modalButton: {
+    backgroundColor: '#2193b0',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16
+  }
+  
+
+
+
+
+
+
+
+
 });
 
 export default ActivitiesScreen;

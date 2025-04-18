@@ -75,7 +75,7 @@ export const ActivityProvider = ({ children }) => {
         upload: true
       };
   
-      // 上传到后端
+      // déposer à backend
       const payload = {
         email: email,
         painLevel: pain,
@@ -191,10 +191,10 @@ export const ActivityProvider = ({ children }) => {
             if (backendItem.should_update){
                 console.log('🔁 Updating activities of existing seance');
                 console.log('📦 backendItem.activities:', backendItem);
-                console.log("更新前 syncedActivities：", JSON.stringify(syncedActivities, null, 2));
+                console.log("avant syncedActivities：", JSON.stringify(syncedActivities, null, 2));
                 Object.assign(exists, backendItem);
-                console.log("更新后 syncedActivities：", JSON.stringify(syncedActivities, null, 2));
-                console.log("开始更新下一等级")
+                console.log("après syncedActivities：", JSON.stringify(syncedActivities, null, 2));
+                console.log("commencer à calculer next level")
                 calculate_new__next_level(backendItem.avg_max,backendItem.time,backendItem.difficulty);
               }
         }
@@ -211,36 +211,28 @@ export const ActivityProvider = ({ children }) => {
 
   const calculate_new__next_level = async (avg_max, time, difficulty) => { 
     try {
-      // 从 AsyncStorage 获取 profile
+
       const profileStr = await AsyncStorage.getItem('userProfile');
       const profile = profileStr ? JSON.parse(profileStr) : null;
   
       if (!profile || !profile.lastSessionFeedback || !profile.lastSessionFeedback.date) {
         console.log(profile.lastSessionFeedback);
-        console.warn('⚠️ 日期信息缺失，跳过计算。');
+        console.warn('⚠️ manque de date');
         return { intensityRating: 1, metValue: 3.0 };
       }
   
       const sessionDate = new Date(profile.lastSessionFeedback.date);
       const backendTime = new Date(time);
   
-      // 如果不是同一天，直接跳过计算
-      //if (sessionDate.toDateString() !== backendTime.toDateString()) {
-      //  console.log('⏩ 非当天活动，跳过 fc_max 计算。');
-      //  return { intensityRating: 1, metValue: 3.0 };
-      //}
-  
-      // 获取年龄
-    // 从 AsyncStorage 获取 profile
 
       if (!profile || !profile.age) {
-        console.warn('⚠️ 年龄信息缺失，跳过计算。');
+        console.warn("⚠️ manque de l'age");
         return { intensityRating: 1, metValue: 3.0 };
       }
 
       const age = profile.age;
   
-      // 计算最大心率
+      // calculer fcmax
       const fc_max = 220 - age;
       const actual_fc = fc_max * (avg_max / 100);
   
@@ -263,23 +255,24 @@ export const ActivityProvider = ({ children }) => {
         5: 7.0
       };
   
-      // 获取 last_level 和 backendItem.difficulty
+
       const lastLevel = await AsyncStorage.getItem('last_level');
   
-      // 判断 intensityRating 和 difficulty 是否都为 1 或 2
+
       if ((intensityRating === 1 || intensityRating === 2) && (difficulty === 1 || difficulty === 2)) {
         if (lastLevel === 'niveau1' || lastLevel === 'niveau2') {
           const nextLevel = lastLevel === 'niveau1' ? 'niveau2' : 'niveau3';
           await AsyncStorage.setItem('recommendedLevel', nextLevel);
-          console.log(`升一级：新的推荐级别是 ${nextLevel}`);
+          console.log(`level up：new level is ${nextLevel}`);
         }
       }
-      // 判断 intensityRating 和 difficulty 是否都为 4 或 5
+
+      
       else if ((intensityRating === 4 || intensityRating === 5) && (difficulty === 4 || difficulty === 5)) {
         if (lastLevel === 'niveau2' || lastLevel === 'niveau3') {
           const nextLevel = lastLevel === 'niveau2' ? 'niveau1' : 'niveau2';
           await AsyncStorage.setItem('recommendedLevel', nextLevel);
-          console.log(`降一级：新的推荐级别是 ${nextLevel}`);
+          console.log(`level down：new level is ${nextLevel}`);
         }
       }
   
@@ -289,7 +282,7 @@ export const ActivityProvider = ({ children }) => {
       };
   
     } catch (err) {
-      console.error('❌ 错误: calculate_new__next_level 出错', err);
+      console.error('❌ error: calculate_new__next_level error', err);
       return { intensityRating: 1, metValue: 3.0 };
     }
   };

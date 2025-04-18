@@ -145,7 +145,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
       await AsyncStorage.setItem('last_level', last_level);
       await AsyncStorage.setItem('recommendedLevel', nextRecommendation.level);
 
-      console.log('添加活动参数：', {
+      console.log('params activités：', {
         session,
         difficultyRating,
         painRating,
@@ -159,7 +159,7 @@ const DailyActivityScreen = ({ navigation, route }) => {
 
 
 
-      // 更新活动记录（调用 context）
+   
       const start_time = new Date(startTimeRef.current).toISOString();
       await addActivityFromSession(session, difficultyRating, painRating, completedExercises, elapsedTime, start_time);
 
