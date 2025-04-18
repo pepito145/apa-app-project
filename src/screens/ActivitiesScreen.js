@@ -304,10 +304,10 @@ const ActivitiesScreen = ({ navigation }) => {
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Veuillez démarrer l'activité sur votre montre ⌚</Text>
           <Text style={styles.modalText}>Pour démarrer l’activité :</Text>
-<Text style={styles.modalText}>• Mettez votre montre.</Text>
-<Text style={styles.modalText}>• Appuyez longuement pour accéder au menu des activités.</Text>
-<Text style={styles.modalText}>• Appuyez une fois pour sélectionner "Musculation".</Text>
-<Text style={styles.modalText}>• Appuyez longuement à nouveau pour démarrer l’activité.</Text>
+          <Text style={styles.modalText}>• Mettez votre montre.</Text>
+          <Text style={styles.modalText}>• Appuyez longuement pour accéder au menu des activités.</Text>
+          <Text style={styles.modalText}>• Appuyez une fois pour sélectionner "Musculation".</Text>
+          <Text style={styles.modalText}>• Appuyez longuement à nouveau pour démarrer l’activité.</Text>
 
           <TouchableOpacity style={styles.modalButton} onPress={proceedToActivity}>
             <Text style={styles.modalButtonText}>Je suis prêt !</Text>
